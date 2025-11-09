@@ -8,11 +8,12 @@ import InputCambiarNombre from "./components/InputCambiarNombre/InputCambiarNomb
 function App() {
   const [carrito, setCarrito] = useState([]);
   const [nombreUsuario, setNombreUsuario] = useState("Invitado");
+  const msjBienvenida = `¡Hola ${nombreUsuario}!`;
 
   return (
     <>
       <NavBar />
-      <ItemListContainer nombreUsuario={nombreUsuario} />
+      <ItemListContainer msjBienvenida={msjBienvenida} />
       <InputCambiarNombre
         nombreUsuario={nombreUsuario}
         setNombreUsuario={setNombreUsuario}

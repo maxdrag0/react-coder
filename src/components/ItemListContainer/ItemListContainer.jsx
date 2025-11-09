@@ -1,10 +1,10 @@
 import "./ItemListContainer.css";
 
 function ItemListContainer(props) {
-  const { nombreUsuario } = props;
+  const { msjBienvenida } = props;
   return (
     <>
-      <h1 className="bienvenida-usuario">¡Hola {nombreUsuario}!</h1>
+      <h1 className="bienvenida-usuario">{msjBienvenida}</h1>
     </>
   );
 }

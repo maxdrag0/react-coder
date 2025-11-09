@@ -1,0 +1,18 @@
+.carrito-container {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.carrito {
+  height: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.carrito-img {
+  height: 80%;
+  object-fit: contain;
+}

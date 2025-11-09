@@ -1,0 +1,27 @@
+.container-menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-item {
+  list-style: none;
+  padding: 0 10px;
+  position: relative;
+}
+
+.menu-item .menu-item-link {
+  text-decoration: none;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: rgb(27, 26, 26);
+}

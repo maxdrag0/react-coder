@@ -1,4 +1,5 @@
-import { ITEMS } from "../data/items";
+import ITEMS from "../data/items.json";
+import { Axios } from "axios";
 
 export function fetchItemsMock(delay = 2000) {
   return new Promise((resolve) => {

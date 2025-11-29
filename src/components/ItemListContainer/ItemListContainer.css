@@ -2,3 +2,19 @@
   font-style: italic;
   text-align: center;
 }
+
+.items-listado {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-auto-rows: 1fr;
+  gap: 20px;
+  padding: 20px 40px;
+  place-items: center;
+}
+
+p {
+  text-align: center;
+  font-weight: 600;
+  font-style: italic;
+}

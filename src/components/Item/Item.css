@@ -1,0 +1,64 @@
+.itemCard {
+  border: 1px solid #878787;
+  background-color: #f7f8fa;
+  width: 100%;
+  height: 100%;
+  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.stock,
+.titulo {
+  padding: 10px;
+  font-weight: 600;
+  background-color: #f0f1f2;
+  width: 100%;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.titulo {
+  border-bottom: 1px solid #d4d5d7;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stock {
+  border-top: 1px solid #d4d5d7;
+}
+
+.img {
+  width: 100%;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.img img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  display: block;
+}
+
+.descripcion {
+}
+
+.button button {
+  padding: 5px 20px;
+  font-weight: 600;
+  border-radius: 5px;
+  background-color: #d6d1d2;
+  border: 3px solid #5bddda;
+  cursor: pointer;
+}

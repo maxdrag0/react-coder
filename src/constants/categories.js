@@ -1,0 +1,7 @@
+export const CATEGORIES = {
+  ALL: "ALL",
+  MEN: "MEN",
+  WOMEN: "WOMEN",
+  JEWELRY: "JEWELRY",
+  ELECTRONICS: "ELECTRONICS",
+};

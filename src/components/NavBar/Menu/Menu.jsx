@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom";
 import "./Menu.css";
 
 function Menu() {
@@ -6,19 +7,19 @@ function Menu() {
       <nav className="container-menu">
         <ul className="menu">
           <li className="menu-item">
-            <a href="" className="menu-item-link">
+            <NavLink to="/" className="menu-item-link">
               Home
-            </a>
+            </NavLink>
           </li>
           <li className="menu-item">
-            <a href="" className="menu-item-link">
+            <NavLink to="/products" className="menu-item-link">
               Products
-            </a>
+            </NavLink>
           </li>
           <li className="menu-item">
-            <a href="" className="menu-item-link">
+            <NavLink to="/contact" className="menu-item-link">
               Contact
-            </a>
+            </NavLink>
           </li>
         </ul>
       </nav>

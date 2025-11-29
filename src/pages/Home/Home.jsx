@@ -1,17 +1,9 @@
 import "./Home.css";
-import ItemListContainer from "../../components/ItemListContainer/ItemListContainer";
-import InputCambiarNombre from "../../components/InputCambiarNombre/InputCambiarNombre";
 
-function Home({ nombreUsuario, setNombreUsuario }) {
+function Home() {
   return (
     <>
-      <div className="container">
-        <ItemListContainer nombreUsuario={nombreUsuario} />
-        <InputCambiarNombre
-          nombreUsuario={nombreUsuario}
-          setNombreUsuario={setNombreUsuario}
-        />
-      </div>
+      <div className="container">BIENVENIDOS AL HOME</div>
     </>
   );
 }

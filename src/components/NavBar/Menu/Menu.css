@@ -50,3 +50,44 @@
 .menu-item .menu-item-link.active::after {
   transform: scaleX(1);
 }
+
+.submenu {
+  display: none;
+  position: absolute;
+  list-style: none;
+  padding: 0;
+  background-color: #f9f9f9;
+  z-index: 10;
+  text-align: center;
+  top: calc(100% + 25px);
+  left: 0;
+  margin-top: 0;
+}
+
+/* .menu-item.products-dropdown {
+  padding-bottom: 10px;
+} */
+
+.products-dropdown:hover .submenu {
+  display: block;
+  margin-top: -15px;
+  padding-top: 15px;
+  background-color: #f0f0f0;
+}
+
+.submenu-item {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.submenu-item-link {
+  padding: 12px 16px;
+  display: block;
+  text-decoration: none;
+  color: #333;
+}
+
+.submenu-item-link:hover {
+  background-color: #ddd;
+}

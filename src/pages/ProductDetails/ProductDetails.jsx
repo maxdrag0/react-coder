@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { PuffLoader } from "react-spinners";
-import { fetchItemByIdMock } from "../../services/items.js";
 import ItemDetails from "../../components/ItemDetails/ItemDetails";
 import "./ProductDetails.css";
 import useProductDetails from "../../hooks/useProductDetails.jsx";

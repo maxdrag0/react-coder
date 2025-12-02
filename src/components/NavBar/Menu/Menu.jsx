@@ -23,7 +23,7 @@ function Menu() {
                 return (
                   <li key={category} className="submenu-item">
                     <Link
-                      to={`products/${category}`}
+                      to={`/products/${category}`}
                       className="submenu-item-link"
                     >
                       {category}

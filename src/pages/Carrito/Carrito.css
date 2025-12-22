@@ -1,0 +1,16 @@
+.total {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.total .suma-total {
+  margin-bottom: 0;
+  font-size: 1.5rem;
+}
+
+.total .realizar-compra {
+  border-radius: 5px;
+  padding: 10px;
+}

@@ -1,0 +1,37 @@
+.counter-group {
+  display: flex;
+  align-items: center;
+}
+
+.boton-counter {
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  background-color: #eee;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+}
+
+.boton-counter:hover {
+  background-color: #cecdcd;
+  font-weight: bold;
+  box-shadow: 0px 2px 5px rgba(10, 9, 9, 0.367);
+}
+
+.counter-display {
+  width: 40px;
+  height: 30px;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  margin: 0 -10px;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  border-radius: 15px;
+}

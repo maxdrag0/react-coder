@@ -3,7 +3,6 @@ import ItemListContainer from "../../components/ItemListContainer/ItemListContai
 import { useProducts } from "../../hooks/useProducts";
 import "./Products.css";
 import { useParams } from "react-router-dom";
-import { useEffect } from "react";
 
 function Products() {
   const { category } = useParams();
@@ -16,9 +15,7 @@ function Products() {
         <PuffLoader></PuffLoader>
       ) : (
         <>
-          {category
-            ? `Productos de categoría ${category}`
-            : "Todos los productos"}
+          {category ? <h1>{category}</h1> : <h1>Todos los productos</h1>}
           <ItemListContainer items={items} />
         </>
       )}

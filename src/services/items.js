@@ -4,12 +4,9 @@ import { Axios } from "axios";
 export function fetchItemsMock(category, delay = 2000) {
   return new Promise((resolve) => {
     setTimeout(() => {
-      // 1. Convertir la categoría a mayúsculas para asegurar la comparación,
-      //    y asegurarnos de que no sea null o undefined.
       const filterCategory = category ? category : null;
 
-      // 2. Definir los ítems a devolver
-      let itemsToReturn = [...ITEMS]; // Inicialmente, todos los ítems
+      let itemsToReturn = [...ITEMS];
 
       if (filterCategory) {
         itemsToReturn = itemsToReturn.filter(
@@ -17,7 +14,6 @@ export function fetchItemsMock(category, delay = 2000) {
         );
       }
 
-      // 4. Resolver la promesa con la lista (completa o filtrada)
       resolve(itemsToReturn);
     }, delay);
   });

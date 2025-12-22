@@ -1,0 +1,56 @@
+.carrito-card-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 120px;
+  border: 1px solid #ccc;
+  margin: 0 10px;
+  border-radius: 20px;
+  padding: 20px;
+  background-color: #f0f0f0;
+  margin-bottom: 10px;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.15);
+}
+
+.item {
+  display: flex;
+  height: 100%;
+}
+.item__imagen {
+  width: 100px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background-color: white;
+  border-radius: 10px;
+}
+
+.item__imagen img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.item .item__detalle {
+  padding-left: 20px;
+}
+
+.item__detalle .precio-unitario {
+  margin: 0;
+  text-align: left;
+  font-weight: 100;
+  font-style: italic;
+}
+
+.item .item__detalle .item__detalle__titulo-boton h3 {
+  margin: 0;
+}
+
+.total-a-pagar {
+  padding-right: 10px;
+  font-weight: bold;
+  font-size: 1.5rem;
+}

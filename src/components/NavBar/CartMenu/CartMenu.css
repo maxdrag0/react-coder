@@ -6,10 +6,11 @@
 }
 
 .carrito {
-  height: 80%;
+  height: 70%;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 
 .carrito-img {

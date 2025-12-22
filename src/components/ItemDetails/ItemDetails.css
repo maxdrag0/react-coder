@@ -13,7 +13,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid black;
+  border: 1px solid rgba(10, 9, 9, 0.367);
+  border-radius: 5px;
+  box-shadow: 0px 4px 10px rgba(10, 9, 9, 0.367);
 }
 
 .item-detail-container .item-img img {
@@ -26,8 +28,91 @@
 .item-detail-container .item-detail {
   width: 60%;
   padding-left: 10px;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
 }
 
+.item-detail-container .item-detail .item-detail__intro__titulo {
+  font-size: 2rem;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.item-detail__intro__rating {
+  font-style: italic;
+  font-weight: 100;
+}
+
+.item-detail__price {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.item-detail-container .item-detail .item-detail__carrito {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.item-detail-container
+  .item-detail
+  .item-detail__carrito
+  .item-detail__carrito__contador {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #f9f9f9;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 360px;
+  justify-content: space-between;
+}
+
+.boton-agregar-carrito {
+  border-radius: 5px;
+  background-color: #eee;
+  border: 1px solid #ccc;
+  width: 250px;
+}
+
+.boton-agregar-carrito:hover {
+  background-color: #cecdcd;
+  font-weight: bold;
+  box-shadow: 0px 2px 5px rgba(10, 9, 9, 0.367);
+}
+
+.item-detail-container
+  .item-detail
+  .item-detail__carrito
+  .item-detail__carrito__ir-al-carrito {
+  display: flex;
+  width: 100%;
+}
+
+.item-detail-container
+  .item-detail
+  .item-detail__carrito
+  .item-detail__carrito__ir-al-carrito
+  .nav-carrito {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  color: black;
+  border: 1px solid black;
+  padding: 8px;
+  border-radius: 5px;
+  width: 100%;
+  max-width: 360px;
+  background-color: #eee;
+}
+
+.nav-carrito:hover {
+  box-shadow: 0px 2px 5px rgba(10, 9, 9, 0.367);
+  background-color: #cecdcd;
+  font-weight: 600;
+}
 @media screen and (min-width: 600px) {
   .item-detail-container {
     flex-direction: row;

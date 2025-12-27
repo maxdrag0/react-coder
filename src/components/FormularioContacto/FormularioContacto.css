@@ -1,0 +1,29 @@
+.form-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.formulario-contacto {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  gap: 5px;
+  width: 30%;
+  height: 50vh;
+}
+
+.formulario-contacto input {
+  height: 10%;
+}
+
+.formulario-contacto textarea {
+  height: 75%;
+}
+
+.formulario-contacto input,
+.formulario-contacto textarea,
+.formulario-contacto button {
+  padding: 10px;
+}

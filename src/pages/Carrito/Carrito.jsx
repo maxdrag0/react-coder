@@ -5,18 +5,47 @@ import CarritoCard from "../../components/CarritoCard/CarritoCard";
 import { useNavigate } from "react-router-dom";
 import Modal from "../../components/common/Modal/Modal";
 import "./Carrito.css";
+import { services } from "../../services";
 
 function Carrito() {
   const { removeList, cartList, total } = useContext(CartContext);
   const [showModal, setShowModal] = useState(false);
-
+  const [orderId, setOrderId] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
 
   const handleAbrirModal = () => {
     setShowModal(true);
   };
 
-  const handleFinalizarCompra = () => {
+  const handleProcesarCompra = async () => {
+    setIsProcessing(true);
+
+    const orden = {
+      // buyer: {
+      //   name: "",
+      //   phone: "",
+      //   email: "",
+      // },
+      items: cartList,
+      total: total,
+      date: new Date().toISOString(),
+    };
+    try {
+      const id = await services.firebase.crearCompra(orden);
+
+      setOrderId(id);
+
+      setShowModal(true);
+    } catch (error) {
+      console.error("Error al procesar:", error);
+      alert("Error al guardar la compra");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleCerrarYFinalizar = () => {
     removeList();
     setShowModal(false);
     navigate("/");
@@ -35,7 +64,7 @@ function Carrito() {
       ) : (
         <>
           {cartList.map((item) => (
-            <CarritoCard key={item.id} item={item} />
+            <CarritoCard key={item.idProduct} item={item} />
           ))}
         </>
       )}
@@ -45,8 +74,12 @@ function Carrito() {
             <p className="suma-total">
               <strong>Total final: </strong>$ {total}
             </p>
-            <Button callback={handleAbrirModal} className="realizar-compra">
-              Finalizar compra
+            <Button
+              callback={handleProcesarCompra}
+              className="realizar-compra"
+              disabled={isProcessing}
+            >
+              {isProcessing ? "Procesando..." : "Finalizar compra"}
             </Button>
           </>
         ) : null}
@@ -55,9 +88,9 @@ function Carrito() {
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        onAccept={handleFinalizarCompra}
+        onAccept={handleCerrarYFinalizar}
         tittle="¡Compra Exitosa!"
-        message="Compra reservada con éxito. A la brevedad recibirá un mail de confirmación."
+        message={`Tu número de orden es: ${orderId}. A la brevedad recibirá un mail de confirmación.`}
       />
     </>
   );

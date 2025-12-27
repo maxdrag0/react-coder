@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "../common/Button/Button";
 import "./CarritoCard.css";
 
-const CarritoCard = ({ item, callback }) => {
+function CarritoCard({ item, callback }) {
   const subtotal = item.price * item.cantidad;
   return (
     <div className="carrito-card-container">
@@ -23,6 +23,6 @@ const CarritoCard = ({ item, callback }) => {
       <div className="total-a-pagar">$ {subtotal}</div>
     </div>
   );
-};
+}
 
 export default CarritoCard;

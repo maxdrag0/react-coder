@@ -11,6 +11,7 @@ const CartContextProvider = ({ children }) => {
   const cantidadItems = cartList.reduce((acc, item) => acc + item.cantidad, 0);
 
   const addToCart = (item, cantidad) => {
+    console.log(JSON.stringify(item));
     const yaEstaAgregado = cartList.find((i) => i.id === item.id);
 
     if (yaEstaAgregado) {
@@ -26,6 +27,8 @@ const CartContextProvider = ({ children }) => {
     } else {
       setCartList([...cartList, { ...item, cantidad }]);
     }
+
+    console.log(JSON.stringify(cartList));
   };
 
   const removeList = () => {

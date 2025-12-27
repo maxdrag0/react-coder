@@ -3,12 +3,12 @@
   flex-direction: column;
   display: flex;
   justify-content: center;
-  height: 80vh;
+  height: 75vh;
   width: 100%;
 }
 
 .item-detail-container .item-img {
-  width: 40%;
+  width: 35%;
   padding: 0.8rem;
   display: flex;
   align-items: center;
@@ -27,7 +27,7 @@
 
 .item-detail-container .item-detail {
   width: 60%;
-  padding-left: 10px;
+  padding-left: 30px;
   display: flex;
   justify-content: space-between;
   flex-direction: column;

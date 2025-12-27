@@ -1,30 +1,40 @@
 import { useEffect, useState } from "react";
-import { fetchItemByIdMock } from "../services/items.js";
+import { services } from "../services/index.js";
+import { useNavigate } from "react-router-dom";
 
 function useProductDetails(id) {
   const [itemSeleccionado, setItemSeleccionado] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
     setError(null);
 
-    fetchItemByIdMock(id)
+    services.firebase
+      .obtenerProductosPorId(id)
       .then((product) => {
+        if (!product) {
+          navigate("/not-found", { replace: true });
+          return;
+        }
         setItemSeleccionado(product);
       })
-      .catch((error) => {
-        console.error("Error en la carga:", error);
-        setError(error);
-        setItemSeleccionado(null);
+      .catch((err) => {
+        console.error("Error en Firebase:", err);
+        setError(err);
+        navigate("/not-found", { replace: true });
       })
       .finally(() => {
         setLoading(false);
       });
-  }, [id]);
+  }, [id, navigate]);
 
   return { itemSeleccionado, loading, error };
 }

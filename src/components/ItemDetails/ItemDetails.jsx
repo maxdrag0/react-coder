@@ -8,10 +8,11 @@ import { NavLink } from "react-router-dom";
 import Modal from "../common/Modal/Modal";
 
 function ItemDetails({ item }) {
-  const { addToCart } = useContext(CartContext);
-
+  const { cartList, addToCart } = useContext(CartContext);
+  const isInCart = cartList.some((prod) => prod.id === item.id);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [count, setCount] = useState(1);
+
   const sumar = () => {
     if (count < item.stock) {
       setCount(count + 1);
@@ -47,12 +48,21 @@ function ItemDetails({ item }) {
         </div>
 
         <div className="item-detail__carrito">
-          <div className="item-detail__carrito__contador">
-            <Counter count={count} sumar={sumar} restar={restar} />
-            <Button callback={handleAdd} className="boton-agregar-carrito">
-              Agregar al carrito
-            </Button>
-          </div>
+          {!isInCart ? (
+            <div className="item-detail__carrito__contador">
+              <Counter count={count} sumar={sumar} restar={restar} />
+              <Button callback={handleAdd} className="boton-agregar-carrito">
+                Agregar al carrito
+              </Button>
+            </div>
+          ) : (
+            <p
+              style={{ color: "green", fontWeight: "bold", textAlign: "left" }}
+            >
+              ¡Item ya agregado al carrito!
+            </p>
+          )}
+
           <div className="item-detail__carrito__ir-al-carrito">
             <NavLink to="/carrito" className="nav-carrito">
               Ir al carrito

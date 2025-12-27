@@ -3,8 +3,9 @@ import "./Menu.css";
 import { Link } from "react-router-dom";
 import { CATEGORIES } from "../../../constants/categories";
 
+const categoryValues = Object.values(CATEGORIES);
+
 function Menu() {
-  const categoryValues = Object.values(CATEGORIES);
   return (
     <>
       <nav className="container-menu">

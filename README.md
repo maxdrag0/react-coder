@@ -19,9 +19,9 @@ Este es un proyecto de Ecommerce desarrollado con **React**, utilizando **Fireba
 
 - **React.js** (Hooks, Context API, Router)
 - **Firebase** (Firestore Database)
-- **CSS3** (Diseño responsivo)
 - **React Router Dom** (Navegación)
 - **React Spinners** (Carga de datos)
+- **CSS3**
 
 ---
 
@@ -31,6 +31,6 @@ Sigue estos pasos para correr el proyecto localmente:
 
 1. **Clonar el repositorio:**
    ```bash
-   git clone [https://github.com/tu-usuario/tu-repositorio.git](https://github.com/tu-usuario/tu-repositorio.git)
-   cd tu-repositorio
+   git clone [https://github.com/maxdrag0/react-coder](https://github.com/maxdrag0/react-coder)
+   cd react-coder
    ```

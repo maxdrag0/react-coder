@@ -226,10 +226,11 @@ en el README de la etapa D. No requiere plan Blaze.
 Tres piezas.
 
 **1. Script de asignación** — `scripts/set-admin.mjs`, corre en tu máquina con el Admin
-SDK y una service account:
+SDK y una service account. Toma el **email** y resuelve el uid por su cuenta, porque el
+uid hay que ir a buscarlo a la consola y el email ya lo sabés:
 
-```js
-await admin.auth().setCustomUserClaims(uid, { admin: true });
+```bash
+npm run set-admin -- tucorreo@ejemplo.com
 ```
 
 Se corre una vez para tu usuario. Requiere bajar la service account de la consola de
@@ -251,9 +252,16 @@ ya tiene en la mano — los tokens duran una hora. Hay que forzar
 `getIdToken(true)` o cerrar y volver a abrir sesión. Es la causa número uno de
 "le puse el claim y no funciona", así que va documentado en el script y en el runbook.
 
-El campo `role` del documento `users/{uid}` **se deja**, pero pasa a ser informativo
-(lo muestra el perfil) y de escritura exclusiva de admin según las reglas. La fuente de
-verdad para autorizar es el claim. Mantener los dos en sincronía es trabajo de E.
+**Modelo de roles (decidido por el dueño del proyecto):** hay exactamente dos y **el
+campo `role` desaparece del modelo de datos**. Con el claim `admin` en el token sos
+soporte/dueño; sin el claim sos comprador. El usuario que se registra no completa ningún
+rol porque no hay nada que completar: comprador es el default por ausencia.
+
+Esto es más simple y más seguro que mantener un campo espejo: no hay dos fuentes de
+verdad que puedan desincronizarse. Las reglas igual rechazan cualquier escritura de
+`role` desde el cliente, como defensa en profundidad para que el campo no vuelva a
+aparecer por la ventana. `Profile` muestra "Administrador" o "Comprador" derivándolo de
+`isAdmin`.
 
 ### A3 — `ProtectedRoute`
 

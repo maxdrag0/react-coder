@@ -33,3 +33,6 @@ ui-debug.log
 
 # Workspace de superpowers (scratch, el registro real es git)
 .superpowers/
+
+# Credencial del Admin SDK - NUNCA commitear
+serviceAccount.json

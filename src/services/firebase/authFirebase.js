@@ -4,92 +4,59 @@ import {
   signOut,
   GoogleAuthProvider,
   signInWithPopup,
+  updateProfile,
+  sendEmailVerification,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
-import { auth, db } from "../../utils/firebase";
+import { auth, db } from "@/utils/firebase";
+
+// El perfil NO incluye `role`: las reglas de Firestore rechazan ese campo
+// desde el cliente. Hay exactamente dos roles y salen del token: con el
+// claim `admin` sos soporte/dueno, sin el claim sos comprador.
+const crearPerfil = (uid, datos) =>
+  setDoc(doc(db, "users", uid), {
+    ...datos,
+    createdAt: new Date().toISOString(),
+  });
 
 export const registerWithEmail = async (email, password, name) => {
-  try {
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password,
-    );
-    const user = userCredential.user;
+  const { user } = await createUserWithEmailAndPassword(auth, email, password);
 
-    // Create user profile in Firestore
-    await setDoc(doc(db, "users", user.uid), {
-      name,
-      email,
-      role: "buyer", // default role
-      createdAt: new Date(),
-    });
+  // Sin esto user.displayName queda en null para siempre y toda la app
+  // muestra "Usuario" en lugar del nombre que la persona escribio.
+  await updateProfile(user, { displayName: name });
 
-    return user;
-  } catch (error) {
-    console.error("Error in registerWithEmail:", error);
-    throw error;
-  }
+  await crearPerfil(user.uid, { name, email });
+  await sendEmailVerification(user);
+
+  return user;
 };
 
 export const loginWithEmail = async (email, password) => {
-  try {
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password,
-    );
-    return userCredential.user;
-  } catch (error) {
-    console.error("Error in loginWithEmail:", error);
-    throw error;
-  }
+  const { user } = await signInWithEmailAndPassword(auth, email, password);
+  return user;
 };
 
 export const loginWithGoogle = async () => {
-  try {
-    const provider = new GoogleAuthProvider();
-    const userCredential = await signInWithPopup(auth, provider);
-    const user = userCredential.user;
+  const { user } = await signInWithPopup(auth, new GoogleAuthProvider());
 
-    // Check if user exists in Firestore
-    const userDoc = await getDoc(doc(db, "users", user.uid));
-
-    if (!userDoc.exists()) {
-      // Create user profile if it's their first time logging in with Google
-      await setDoc(doc(db, "users", user.uid), {
-        name: user.displayName,
-        email: user.email,
-        role: "buyer", // default role
-        createdAt: new Date(),
-      });
-    }
-
-    return user;
-  } catch (error) {
-    console.error("Error in loginWithGoogle:", error);
-    throw error;
+  const perfil = await getDoc(doc(db, "users", user.uid));
+  if (!perfil.exists()) {
+    await crearPerfil(user.uid, {
+      name: user.displayName ?? "",
+      email: user.email,
+    });
   }
+
+  return user;
 };
 
-export const logoutUser = async () => {
-  try {
-    await signOut(auth);
-  } catch (error) {
-    console.error("Error in logoutUser:", error);
-    throw error;
-  }
-};
+export const logoutUser = () => signOut(auth);
 
-export const getUserRole = async (uid) => {
-  try {
-    const userDoc = await getDoc(doc(db, "users", uid));
-    if (userDoc.exists()) {
-      return userDoc.data().role;
-    }
-    return "buyer";
-  } catch (error) {
-    console.error("Error getting user role:", error);
-    return "buyer";
-  }
+export const enviarResetPassword = (email) => sendPasswordResetEmail(auth, email);
+
+export const reenviarVerificacion = () => {
+  if (!auth.currentUser) throw new Error("No hay sesión activa");
+  return sendEmailVerification(auth.currentUser);
 };

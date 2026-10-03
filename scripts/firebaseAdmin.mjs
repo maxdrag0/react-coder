@@ -21,9 +21,25 @@ Si lo guardaste en otra ruta, pasala en FIREBASE_SERVICE_ACCOUNT_PATH.
   process.exit(1);
 }
 
-admin.initializeApp({
-  credential: admin.credential.cert(JSON.parse(readFileSync(rutaAbsoluta, "utf8"))),
-});
+// Una credencial presente pero corrupta o de otro formato tira un stack
+// trace de firebase-admin que no le dice nada a nadie. Traducirlo.
+try {
+  admin.initializeApp({
+    credential: admin.credential.cert(JSON.parse(readFileSync(rutaAbsoluta, "utf8"))),
+  });
+} catch (error) {
+  console.error(`
+La credencial existe pero no se pudo usar:
+  ${rutaAbsoluta}
+
+Detalle: ${error.message}
+
+Suele ser por bajar el archivo equivocado. Tiene que ser el JSON de
+"Generar nueva clave privada" en Configuración del proyecto -> Cuentas de
+servicio, con los campos project_id, client_email y private_key.
+`);
+  process.exit(1);
+}
 
 export { admin };
 export const db = admin.firestore();

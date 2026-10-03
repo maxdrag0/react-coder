@@ -43,13 +43,23 @@ service cloud.firestore {
     match /compras/{id} {
       allow read:   if isAdmin() ||
                        (isSignedIn() && resource.data.buyer.uid == request.auth.uid);
+      // `date` es obligatorio: obtenerTodasLasCompras ordena por el y
+      // Firestore omite en silencio los documentos que no lo tienen, asi que
+      // un pedido sin date le muestra "compra exitosa" al cliente y queda
+      // invisible en el panel para siempre.
+      // `buyer.email` tiene que coincidir con el del token porque el
+      // subproyecto C va a mandar ahi el mail del pedido.
       allow create: if isSignedIn()
+                    && request.resource.data.keys().hasOnly(['buyer', 'items', 'total', 'date'])
                     && request.resource.data.buyer.uid == request.auth.uid
+                    && request.resource.data.buyer.email == request.auth.token.email
                     && request.resource.data.total is number
                     && request.resource.data.total >= 0
                     && request.resource.data.items is list
                     && request.resource.data.items.size() > 0
-                    && request.resource.data.items.size() <= 50;
+                    && request.resource.data.items.size() <= 50
+                    && request.resource.data.date is string
+                    && request.resource.data.date.size() <= 40;
       allow update, delete: if isAdmin();
     }
 
@@ -57,10 +67,29 @@ service cloud.firestore {
     // solo el admin lee. Exigir login perderia consultas de gente que
     // todavia no se registro; el limite de tamanio acota el spam hasta que
     // haya rate limiting en api/contacto.
+    //
+    // `hasOnly` no es cosmetico: sin el, limitar solo `mensaje` dejaba que
+    // cualquiera sin sesion escribiera documentos de ~1 MiB en un campo
+    // inventado, cobrados a Max, hasta reventar la bandeja (que ademas se
+    // lee sin limit()). Cada string va acotado, no solo el cuerpo.
+    // `date` es obligatorio porque obtenerMensajes ordena por el y Firestore
+    // omite en silencio los documentos que no tienen el campo del orderBy.
     match /mensajes/{id} {
-      allow read:   if isAdmin();
-      allow create: if request.resource.data.mensaje is string
-                    && request.resource.data.mensaje.size() <= 2000;
+      allow read: if isAdmin();
+      allow create: if request.resource.data.keys()
+                         .hasOnly(['nombre', 'email', 'direccion', 'ciudad', 'mensaje', 'date', 'leido'])
+                    && request.resource.data.mensaje is string
+                    && request.resource.data.mensaje.size() <= 2000
+                    && request.resource.data.email is string
+                    && request.resource.data.email.size() <= 200
+                    && request.resource.data.date is string
+                    && request.resource.data.date.size() <= 40
+                    && (!('nombre' in request.resource.data)
+                        || request.resource.data.nombre.size() <= 120)
+                    && (!('direccion' in request.resource.data)
+                        || request.resource.data.direccion.size() <= 200)
+                    && (!('ciudad' in request.resource.data)
+                        || request.resource.data.ciudad.size() <= 120);
       allow update, delete: if isAdmin();
     }
 

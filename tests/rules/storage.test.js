@@ -95,3 +95,29 @@ describe("storage products/", () => {
     await assertSucceeds(getDownloadURL(ref(anon.storage(), "products/publica.jpg")));
   });
 });
+
+// --- Hallazgo de la revision final (Important 6) ---
+
+describe("storage products/ - borrado", () => {
+  it("permite que el admin borre un archivo de producto", async () => {
+    // En un delete, request.resource es null: evaluar
+    // request.resource.contentType revienta y la regla niega. Sin esto, cada
+    // imagen reemplazada queda huerfana para siempre.
+    const { deleteObject } = await import("firebase/storage");
+    const admin = env.authenticatedContext("max", { admin: true });
+    await uploadBytes(ref(admin.storage(), "products/borrar.jpg"), imagenChica(), {
+      contentType: "image/jpeg",
+    });
+    await assertSucceeds(deleteObject(ref(admin.storage(), "products/borrar.jpg")));
+  });
+
+  it("NIEGA que un cliente borre un archivo de producto", async () => {
+    const { deleteObject } = await import("firebase/storage");
+    const admin = env.authenticatedContext("max", { admin: true });
+    await uploadBytes(ref(admin.storage(), "products/protegida.jpg"), imagenChica(), {
+      contentType: "image/jpeg",
+    });
+    const cliente = env.authenticatedContext("cliente1");
+    await assertFails(deleteObject(ref(cliente.storage(), "products/protegida.jpg")));
+  });
+});

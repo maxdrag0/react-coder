@@ -40,7 +40,7 @@ Sigue estos pasos para correr el proyecto localmente:
 | Comando | Qué hace |
 |---|---|
 | `npm run dev` | Levanta el frontend |
-| `npm test` | Tests unitarios + de reglas de seguridad |
+| `npm test` | Tests unitarios + de reglas de seguridad (134 en total) |
 | `npm run test:unit` | Solo los unitarios (rápido, sin emulador) |
 | `npm run test:rules` | Reglas de Firestore y Storage contra el emulador |
 | `npm run set-admin -- <email>` | Da permisos de admin a un usuario |

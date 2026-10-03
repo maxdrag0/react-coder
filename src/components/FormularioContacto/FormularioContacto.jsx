@@ -1,9 +1,12 @@
 import "./FormularioContacto.css";
 import { useState } from "react";
+import { MENSAJE_MAXIMO } from "@/constants/limites";
 
 function FormularioContacto({ onConfirm }) {
   const [formData, setFormData] = useState({
     email: "",
+    direccion: "",
+    ciudad: "",
     mensaje: "",
   });
 
@@ -28,13 +31,38 @@ function FormularioContacto({ onConfirm }) {
           required
         />
 
+        <input
+          type="text"
+          name="direccion"
+          placeholder="Dirección"
+          value={formData.direccion}
+          onChange={handleChange}
+          required
+        />
+
+        <input
+          type="text"
+          name="ciudad"
+          placeholder="Ciudad"
+          value={formData.ciudad}
+          onChange={handleChange}
+          required
+        />
+
+        {/* maxLength tiene que coincidir con el limite de firestore.rules:
+            sin esto, una consulta larga se escribe, el servidor la rechaza y
+            la persona pierde todo lo que escribio con un error genérico. */}
         <textarea
           name="mensaje"
           placeholder="Deje su mensaje"
           value={formData.mensaje}
           onChange={handleChange}
+          maxLength={MENSAJE_MAXIMO}
           required
         />
+        <small className="contador-mensaje">
+          {formData.mensaje.length} / {MENSAJE_MAXIMO}
+        </small>
 
         <button type="submit">Enviar Mensaje</button>
       </form>

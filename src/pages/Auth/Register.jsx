@@ -21,8 +21,12 @@ const Register = () => {
     setCargando(true);
     setError("");
     try {
-      await accion();
-      navigate("/");
+      const resultado = await accion();
+
+      // Avisos de pasos no criticos que fallaron: la cuenta se creo igual,
+      // asi que se navega y el aviso viaja para mostrarse en el perfil.
+      const avisos = resultado?.avisos ?? [];
+      navigate("/", { state: avisos.length ? { avisos } : undefined });
     } catch (err) {
       setError(mensajeDeError(err.code));
     } finally {
@@ -33,14 +37,19 @@ const Register = () => {
   const registrar = (e) => {
     e.preventDefault();
 
-    if (datos.password !== datos.confirmar) {
+    // Se registra la contrasenia ya trimeada, porque validarPassword tambien
+    // trimea: sin esto "  12345678  " se aceptaba y se guardaba CON espacios,
+    // y despues la persona no podia entrar escribiendo lo que creia su clave.
+    const password = datos.password.trim();
+
+    if (password !== datos.confirmar.trim()) {
       return setError("Las contraseñas no coinciden.");
     }
 
-    const errorPassword = validarPassword(datos.password);
+    const errorPassword = validarPassword(password);
     if (errorPassword) return setError(errorPassword);
 
-    ejecutar(() => registerWithEmail(datos.email, datos.password, datos.name));
+    ejecutar(() => registerWithEmail(datos.email.trim(), password, datos.name.trim()));
   };
 
   return (

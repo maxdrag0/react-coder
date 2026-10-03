@@ -109,3 +109,28 @@ describe("users - escalada de privilegios", () => {
     await assertFails(deleteDoc(doc(ana.firestore(), "users/ana")));
   });
 });
+
+// --- Hallazgos de la revision final (Important 9) ---
+
+describe("users - aislamiento por otras formas de consulta", () => {
+  it("NIEGA listar la coleccion users entera", async () => {
+    const { collection, getDocs } = await import("firebase/firestore");
+    await sembrarUsuario("ana", PERFIL);
+    const beto = env.authenticatedContext("beto");
+    await assertFails(getDocs(collection(beto.firestore(), "users")));
+  });
+
+  it("NIEGA escribir role por setDoc con merge", async () => {
+    await sembrarUsuario("ana", PERFIL);
+    const ana = env.authenticatedContext("ana");
+    await assertFails(
+      setDoc(doc(ana.firestore(), "users/ana"), { role: "admin" }, { merge: true })
+    );
+  });
+
+  it("NIEGA escribir en una subcoleccion del perfil", async () => {
+    await sembrarUsuario("ana", PERFIL);
+    const ana = env.authenticatedContext("ana");
+    await assertFails(setDoc(doc(ana.firestore(), "users/ana/privado/x"), { a: 1 }));
+  });
+});

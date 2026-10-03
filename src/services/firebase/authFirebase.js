@@ -20,17 +20,50 @@ const crearPerfil = (uid, datos) =>
     createdAt: new Date().toISOString(),
   });
 
+// Una vez que createUserWithEmailAndPassword devuelve, la cuenta EXISTE y la
+// sesion esta abierta. Si un paso posterior tira y el error sube a la
+// interfaz, la persona cree que el registro fallo mientras ya esta registrada,
+// y al reintentar le dicen "ese email ya tiene una cuenta", que se lee como
+// una contradiccion. Asi que los pasos posteriores degradan en avisos.
+const intentar = async (accion, aviso, avisos) => {
+  try {
+    await accion();
+  } catch {
+    avisos.push(aviso);
+  }
+};
+
+/**
+ * @returns {Promise<{user: object, avisos: string[]}>} `avisos` lista los
+ * pasos no criticos que fallaron, para mostrarlos sin bloquear el registro.
+ */
 export const registerWithEmail = async (email, password, name) => {
+  // Si esto falla no hay cuenta, asi que el error ES la verdad y sube.
   const { user } = await createUserWithEmailAndPassword(auth, email, password);
 
-  // Sin esto user.displayName queda en null para siempre y toda la app
-  // muestra "Usuario" en lugar del nombre que la persona escribio.
-  await updateProfile(user, { displayName: name });
+  const avisos = [];
 
-  await crearPerfil(user.uid, { name, email });
-  await sendEmailVerification(user);
+  // Sin updateProfile, user.displayName queda en null para siempre y toda la
+  // app muestra "Usuario" en lugar del nombre que la persona escribio.
+  await intentar(
+    () => updateProfile(user, { displayName: name }),
+    "No pudimos guardar tu nombre. Podés completarlo desde tu perfil.",
+    avisos,
+  );
 
-  return user;
+  await intentar(
+    () => crearPerfil(user.uid, { name, email }),
+    "No pudimos guardar tus datos de perfil. Revisalos desde tu perfil.",
+    avisos,
+  );
+
+  await intentar(
+    () => sendEmailVerification(user),
+    "No pudimos enviarte el mail de verificación. Reenvialo desde tu perfil.",
+    avisos,
+  );
+
+  return { user, avisos };
 };
 
 export const loginWithEmail = async (email, password) => {

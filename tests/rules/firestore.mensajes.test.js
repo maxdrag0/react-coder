@@ -90,3 +90,60 @@ describe("catch-all sigue cerrado", () => {
     await assertFails(getDoc(doc(admin.firestore(), "coleccionInventada/x")));
   });
 });
+
+// --- Hallazgos de la revision final ---
+
+describe("mensajes - limites del documento (Critical 1)", () => {
+  it("NIEGA un documento enorme escondido en un campo que no es mensaje", async () => {
+    // El limite de 2000 solo cubria `mensaje`: cualquiera podia escribir
+    // documentos de ~1 MiB sin sesion, cobrados a Max, y reventar la bandeja.
+    const anon = env.unauthenticatedContext();
+    await assertFails(
+      addDoc(collection(anon.firestore(), "mensajes"), {
+        ...MENSAJE,
+        basura: "x".repeat(700 * 1024),
+      })
+    );
+  });
+
+  it("NIEGA campos no declarados en el esquema", async () => {
+    const anon = env.unauthenticatedContext();
+    await assertFails(
+      addDoc(collection(anon.firestore(), "mensajes"), { ...MENSAJE, loQueSea: 1 })
+    );
+  });
+
+  it("NIEGA un email de mas de 200 caracteres", async () => {
+    const anon = env.unauthenticatedContext();
+    await assertFails(
+      addDoc(collection(anon.firestore(), "mensajes"), {
+        ...MENSAJE,
+        email: "a".repeat(201),
+      })
+    );
+  });
+
+  it("NIEGA un mensaje sin date (quedaria invisible en el panel)", async () => {
+    // obtenerMensajes ordena por date, y Firestore omite en silencio los
+    // documentos que no tienen el campo del orderBy.
+    const sinDate = { ...MENSAJE };
+    delete sinDate.date;
+    const anon = env.unauthenticatedContext();
+    await assertFails(addDoc(collection(anon.firestore(), "mensajes"), sinDate));
+  });
+
+  it("acepta los campos del formulario de contacto, incluidos direccion y ciudad", async () => {
+    const anon = env.unauthenticatedContext();
+    await assertSucceeds(
+      addDoc(collection(anon.firestore(), "mensajes"), {
+        nombre: "Ana",
+        email: "ana@mail.com",
+        direccion: "Calle Falsa 123",
+        ciudad: "Rosario",
+        mensaje: "Consulta",
+        date: new Date().toISOString(),
+        leido: false,
+      })
+    );
+  });
+});

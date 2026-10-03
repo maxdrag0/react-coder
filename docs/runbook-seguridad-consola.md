@@ -40,23 +40,29 @@ await firebase.auth().currentUser.getIdTokenResult()
 npm test
 ```
 
-Tienen que pasar 28 unitarios y 58 de reglas. **Si algo falla, no desplegar.**
+Tienen que pasar 57 unitarios y 77 de reglas. **Si algo falla, no desplegar.**
 
 - [ ] **Paso 5 — desplegar**
 
 ```bash
 npx firebase login
-npx firebase deploy --only firestore:rules,firestore:indexes,storage:rules
+npx firebase deploy --only firestore:rules,storage:rules
 ```
 
-No requiere plan Blaze. El índice compuesto puede tardar unos minutos en
-construirse: hasta que termine, el filtro por categoría puede devolver un
-error con un link. Es temporal.
+**Solo las reglas, a propósito.** Si se incluye `firestore:indexes` en el mismo
+comando y la parte de índices falla, el comando sale con error y queda ambiguo
+si las reglas se publicaron — justo la duda que no querés en un deploy de
+seguridad. `firestore.indexes.json` está vacío: la query
+`where('category','in',[…])` + `orderBy('__name__')` no necesita índice
+compuesto, porque para el indexador `in` cuenta como igualdad y el índice de un
+solo campo ya lo provee Firestore solo.
+
+No requiere plan Blaze.
 
 - [ ] **Paso 6 — verificar en producción**
 
 1. Navegar el catálogo sin sesión → los productos se ven.
-2. Filtrar por categoría → anda (si no, el índice todavía se está construyendo).
+2. Filtrar por categoría → anda.
 3. Con sesión de admin, entrar a `/admin` → ve productos, pedidos y mensajes.
 4. Crear, editar y borrar un producto de prueba → funciona.
 5. Subir una imagen de producto → funciona.
@@ -137,7 +143,7 @@ de la base.
 ## 7. Después de cada cambio de reglas
 
 - [ ] `npm test` en verde
-- [ ] `npx firebase deploy --only firestore:rules,firestore:indexes,storage:rules`
+- [ ] `npx firebase deploy --only firestore:rules,storage:rules`
 - [ ] Repasar los 8 puntos de verificación de la sección 0, Paso 6
 
 ---

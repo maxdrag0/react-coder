@@ -12,6 +12,7 @@ import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import Profile from "./pages/Profile/Profile";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
+import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
 
 function App() {
   return (
@@ -27,8 +28,15 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+
+          <Route element={<ProtectedRoute />}>
+            <Route path="/profile" element={<Profile />} />
+          </Route>
+
+          <Route element={<ProtectedRoute requireAdmin />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+          </Route>
+
           <Route path="/*" element={<NotFound />} />
         </Routes>
       </main>

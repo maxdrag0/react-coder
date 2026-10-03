@@ -1,0 +1,6 @@
+.ruta-cargando {
+  display: grid;
+  place-items: center;
+  min-height: 50vh;
+  color: var(--text-secondary);
+}

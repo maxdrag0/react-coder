@@ -17,3 +17,14 @@ export async function montarEntorno() {
 export async function limpiar(env) {
   await env.clearFirestore();
 }
+
+export async function montarEntornoStorage() {
+  return initializeTestEnvironment({
+    projectId: PROJECT_ID,
+    storage: {
+      rules: readFileSync("storage.rules", "utf8"),
+      host: "127.0.0.1",
+      port: 9199,
+    },
+  });
+}

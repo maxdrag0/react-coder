@@ -2,7 +2,25 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // Default: negar. La T6 abre products/ con whitelist de MIME y tamanio.
+    // Fotos y videos de producto: lectura publica, escritura solo admin.
+    // El accept="image/*,video/*" del formulario de admin es solo el
+    // selector del navegador y no valida nada: el limite real esta aca.
+    // Los dos umbrales son distintos a proposito: 5 MB no alcanza para un
+    // video y 50 MB es absurdo para una foto de producto.
+    match /products/{file} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && request.auth.token.admin == true
+                   && (
+                        (request.resource.contentType.matches('image/.*')
+                         && request.resource.size < 5 * 1024 * 1024)
+                        ||
+                        (request.resource.contentType.matches('video/.*')
+                         && request.resource.size < 50 * 1024 * 1024)
+                      );
+    }
+
+    // Default: negar.
     match /{allPaths=**} {
       allow read, write: if false;
     }

@@ -1,0 +1,15 @@
+.verificacion-pendiente {
+  padding: 0.9rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--warning-color, #d9a406);
+  background: var(--warning-bg, #fff8e1);
+  color: var(--warning-text, #6b4e00);
+  font-size: 0.9rem;
+}
+.verificacion-pendiente p { margin: 0 0 0.5rem; }
+.verificacion-estado { font-weight: 600; margin-bottom: 0; }
+.verificacion-pendiente button {
+  background: none; border: none; padding: 0;
+  color: inherit; text-decoration: underline; cursor: pointer; font: inherit;
+}

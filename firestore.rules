@@ -6,6 +6,18 @@ service cloud.firestore {
     function isAdmin()    { return isSignedIn() && request.auth.token.admin == true; }
     function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
 
+    // Catalogo: lectura publica, escritura solo admin.
+    match /products/{id} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
+    // Promociones: mismo criterio que el catalogo.
+    match /promociones/{id} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
     // Default: negar. Una coleccion nueva nace cerrada, no abierta.
     match /{document=**} {
       allow read, write: if false;

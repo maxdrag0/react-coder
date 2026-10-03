@@ -18,9 +18,12 @@ afterAll(async () => {
 });
 
 describe("default deny", () => {
-  it("niega la lectura anónima de cualquier documento", async () => {
+  // Usa una colección NO declarada a propósito: las colecciones con regla
+  // propia (products, promociones) sí son legibles, y eso es correcto.
+  // Lo que este archivo prueba es que lo no declarado nace cerrado.
+  it("niega la lectura anónima de una colección no declarada", async () => {
     const anon = env.unauthenticatedContext();
-    await assertFails(getDoc(doc(anon.firestore(), "products/p1")));
+    await assertFails(getDoc(doc(anon.firestore(), "coleccionInventada/x")));
   });
 
   it("niega la escritura de un usuario autenticado en una colección no declarada", async () => {

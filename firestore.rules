@@ -34,6 +34,25 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Pedidos: cada cliente ve los suyos; el admin ve todos.
+    // El `create` del cliente es TEMPORAL — en el subproyecto B pasa a
+    // `if false` y la escritura queda solo en manos del Admin SDK, que es
+    // lo que permite revalidar precios y stock del lado del servidor.
+    // Las reglas no pueden revalidar precios: exigiria un get() por item
+    // y el limite son 10 lecturas por evaluacion.
+    match /compras/{id} {
+      allow read:   if isAdmin() ||
+                       (isSignedIn() && resource.data.buyer.uid == request.auth.uid);
+      allow create: if isSignedIn()
+                    && request.resource.data.buyer.uid == request.auth.uid
+                    && request.resource.data.total is number
+                    && request.resource.data.total >= 0
+                    && request.resource.data.items is list
+                    && request.resource.data.items.size() > 0
+                    && request.resource.data.items.size() <= 50;
+      allow update, delete: if isAdmin();
+    }
+
     // Default: negar. Una coleccion nueva nace cerrada, no abierta.
     match /{document=**} {
       allow read, write: if false;

@@ -24,3 +24,12 @@ dist-ssr
 *.sw?
 
 .env
+# Firebase: cache de deploy y artefactos del emulador
+.firebase/
+firebase-debug.log
+firestore-debug.log
+storage-debug.log
+ui-debug.log
+
+# Workspace de superpowers (scratch, el registro real es git)
+.superpowers/

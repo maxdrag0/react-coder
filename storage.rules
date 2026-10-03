@@ -1,0 +1,10 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Default: negar. La T6 abre products/ con whitelist de MIME y tamanio.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

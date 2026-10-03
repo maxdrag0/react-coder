@@ -53,6 +53,17 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    // Mensajes de contacto: cualquiera escribe (el formulario es publico),
+    // solo el admin lee. Exigir login perderia consultas de gente que
+    // todavia no se registro; el limite de tamanio acota el spam hasta que
+    // haya rate limiting en api/contacto.
+    match /mensajes/{id} {
+      allow read:   if isAdmin();
+      allow create: if request.resource.data.mensaje is string
+                    && request.resource.data.mensaje.size() <= 2000;
+      allow update, delete: if isAdmin();
+    }
+
     // Default: negar. Una coleccion nueva nace cerrada, no abierta.
     match /{document=**} {
       allow read, write: if false;

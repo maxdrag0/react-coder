@@ -1,0 +1,12 @@
+.campo { display: flex; flex-direction: column; gap: 0.35rem; }
+.campo label { font-size: 0.9rem; color: var(--text-secondary); }
+.campo input {
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: 8px;
+  background: var(--bg-input, #fff);
+  color: inherit;
+  font: inherit;
+}
+.campo input:focus-visible { outline: 2px solid var(--accent-color, #c9a227); outline-offset: 1px; }
+.campo-ayuda { font-size: 0.78rem; color: var(--text-secondary); }

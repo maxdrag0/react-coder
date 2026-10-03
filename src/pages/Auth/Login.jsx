@@ -1,99 +1,78 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { loginWithEmail, loginWithGoogle } from "../../services/firebase/authFirebase";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { loginWithEmail, loginWithGoogle } from "@/services/firebase/authFirebase";
+import { mensajeDeError } from "@/constants/authErrors";
+import AuthCard from "@/components/auth/AuthCard/AuthCard";
+import GoogleAuthButton from "@/components/auth/GoogleAuthButton/GoogleAuthButton";
+import PasswordResetLink from "@/components/auth/PasswordResetLink/PasswordResetLink";
+import FormField from "@/components/common/FormField/FormField";
+import FormError from "@/components/common/FormError/FormError";
 import "./Auth.css";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [datos, setDatos] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [cargando, setCargando] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleEmailLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  // ProtectedRoute guarda a donde queria ir la persona antes de rebotarla.
+  const destino = location.state?.volverA ?? "/";
+
+  const cambiar = (e) => setDatos({ ...datos, [e.target.name]: e.target.value });
+
+  const ejecutar = async (accion) => {
+    setCargando(true);
     setError("");
     try {
-      await loginWithEmail(email, password);
-      navigate("/");
+      await accion();
+      navigate(destino, { replace: true });
     } catch (err) {
-      setError("Failed to log in. Please check your credentials.");
-      console.error(err);
+      setError(mensajeDeError(err.code));
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      await loginWithGoogle();
-      navigate("/");
-    } catch (err) {
-      setError("Failed to log in with Google.");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+  const ingresar = (e) => {
+    e.preventDefault();
+    ejecutar(() => loginWithEmail(datos.email, datos.password));
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h2>Bienvenido de nuevo</h2>
-        <p>Inicia sesión en tu cuenta</p>
-        
-        {error && <div className="auth-error">{error}</div>}
+    <AuthCard titulo="Iniciar sesión" subtitulo="Bienvenido de vuelta">
+      <FormError mensaje={error} />
 
-        <form onSubmit={handleEmailLogin} className="auth-form">
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="password">Contraseña</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+      <form onSubmit={ingresar} className="auth-form">
+        <FormField label="Email" id="email" type="email" value={datos.email} onChange={cambiar} autoComplete="email" />
+        <FormField
+          label="Contraseña"
+          id="password"
+          type="password"
+          value={datos.password}
+          onChange={cambiar}
+          autoComplete="current-password"
+        />
 
-          <button type="submit" className="auth-btn" disabled={loading}>
-            {loading ? "Cargando..." : "Iniciar Sesión"}
-          </button>
-        </form>
+        <PasswordResetLink />
 
-        <div className="auth-divider">
-          <span>o</span>
-        </div>
-
-        <button 
-          type="button" 
-          className="auth-btn google-btn" 
-          onClick={handleGoogleLogin}
-          disabled={loading}
-        >
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" />
-          Continuar con Google
+        <button type="submit" className="auth-btn" disabled={cargando}>
+          {cargando ? "Ingresando..." : "Ingresar"}
         </button>
+      </form>
 
-        <p className="auth-redirect">
-          ¿No tienes una cuenta? <Link to="/register">Regístrate</Link>
-        </p>
-      </div>
-    </div>
+      <div className="auth-divider"><span>o</span></div>
+
+      <GoogleAuthButton
+        texto="Continuar con Google"
+        onClick={() => ejecutar(loginWithGoogle)}
+        disabled={cargando}
+      />
+
+      <p className="auth-redirect">
+        ¿No tenés cuenta? <Link to="/register">Registrate</Link>
+      </p>
+    </AuthCard>
   );
 };
 

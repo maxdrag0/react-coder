@@ -26,4 +26,21 @@ export default defineConfig([
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
     },
   },
+  {
+    // Archivos que corren en Node, no en el navegador: configuracion de
+    // build, scripts de administracion y tests. Sin esto, `process`,
+    // `__dirname` y compania se reportan como no definidos.
+    files: [
+      '*.config.js',
+      'scripts/**/*.{js,mjs}',
+      'tests/**/*.{js,jsx}',
+    ],
+    languageOptions: {
+      globals: globals.node,
+    },
+    rules: {
+      // Fast refresh no aplica fuera del codigo de la app.
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ])

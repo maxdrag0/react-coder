@@ -7,14 +7,12 @@ import {
   orderBy,
   query,
   where,
-  writeBatch,
   limit,
   startAfter,
   deleteDoc,
   setDoc,
 } from "firebase/firestore";
 import { db } from "../../utils/firebase";
-import { products } from "../../constants/products";
 
 export const obtenerProductos = async (categoria, lastVisible = null, pageSize = 8) => {
   try {
@@ -105,45 +103,5 @@ export const eliminarProducto = async (id) => {
   } catch (error) {
     console.error("Error al eliminar producto:", error);
     throw error;
-  }
-};
-
-export const sembrarProductos = async () => {
-  try {
-    const productsRef = collection(db, "products");
-
-    // 1. CHEQUEO DE SEGURIDAD
-    const snapshot = await getDocs(query(productsRef, limit(1)));
-    if (!snapshot.empty) {
-      console.log(
-        "¡La base de datos ya tiene productos! Ignorando la carga masiva.",
-      );
-      return;
-    }
-
-    // 2. BATCH DE FIRESTORE
-    const batch = writeBatch(db);
-
-    products.forEach((producto) => {
-      const itemAdaptado = {
-        ...producto,
-        category: producto.categoria,
-      };
-      delete itemAdaptado.categoria;
-
-      // EL FIX ESTÁ AQUÍ: Reemplazamos todas las '/' por '-' para hacer un ID válido en Firebase
-      const idSeguro = String(producto.codigo).replace(/\//g, "-");
-
-      // Usamos el idSeguro en la referencia
-      const docRef = doc(productsRef, idSeguro);
-
-      batch.set(docRef, itemAdaptado);
-    });
-
-    // 3. EJECUCIÓN
-    await batch.commit();
-    console.log("¡Catálogo completo del PDF subido a Firestore con éxito!");
-  } catch (error) {
-    console.error("Error al sembrar la base de datos:", error);
   }
 };

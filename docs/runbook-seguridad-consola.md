@@ -179,7 +179,7 @@ Tienen que pasar **57 unitarios y 77 de reglas** (134 en total). Tarda unos
 Este es el paso que hace que todo lo anterior tenga efecto.
 
 ```bash
-npx firebase deploy --only firestore:rules,storage:rules
+npx firebase deploy --only firestore:rules,storage
 ```
 
 **Solo las reglas, a propósito.** Si incluís `firestore:indexes` en el mismo
@@ -189,7 +189,18 @@ seguridad. (`firestore.indexes.json` está vacío porque la consulta que usamos 
 necesita índice compuesto: para el indexador un `in` cuenta como igualdad, y el
 índice de un solo campo ya lo provee Firestore solo.)
 
-No requiere el plan Blaze. El plan gratuito alcanza.
+**Ojo con la sintaxis**: para Firestore es `firestore:rules` (porque reglas e
+índices son dos cosas separables), pero para Storage es `storage` a secas. Si
+escribís `storage:rules`, Firebase lo interpreta como "el target llamado
+rules", no lo encuentra, y falla con *"Could not find rules for the following
+storage targets: rules"*.
+
+Si Storage todavía no está habilitado en el proyecto, el deploy falla entero.
+En ese caso desplegá primero solo Firestore (`--only firestore:rules`), que es
+lo que cierra los agujeros graves, y habilitá Storage después desde la consola
+eligiendo **modo de producción** (nunca modo de prueba: abre todo por 30 días).
+
+No requiere el plan Blaze para Firestore. El plan gratuito alcanza.
 
 Cuando termina dice "Deploy complete!". Las reglas ya están activas.
 
@@ -411,7 +422,7 @@ necesita servidor y es el subproyecto C.
 
 ```bash
 npm test
-npx firebase deploy --only firestore:rules,storage:rules
+npx firebase deploy --only firestore:rules,storage
 ```
 
 Y repasá el punto 8 de la Parte 7.

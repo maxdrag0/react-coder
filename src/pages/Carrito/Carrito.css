@@ -1,39 +1,65 @@
-.total {
+.carrito { padding-block: var(--e-5) var(--e-8); }
+
+.carrito-grid { display: grid; gap: var(--e-5); }
+
+.carrito-lista { display: grid; gap: var(--e-3); align-content: start; }
+
+.carrito-resumen {
+  display: grid;
+  gap: var(--e-4);
+  padding: var(--e-5);
+  background: var(--surface);
+  border-radius: var(--r-card);
+  box-shadow: var(--elev-1);
+}
+
+.carrito-total {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  padding: 2rem 0;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--e-3);
+  font-variant-numeric: tabular-nums;
 }
 
-.total .suma-total {
+.carrito-total span { color: var(--text-suave); font-size: var(--t-sm); }
+
+.carrito-total strong {
+  font-size: var(--t-xl);
+  font-stretch: var(--ancho-display);
+  color: var(--gold);
+}
+
+.carrito-aviso {
+  font-size: var(--t-xs);
+  color: var(--text-tenue);
   margin: 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-primary);
 }
 
-.total .realizar-compra {
-  padding: 0.75rem 2rem;
-  border-radius: var(--radius-md);
-  background: var(--accent-color);
-  color: var(--text-light);
-  border: none;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all var(--transition-fast);
+/* Estado vacío: una invitación a actuar, no dos párrafos sueltos. */
+.carrito-vacio {
+  display: grid;
+  gap: var(--e-4);
+  justify-items: start;
+  padding-block: var(--e-8);
+  color: var(--text-suave);
 }
 
-.total .realizar-compra:hover {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+@media (min-width: 900px) {
+  .carrito-grid {
+    grid-template-columns: 1fr 22rem;
+    gap: var(--e-6);
+    align-items: start;
+  }
+  .carrito-resumen { position: sticky; top: calc(64px + var(--e-5)); }
 }
 
-.total .realizar-compra:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+/* En celular el resumen queda fijo abajo: el total siempre a la vista. */
+@media (max-width: 899px) {
+  .carrito-resumen {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+    border-radius: var(--r-card) var(--r-card) 0 0;
+    box-shadow: var(--elev-2);
+  }
 }

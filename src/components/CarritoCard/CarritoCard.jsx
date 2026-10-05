@@ -2,11 +2,16 @@ import { useContext } from "react";
 import { CartContext } from "../../contexts/cart/CartContext";
 import { Trash2 } from "lucide-react";
 import { Counter } from "../common/Counter/Counter";
+import MediaPlaceholder from "@/components/common/MediaPlaceholder/MediaPlaceholder";
+import { formatearPrecio } from "@/utils/formatearPrecio";
 import "./CarritoCard.css";
 
 function CarritoCard({ item }) {
   const { deleteItem, updateQuantity } = useContext(CartContext);
-  const subtotal = item.precioUnitario * item.cantidad;
+  const unitario = item.precioUnitario || item.price;
+  const subtotal = unitario * item.cantidad;
+  const nombre = item.nombre || item.name;
+  const foto = item.fotoUrl || item.image;
 
   const handleSumar = () => {
     if (item.cantidad < item.stock) {
@@ -21,35 +26,30 @@ function CarritoCard({ item }) {
   };
 
   return (
-    <div className="carrito-card-container">
-      <div className="item">
-        <div className="item__imagen">
-          <img src={item.fotoUrl || item.image} alt={item.nombre || item.name} />
-        </div>
-        <div className="item__detalle">
-          <div className="item__detalle__titulo-boton">
-            <h3>{item.nombre || item.name}</h3>
-          </div>
-          <p className="precio-unitario">
-            Precio unidad: ${item.precioUnitario || item.price}
-          </p>
-        </div>
+    <article className="carrito-item">
+      <div className="carrito-item-media">
+        {foto ? <img src={foto} alt="" /> : <MediaPlaceholder />}
       </div>
-      
-      <div className="carrito-card-actions">
-        <div className="carrito-card-counter">
-          <Counter count={item.cantidad} sumar={handleSumar} restar={handleRestar} />
-        </div>
-        <div className="total-a-pagar">$ {subtotal}</div>
-        <button 
-          className="btn-delete-cart" 
+
+      <div className="carrito-item-info">
+        <h3 className="carrito-item-nombre">{nombre}</h3>
+        <p className="carrito-item-sub">
+          {formatearPrecio(unitario)} por unidad
+        </p>
+        <p className="carrito-item-subtotal">{formatearPrecio(subtotal)}</p>
+      </div>
+
+      <div className="carrito-item-acciones">
+        <Counter count={item.cantidad} sumar={handleSumar} restar={handleRestar} />
+        <button
+          className="boton boton-fantasma carrito-item-borrar"
           onClick={() => deleteItem(item.codigo)}
-          title="Eliminar del carrito"
+          aria-label={`Eliminar ${nombre} del carrito`}
         >
-          <Trash2 size={20} />
+          <Trash2 size={18} />
         </button>
       </div>
-    </div>
+    </article>
   );
 }
 

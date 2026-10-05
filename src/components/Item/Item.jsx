@@ -1,32 +1,42 @@
 import { Link } from "react-router-dom";
+import Precio from "@/components/common/Precio/Precio";
+import BarraStock from "@/components/common/BarraStock/BarraStock";
+import MediaPlaceholder from "@/components/common/MediaPlaceholder/MediaPlaceholder";
 import "./Item.css";
 
 function Item({ item }) {
-  const name = item.name || item.nombre;
-  const image = item.image || item.fotoUrl;
-  const price = item.price || item.precioUnitario;
-  const description = item.description || item.descripcion;
+  // El catálogo convive con los dos esquemas hasta que E los unifique.
+  const nombre = item.nombre || item.name;
+  const foto = item.fotoUrl || item.image;
+  const categoria = item.categoria || item.category;
+
+  const meta = [categoria, item.duracion ? `${item.duracion} seg` : null]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
-    <div className="itemCard">
-      <div className="img">
-        {image ? (
-          <img src={image} alt={name} title={description} />
-        ) : (
-          <div className="no-image">No Image</div>
-        )}
+    <article className="item">
+      <Link to={`/product/${item.codigo}`} className="item-link">
+        <div className="item-media">
+          {foto ? <img src={foto} alt="" loading="lazy" /> : <MediaPlaceholder />}
+        </div>
+
+        <div className="item-cuerpo">
+          <h3 className="item-titulo">{nombre}</h3>
+          {meta && <p className="item-meta">{meta}</p>}
+
+          <Precio
+            unitario={item.precioUnitario ?? item.price}
+            display={item.precioDisplay}
+            bulto={item.precioBulto}
+          />
+        </div>
+      </Link>
+
+      <div className="item-pie">
+        <BarraStock stock={item.stock} />
       </div>
-      <div className="item-info">
-        <h3 className="titulo">{name}</h3>
-        <div className="precio">${price}</div>
-      </div>
-      <div className="button-container">
-        <Link to={`/product/${item.codigo}`} className="item-link">
-          <button className="auth-btn btn-view">Ver Detalles</button>
-        </Link>
-      </div>
-      <div className="stock">Stock disponible: {item.stock}</div>
-    </div>
+    </article>
   );
 }
 

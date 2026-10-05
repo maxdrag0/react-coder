@@ -1,16 +1,73 @@
-import { Button } from "../Button/Button";
+import { useEffect, useRef } from "react";
 import "./Modal.css";
 
+const ENFOCABLES =
+  'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+// `tittle` está mal escrito desde el original. Se mantiene para no tocar a sus
+// consumidores; renombrarlo es trabajo del subproyecto E.
 const Modal = ({ isOpen, onClose, onAccept, tittle, message }) => {
+  const caja = useRef(null);
+  const previo = useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    previo.current = document.activeElement;
+    caja.current?.focus();
+
+    const alTeclear = (e) => {
+      if (e.key === "Escape") {
+        onClose?.();
+        return;
+      }
+      if (e.key !== "Tab") return;
+
+      const items = caja.current?.querySelectorAll(ENFOCABLES);
+      if (!items?.length) return;
+
+      const primero = items[0];
+      const ultimo = items[items.length - 1];
+
+      if (e.shiftKey && document.activeElement === primero) {
+        e.preventDefault();
+        ultimo.focus();
+      } else if (!e.shiftKey && document.activeElement === ultimo) {
+        e.preventDefault();
+        primero.focus();
+      }
+    };
+
+    document.addEventListener("keydown", alTeclear);
+    const devolverFocoA = previo.current;
+
+    return () => {
+      document.removeEventListener("keydown", alTeclear);
+      // Devolver el foco a donde estaba: si no, queda en el body y la
+      // persona que navega con teclado pierde su lugar.
+      devolverFocoA?.focus?.();
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <h2>{tittle}</h2>
-        <p>{message}</p>
-        <div className="modal-actions">
-          <Button callback={onAccept}>Aceptar</Button>
+    <div className="modal-fondo" onClick={onClose}>
+      <div
+        className="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-titulo"
+        tabIndex={-1}
+        ref={caja}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 id="modal-titulo">{tittle}</h2>
+        <div className="modal-cuerpo">{message}</div>
+        <div className="modal-acciones">
+          <button type="button" className="boton boton-primario" onClick={onAccept}>
+            Entendido
+          </button>
         </div>
       </div>
     </div>

@@ -1,46 +1,53 @@
-.modal-overlay {
+.modal-fondo {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(6px);
+  inset: 0;
+  z-index: 100;
   display: flex;
+  align-items: flex-end;
   justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  padding: 1rem;
+  background: rgba(14, 23, 38, 0.7);
+  backdrop-filter: blur(8px);
 }
 
-.modal-content {
-  background: var(--bg-primary);
-  padding: 2rem;
-  border-radius: var(--radius-lg);
-  max-width: 420px;
+.modal {
   width: 100%;
-  box-shadow: var(--shadow-xl);
-  text-align: center;
+  max-width: 480px;
+  background: var(--surface);
+  box-shadow: var(--elev-2);
+  padding: var(--e-5);
+  display: grid;
+  gap: var(--e-4);
+  /* En celular sube desde abajo como una hoja, que es lo que se espera
+     en un teléfono; en pantallas grandes se centra como caja. */
+  border-radius: var(--r-card) var(--r-card) 0 0;
+  animation: modal-subir var(--mov-base);
 }
 
-.modal-content h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 0.75rem;
+@keyframes modal-subir {
+  from { transform: translateY(8px); opacity: 0; }
+  to   { transform: translateY(0);   opacity: 1; }
 }
 
-.modal-content p {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-  font-weight: 400;
-  font-style: normal;
-  line-height: 1.5;
+.modal h2 { font-size: var(--t-lg); }
+
+.modal-cuerpo {
+  color: var(--text-suave);
+  font-size: var(--t-sm);
 }
 
-.modal-actions {
-  margin-top: 1.5rem;
+.modal-acciones {
   display: flex;
-  gap: 0.75rem;
-  justify-content: center;
+  justify-content: flex-end;
+  gap: var(--e-2);
+}
+
+.modal:focus-visible { outline: none; }
+
+@media (min-width: 640px) {
+  .modal-fondo { align-items: center; padding: var(--e-4); }
+  .modal { border-radius: var(--r-card); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal { animation: none; }
 }

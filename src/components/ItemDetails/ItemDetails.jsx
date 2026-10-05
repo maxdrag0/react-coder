@@ -1,11 +1,11 @@
-import "./ItemDetails.css";
-import { useState } from "react";
-import { useContext } from "react";
-import { Counter } from "../common/Counter/Counter";
-import { Button } from "../common/Button/Button";
+import { useState, useContext } from "react";
 import { CartContext } from "../../contexts/cart/CartContext";
-import { NavLink } from "react-router-dom";
+import { Counter } from "../common/Counter/Counter";
 import Modal from "../common/Modal/Modal";
+import Precio from "@/components/common/Precio/Precio";
+import BarraStock from "@/components/common/BarraStock/BarraStock";
+import MediaPlaceholder from "@/components/common/MediaPlaceholder/MediaPlaceholder";
+import "./ItemDetails.css";
 
 function ItemDetails({ item }) {
   const { cartList, addToCart } = useContext(CartContext);
@@ -16,17 +16,8 @@ function ItemDetails({ item }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [count, setCount] = useState(1);
 
-  const sumar = () => {
-    if (count < availableStock) {
-      setCount(count + 1);
-    }
-  };
-
-  const restar = () => {
-    if (count > 1) {
-      setCount(count - 1);
-    }
-  };
+  const sumar = () => { if (count < availableStock) setCount(count + 1); };
+  const restar = () => { if (count > 1) setCount(count - 1); };
 
   const handleAdd = () => {
     if (count <= availableStock) {
@@ -36,58 +27,67 @@ function ItemDetails({ item }) {
     }
   };
 
+  const nombre = item.nombre || item.name;
+  const foto = item.fotoUrl || item.image;
+  const categoria = item.categoria || item.category;
+  const descripcion = item.descripcion || item.description;
+
+  const ficha = [
+    ["Categoría", categoria],
+    ["Subcategoría", item.subcategoria],
+    ["Duración", item.duracion ? `${item.duracion} segundos` : null],
+    ["Código", item.codigo],
+  ].filter(([, valor]) => valor);
+
   return (
-    <div className="item-detail-container">
-      <div className="item-img">
-        <img src={item.fotoUrl} alt={item.nombre} />
+    <article className="detalle">
+      <div className="detalle-media">
+        {foto ? <img src={foto} alt="" /> : <MediaPlaceholder />}
       </div>
-      <div className="item-detail">
-        <div className="item-detail__intro">
-          <div className="item-detail__intro__titulo">{item.nombre}</div>
-          <div className="item-detail__intro__rating">
-          </div>
-          <div className="item-detail__description">{item.descripcion}</div>
-          <div className="item-detail__price">
-            $ {item.precioUnitario} (Stock: {item.stock})
-          </div>
-        </div>
 
-        <div className="item-detail__carrito">
-          {inCartQuantity > 0 && (
-            <p style={{ color: "var(--accent-color)", fontWeight: "bold", fontSize: "0.9rem", margin: "0 0 0.5rem 0" }}>
-              Ya tienes {inCartQuantity} unidad(es) en el carrito.
-            </p>
-          )}
+      <div className="detalle-info">
+        <h1>{nombre}</h1>
+        {descripcion && <p className="detalle-desc">{descripcion}</p>}
 
-          {availableStock > 0 ? (
-            <div className="item-detail__carrito__contador">
-              <Counter count={count} sumar={sumar} restar={restar} />
-              <Button callback={handleAdd} className="boton-agregar-carrito">
-                Agregar al carrito
-              </Button>
-            </div>
-          ) : (
-            <p style={{ color: "var(--danger-color)", fontWeight: "bold" }}>
-              Sin stock disponible.
-            </p>
-          )}
+        <Precio
+          unitario={item.precioUnitario ?? item.price}
+          display={item.precioDisplay}
+          bulto={item.precioBulto}
+        />
 
-          <div className="item-detail__carrito__ir-al-carrito">
-            <NavLink to="/carrito" className="nav-carrito">
-              Ir al carrito
-            </NavLink>
+        {ficha.length > 0 && (
+          <dl className="detalle-ficha">
+            {ficha.map(([clave, valor]) => (
+              <div key={clave}>
+                <dt>{clave}</dt>
+                <dd>{valor}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+
+        <BarraStock stock={item.stock} />
+
+        {availableStock > 0 ? (
+          <div className="detalle-compra">
+            <Counter count={count} sumar={sumar} restar={restar} />
+            <button type="button" className="boton boton-primario" onClick={handleAdd}>
+              Agregar al carrito
+            </button>
           </div>
-        </div>
+        ) : (
+          <p className="detalle-agotado">Sin stock disponible.</p>
+        )}
       </div>
 
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onAccept={() => setIsModalOpen(false)}
-        tittle="¡Éxito!"
-        message={`Has agregado ${count} unidad(es) de ${item.nombre} al carrito.`}
-      ></Modal>
-    </div>
+        tittle="Agregado al carrito"
+        message={`${nombre} está en tu carrito.`}
+      />
+    </article>
   );
 }
 

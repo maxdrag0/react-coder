@@ -1,6 +1,12 @@
-.product-details-container {
-  padding: 1rem 0;
-  display: flex;
-  justify-content: center;
+.detalle-pagina {
   width: 100%;
+  max-width: var(--ancho-max);
+  margin-inline: auto;
+  padding-inline: var(--e-4);
+}
+
+.detalle-cargando {
+  display: grid;
+  place-items: center;
+  padding-block: var(--e-8);
 }

@@ -17,6 +17,7 @@
   --gold: #E6B32E;
   --gold-suave: #F0CC6B;
   --gold-linea: rgba(230, 179, 46, 0.15);
+  --sobre-gold: #16202E;
 
   --blue: #3B7CB8;
   --blue-suave: #5B9AD4;
@@ -82,6 +83,7 @@
   --gold: #7A5A0E;
   --gold-suave: #5E460A;
   --gold-linea: rgba(122, 90, 14, 0.18);
+  --sobre-gold: #F7F6F3;
 
   --blue: #1F4E76;
   --blue-suave: #163A58;
@@ -98,56 +100,4 @@
   /* En claro las sombras sí funcionan */
   --elev-1: 0 1px 2px rgba(22, 32, 46, 0.06), 0 0 0 1px rgba(22, 32, 46, 0.06);
   --elev-2: 0 12px 32px rgba(22, 32, 46, 0.12), 0 0 0 1px rgba(22, 32, 46, 0.08);
-}
-
-/* ---------------------------------------------------------------------------
-   Capa de compatibilidad — TEMPORAL
-
-   Los CSS de componentes todavía referencian 32 nombres del sistema anterior.
-   Sin esto, las vistas que aún no se migraron quedarían sin estilo durante la
-   migración. Cada vista deja de usarlos en su propia tarea; la tarea final
-   verifica con grep que no quede ninguno y borra este bloque.
-   --------------------------------------------------------------------------- */
-
-:root {
-  --bg-page: var(--ground);
-  --bg-primary: var(--surface);
-  --bg-secondary: var(--surface-alto);
-  --bg-input: var(--surface-alto);
-  --bg-nav: var(--ground);
-  --secondary-color: var(--surface-alto);
-
-  --text-primary: var(--text);
-  --text-secondary: var(--text-suave);
-  --text-light: var(--text);
-
-  --accent-color: var(--gold);
-  --accent-hover: var(--gold-suave);
-  --border-color: var(--gold-linea);
-
-  --danger-color: var(--danger);
-  --danger-bg: var(--danger-fondo);
-  --success-color: var(--exito);
-  --success-bg: var(--exito-fondo);
-  --success-text: var(--exito);
-  --warning-color: var(--gold);
-  --warning-bg: var(--gold-linea);
-  --warning-text: var(--gold);
-
-  --radius-sm: var(--r-control);
-  --radius-md: var(--r-control);
-  --radius-lg: var(--r-card);
-  --radius-xl: var(--r-card);
-
-  --shadow-sm: var(--elev-1);
-  --shadow-md: var(--elev-1);
-  --shadow-lg: var(--elev-2);
-  --shadow-xl: var(--elev-2);
-
-  --transition-fast: var(--mov-rapido);
-  --transition-base: var(--mov-base);
-  --transition-slow: var(--mov-base);
-
-  --font-family: var(--fuente);
-  --max-width: var(--ancho-max);
 }

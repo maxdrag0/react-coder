@@ -97,3 +97,18 @@ describe("el dorado de marca sin corregir NO pasaría en claro", () => {
     expect(contraste("#E6B32E", "#FFFFFF")).toBeLessThan(3);
   });
 });
+
+describe("texto sobre el dorado — el botón primario", () => {
+  it("es legible en tema oscuro", () => {
+    expect(contraste(token(OSCURO, "--sobre-gold"), token(OSCURO, "--gold")))
+      .toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("es legible en tema claro", () => {
+    // En claro el dorado se oscurece para ser legible como texto, así que el
+    // texto ENCIMA del dorado tiene que invertirse. Fijarlo en un literal
+    // dejaba el botón primario ilegible justo en el tema que menos se prueba.
+    expect(contraste(token(CLARO, "--sobre-gold"), token(CLARO, "--gold")))
+      .toBeGreaterThanOrEqual(4.5);
+  });
+});

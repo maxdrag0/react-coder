@@ -15,15 +15,15 @@
   margin: 0;
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text);
 }
 
 .admin-tabs {
   display: flex;
   gap: 0.25rem;
-  background: var(--secondary-color);
+  background: var(--surface-alto);
   padding: 4px;
-  border-radius: var(--radius-md);
+  border-radius: var(--r-control);
 }
 
 .admin-tab {
@@ -31,22 +31,22 @@
   border: none;
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--text-secondary);
+  color: var(--text-suave);
   cursor: pointer;
   padding: 0.5rem 1.25rem;
-  border-radius: var(--radius-sm);
-  transition: all var(--transition-fast);
+  border-radius: var(--r-control);
+  transition: all var(--mov-rapido);
 }
 
 .admin-tab:hover {
-  color: var(--text-primary);
+  color: var(--text);
 }
 
 .admin-tab.active {
-  background: var(--bg-primary);
-  color: var(--accent-color);
+  background: var(--surface);
+  color: var(--gold);
   font-weight: 600;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--elev-1);
 }
 
 .admin-actions-bar {
@@ -59,17 +59,17 @@
 
 .admin-actions-bar input[type="text"] {
   padding: 0.5rem 0.75rem;
-  border: 1.5px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border: 1.5px solid var(--gold-linea);
+  border-radius: var(--r-control);
   font-size: 0.9rem;
-  font-family: var(--font-family);
+  font-family: var(--fuente);
   min-width: 220px;
-  transition: border-color var(--transition-fast);
+  transition: border-color var(--mov-rapido);
 }
 
 .admin-actions-bar input[type="text"]:focus {
   outline: none;
-  border-color: var(--accent-color);
+  border-color: var(--gold);
   box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
 }
 
@@ -80,9 +80,9 @@
 }
 
 .admin-products {
-  background: var(--bg-primary);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
+  background: var(--surface);
+  border-radius: var(--r-card);
+  border: 1px solid var(--gold-linea);
   overflow-x: auto;
 }
 
@@ -95,25 +95,25 @@
 .admin-table td {
   padding: 0.85rem 1rem;
   text-align: left;
-  border-bottom: 1px solid var(--secondary-color);
+  border-bottom: 1px solid var(--surface-alto);
   font-size: 0.9rem;
 }
 
 .admin-table th {
-  background: var(--bg-secondary);
+  background: var(--surface-alto);
   font-weight: 600;
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--text-secondary);
+  color: var(--text-suave);
 }
 
 .admin-table tbody tr {
-  transition: background var(--transition-fast);
+  transition: background var(--mov-rapido);
 }
 
 .admin-table tbody tr:hover {
-  background: var(--bg-secondary);
+  background: var(--surface-alto);
 }
 
 .admin-table tbody tr:last-child td {
@@ -124,35 +124,35 @@
   width: 48px;
   height: 48px;
   object-fit: cover;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-color);
+  border-radius: var(--r-control);
+  border: 1px solid var(--gold-linea);
 }
 
 .btn-action {
   padding: 0.35rem 0.75rem;
   margin-right: 0.4rem;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--r-control);
   cursor: pointer;
   font-size: 0.8rem;
   font-weight: 500;
-  transition: all var(--transition-fast);
+  transition: all var(--mov-rapido);
 }
 
 .btn-action.edit {
-  background: #fef3c7;
-  color: #92400e;
+  background: var(--gold-linea);
+  color: var(--gold);
 }
 .btn-action.edit:hover {
-  background: #fde68a;
+  background: var(--gold-linea);
 }
 
 .btn-action.delete {
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--danger-fondo);
+  color: var(--danger);
 }
 .btn-action.delete:hover {
-  background: #fecaca;
+  background: var(--danger-fondo);
 }
 
 /* Modal */
@@ -172,14 +172,14 @@
 }
 
 .modal-content {
-  background: var(--bg-primary);
+  background: var(--surface);
   padding: 2rem;
-  border-radius: var(--radius-lg);
+  border-radius: var(--r-card);
   width: 90%;
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: var(--shadow-xl);
+  box-shadow: var(--elev-2);
 }
 
 .modal-content h3 {
@@ -197,17 +197,17 @@
 
 .btn-cancel {
   padding: 0.65rem 1.25rem;
-  background: var(--secondary-color);
-  color: var(--text-primary);
+  background: var(--surface-alto);
+  color: var(--text);
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--r-control);
   cursor: pointer;
   font-weight: 500;
-  transition: all var(--transition-fast);
+  transition: all var(--mov-rapido);
 }
 
 .btn-cancel:hover {
-  background: var(--border-color);
+  background: var(--gold-linea);
 }
 
 .btn-save {
@@ -218,24 +218,24 @@
 .admin-form .form-group textarea {
   width: 100%;
   padding: 0.7rem 1rem;
-  border: 1.5px solid var(--border-color);
-  border-radius: var(--radius-md);
-  font-family: var(--font-family);
+  border: 1.5px solid var(--gold-linea);
+  border-radius: var(--r-control);
+  font-family: var(--fuente);
   font-size: 0.95rem;
   resize: vertical;
   min-height: 80px;
-  transition: border-color var(--transition-fast);
+  transition: border-color var(--mov-rapido);
 }
 
 .admin-form .form-group textarea:focus {
   outline: none;
-  border-color: var(--accent-color);
+  border-color: var(--gold);
   box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
 }
 
 /* Messages tab row states */
 .msg-unread {
-  background: #fffbeb !important;
+  background: var(--surface-alto) !important;
 }
 
 .msg-action-btn {
@@ -243,18 +243,18 @@
   border: none;
   cursor: pointer;
   padding: 0.3rem;
-  border-radius: var(--radius-sm);
-  transition: all var(--transition-fast);
+  border-radius: var(--r-control);
+  transition: all var(--mov-rapido);
   display: inline-flex;
 }
 
 .msg-action-btn:hover {
-  background: var(--secondary-color);
+  background: var(--surface-alto);
 }
 
 .empty-state {
   text-align: center;
-  color: var(--text-secondary);
+  color: var(--text-suave);
   padding: 2rem !important;
 }
 
@@ -263,7 +263,7 @@
   justify-content: center;
   align-items: center;
   min-height: 200px;
-  color: var(--text-secondary);
+  color: var(--text-suave);
 }
 
 @media (max-width: 768px) {

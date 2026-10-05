@@ -19,7 +19,7 @@
 
 .boton-primario {
   background: var(--gold);
-  color: #16202E;
+  color: var(--sobre-gold);
   font-weight: 600;
 }
 .boton-primario:hover:not(:disabled) { background: var(--gold-suave); }
@@ -77,6 +77,6 @@
 .chip[aria-current] {
   background: var(--gold);
   border-color: var(--gold);
-  color: #16202E;
+  color: var(--sobre-gold);
   font-weight: 600;
 }

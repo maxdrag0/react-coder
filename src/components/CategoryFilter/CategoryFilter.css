@@ -50,7 +50,7 @@
   .category-link.active {
     background: var(--gold);
     border-color: var(--gold);
-    color: #16202E;
+    color: var(--sobre-gold);
     font-weight: 600;
   }
 }

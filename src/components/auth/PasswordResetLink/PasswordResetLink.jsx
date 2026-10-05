@@ -54,13 +54,14 @@ const PasswordResetLink = () => {
       <FormError mensaje={error} />
       <div className="reset-form">
         <input
+          className="campo-control"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Tu email"
           aria-label="Email para restablecer la contraseña"
         />
-        <button type="button" onClick={enviar} disabled={enviando}>
+        <button type="button" className="boton boton-secundario" onClick={enviar} disabled={enviando}>
           {enviando ? "Enviando..." : "Enviar link"}
         </button>
       </div>

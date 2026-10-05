@@ -1,8 +1,8 @@
 .form-notice {
   margin: 0;
-  padding: 0.65rem 0.9rem;
-  border-radius: 8px;
-  background: var(--success-bg, #e8f5e9);
-  color: var(--success-text, #1b5e20);
-  font-size: 0.9rem;
+  padding: var(--e-3) var(--e-4);
+  border-radius: var(--r-control);
+  background: var(--exito-fondo);
+  color: var(--exito);
+  font-size: var(--t-sm);
 }

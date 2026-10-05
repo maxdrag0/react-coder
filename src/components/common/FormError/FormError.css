@@ -1,8 +1,8 @@
 .form-error {
   margin: 0;
-  padding: 0.65rem 0.9rem;
-  border-radius: 8px;
-  background: var(--danger-bg, #fdecea);
-  color: var(--danger-color, #b3261e);
-  font-size: 0.9rem;
+  padding: var(--e-3) var(--e-4);
+  border-radius: var(--r-control);
+  background: var(--danger-fondo);
+  color: var(--danger);
+  font-size: var(--t-sm);
 }

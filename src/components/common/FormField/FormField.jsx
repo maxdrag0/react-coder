@@ -4,6 +4,7 @@ const FormField = ({ label, id, type = "text", value, onChange, required = true,
   <div className="campo">
     <label htmlFor={id}>{label}</label>
     <input
+      className="campo-control"
       type={type}
       id={id}
       name={id}

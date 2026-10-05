@@ -1,0 +1,16 @@
+.no-encontrado {
+  display: grid;
+  gap: var(--e-4);
+  justify-items: center;
+  text-align: center;
+  padding-block: var(--e-8);
+}
+
+.no-encontrado-marca {
+  width: 140px;
+  height: 140px;
+  border-radius: var(--r-card);
+  overflow: hidden;
+}
+
+.no-encontrado p { color: var(--text-suave); }

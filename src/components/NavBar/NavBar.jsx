@@ -1,5 +1,6 @@
 import "./NavBar.css";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useDebounce } from "@/hooks/useDebounce";
 import CartMenu from "./CartMenu/CartMenu";
 import Logo from "./Logo/Logo";
 import { useAuth } from "../../contexts/AuthContext";
@@ -20,11 +21,24 @@ function NavBar() {
 
   const cerrarMenu = () => setMenuAbierto(false);
 
+  // Filtra mientras se escribe, sin disparar una navegación por tecla.
+  const busquedaRetrasada = useDebounce(busqueda, 250);
+  const primeraVez = useRef(true);
+
+  useEffect(() => {
+    if (primeraVez.current) {
+      primeraVez.current = false;
+      return;
+    }
+    const q = busquedaRetrasada.trim();
+    // replace y no push: escribir no debe llenar el historial del navegador.
+    navigate(q ? `/products?search=${encodeURIComponent(q)}` : "/products", {
+      replace: true,
+    });
+  }, [busquedaRetrasada, navigate]);
+
   const buscar = (e) => {
     e.preventDefault();
-    if (!busqueda.trim()) return;
-    navigate(`/products?search=${encodeURIComponent(busqueda)}`);
-    setBusqueda("");
     cerrarMenu();
   };
 

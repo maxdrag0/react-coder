@@ -16,7 +16,8 @@
     "test:rules": "firebase emulators:exec --only firestore,storage --project demo-lavadero \"vitest run tests/rules\"",
     "set-admin": "node scripts/set-admin.mjs",
     "seed": "node scripts/seed-productos.mjs",
-    "categorias": "node scripts/normalizar-categorias.mjs"
+    "categorias": "node scripts/normalizar-categorias.mjs",
+    "marcas": "node scripts/normalizar-marcas.mjs"
   },
   "dependencies": {
     "axios": "^1.13.2",

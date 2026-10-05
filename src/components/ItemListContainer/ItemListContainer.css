@@ -1,5 +1,6 @@
 .lista-items {
   display: grid;
+  align-items: stretch;
   grid-template-columns: 1fr;
   gap: var(--e-4);
 }

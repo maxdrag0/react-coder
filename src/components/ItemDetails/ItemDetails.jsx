@@ -36,6 +36,7 @@ function ItemDetails({ item }) {
   const descripcion = item.descripcion || item.description;
 
   const ficha = [
+    ["Marca", item.marca],
     ["Categoría", categoria],
     ["Subcategoría", item.subcategoria],
     ["Duración", item.duracion ? `${item.duracion} segundos` : null],

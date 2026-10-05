@@ -1,103 +1,162 @@
 import { PuffLoader } from "react-spinners";
-import { useState, useEffect } from "react";
-import { useParams, useSearchParams, Link } from "react-router-dom";
+import { useState, useEffect, useMemo } from "react";
+import { useParams, useSearchParams, useNavigate, Link } from "react-router-dom";
 import { Search } from "lucide-react";
 import ItemListContainer from "../../components/ItemListContainer/ItemListContainer";
-import CategoryFilter from "../../components/CategoryFilter/CategoryFilter";
+import FiltrosProductos, { SIN_MARCA } from "../../components/FiltrosProductos/FiltrosProductos";
 import { useProducts } from "../../hooks/useProducts";
+import { precioDe } from "../../constants/unidades";
 import "./Products.css";
 
 function Products() {
   const { category } = useParams();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const urlSearch = searchParams.get("search") || "";
   const [localSearch, setLocalSearch] = useState(urlSearch);
 
-  // Con búsqueda activa se trae el catálogo completo: el filtro corre en el
-  // cliente y con una sola página de 8 productos no encontraba casi nada.
-  const { items, loading, loadMore, hasMore } = useProducts(category, {
-    traerTodo: Boolean(localSearch),
-  });
+  // El catálogo entero de una: el filtro corre en el cliente, así que con
+  // paginado el buscador solo veía la primera página. Traerlo completo
+  // también hace que filtrar sea instantáneo mientras se escribe.
+  const { items, loading } = useProducts(category, { traerTodo: true });
+
+  const [marcasElegidas, setMarcasElegidas] = useState([]);
+  const [topePrecio, setTopePrecio] = useState(null);
 
   useEffect(() => {
     setLocalSearch(urlSearch);
   }, [urlSearch]);
 
+  const marcas = useMemo(() => {
+    const vistas = new Set(items.map((i) => i.marca || SIN_MARCA));
+    return [...vistas].sort((a, b) =>
+      a === SIN_MARCA ? 1 : b === SIN_MARCA ? -1 : a.localeCompare(b)
+    );
+  }, [items]);
+
+  const precioMax = useMemo(() => {
+    const precios = items
+      .map((i) => precioDe(i, "unitario"))
+      .filter((p) => p !== null);
+    return precios.length ? Math.max(...precios) : 0;
+  }, [items]);
+
+  const tope = topePrecio ?? precioMax;
+
+  const filtrados = useMemo(
+    () =>
+      items.filter((item) => {
+        if (localSearch) {
+          const q = localSearch.toLowerCase();
+          const nombre = (item.nombre || item.name || "").toLowerCase();
+          const cat = (item.categoria || item.category || "").toLowerCase();
+          const marca = (item.marca || "").toLowerCase();
+          if (!nombre.includes(q) && !cat.includes(q) && !marca.includes(q)) {
+            return false;
+          }
+        }
+
+        if (marcasElegidas.length > 0) {
+          if (!marcasElegidas.includes(item.marca || SIN_MARCA)) return false;
+        }
+
+        // Un producto sin precio no se oculta por el filtro de precio.
+        const precio = precioDe(item, "unitario");
+        if (precio !== null && precio > tope) return false;
+
+        return true;
+      }),
+    [items, localSearch, marcasElegidas, tope]
+  );
+
   const cambiarBusqueda = (e) => {
     const valor = e.target.value;
     setLocalSearch(valor);
-    setSearchParams(valor ? { search: valor } : {});
+    setSearchParams(valor ? { search: valor } : {}, { replace: true });
   };
 
-  const filtrados = items.filter((item) => {
-    if (!localSearch) return true;
-    const q = localSearch.toLowerCase();
-    const nombre = (item.nombre || item.name || "").toLowerCase();
-    const cat = (item.categoria || item.category || "").toLowerCase();
-    return nombre.includes(q) || cat.includes(q);
-  });
+  const alternarMarca = (marca) =>
+    setMarcasElegidas((actual) =>
+      actual.includes(marca)
+        ? actual.filter((m) => m !== marca)
+        : [...actual, marca]
+    );
+
+  const limpiar = () => {
+    setMarcasElegidas([]);
+    setTopePrecio(null);
+    setLocalSearch("");
+    navigate("/products", { replace: true });
+  };
 
   return (
     <div className="productos contenedor">
       <header className="productos-cabecera">
         <h1>{category || "Todos los productos"}</h1>
 
-        <div className="productos-filtros">
-          <CategoryFilter activeCategory={category} />
-
-          <div className="productos-buscador">
-            <Search size={18} className="productos-buscador-icono" aria-hidden="true" />
-            <input
-              type="search"
-              className="campo-control"
-              placeholder="Filtrar por nombre o categoría"
-              aria-label="Filtrar productos"
-              value={localSearch}
-              onChange={cambiarBusqueda}
-            />
-          </div>
+        <div className="productos-buscador">
+          <Search size={18} className="productos-buscador-icono" aria-hidden="true" />
+          <input
+            type="search"
+            className="campo-control"
+            placeholder="Buscar por nombre, categoría o marca"
+            aria-label="Buscar productos"
+            value={localSearch}
+            onChange={cambiarBusqueda}
+          />
         </div>
       </header>
 
-      {loading && items.length === 0 ? (
-        <div className="productos-cargando">
-          <PuffLoader color="currentColor" size={60} aria-label="Cargando productos" />
-            <p>Cargando productos...</p>
-        </div>
-      ) : (
-        <>
-          <p className="productos-cuenta">
-            {filtrados.length} {filtrados.length === 1 ? "producto" : "productos"}
-          </p>
+      <div className="productos-cuerpo">
+        <aside className="productos-panel">
+          <FiltrosProductos
+            categoria={category ?? null}
+            onCategoria={(c) =>
+              navigate(c ? `/products/${encodeURIComponent(c)}` : "/products")
+            }
+            marcas={marcas}
+            marcasElegidas={marcasElegidas}
+            onMarca={alternarMarca}
+            precioMin={0}
+            precioMax={precioMax}
+            rango={[0, tope]}
+            onRango={([, max]) => setTopePrecio(max)}
+            cantidad={filtrados.length}
+            onLimpiar={limpiar}
+          />
+        </aside>
 
-          {filtrados.length > 0 ? (
-            <ItemListContainer items={filtrados} />
+        <div className="productos-resultado">
+          {loading && items.length === 0 ? (
+            <div className="productos-cargando">
+              <PuffLoader color="currentColor" aria-label="Cargando productos" />
+              <p>Cargando productos...</p>
+            </div>
           ) : (
-            <div className="productos-vacio">
-              <h2>No encontramos nada</h2>
-              <p>
-                Ningún producto coincide con <strong>{localSearch}</strong>.
-                Probá con otra palabra o mirá el catálogo completo.
+            <>
+              <p className="productos-cuenta">
+                {filtrados.length} {filtrados.length === 1 ? "producto" : "productos"}
               </p>
-              <Link to="/products" className="boton boton-secundario">
-                Ver todo el catálogo
-              </Link>
-            </div>
-          )}
 
-          {hasMore && (
-            <div className="productos-mas">
-              <button
-                onClick={loadMore}
-                disabled={loading}
-                className="boton boton-secundario"
-              >
-                {loading ? "Cargando..." : "Cargar más productos"}
-              </button>
-            </div>
+              {filtrados.length > 0 ? (
+                <ItemListContainer items={filtrados} />
+              ) : (
+                <div className="productos-vacio">
+                  <h2>No encontramos nada</h2>
+                  <p>Probá con otra palabra o sacá algún filtro.</p>
+                  <Link
+                    to="/products"
+                    className="boton boton-secundario"
+                    onClick={limpiar}
+                  >
+                    Ver todo el catálogo
+                  </Link>
+                </div>
+              )}
+            </>
           )}
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 }

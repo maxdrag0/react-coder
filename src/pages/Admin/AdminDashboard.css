@@ -342,3 +342,18 @@
 
   .admin-table td:not([data-etiqueta]) { grid-template-columns: 1fr; }
 }
+
+.form-group small {
+  font-size: var(--t-xs);
+  color: var(--text-tenue);
+}
+
+.form-group select {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--e-3);
+  border: 1px solid var(--gold-linea);
+  border-radius: var(--r-control);
+  background: var(--surface-alto);
+  color: var(--text);
+}

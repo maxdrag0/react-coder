@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { useContext } from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -30,6 +30,8 @@ function Sonda() {
     </div>
   );
 }
+
+beforeEach(() => localStorage.clear());
 
 const montar = () =>
   render(
@@ -84,5 +86,65 @@ describe("CartContext", () => {
 
     expect(screen.getByTestId("renglones")).toHaveTextContent("1");
     expect(screen.getByTestId("total")).toHaveTextContent("390000");
+  });
+});
+
+describe("CartContext — persistencia", () => {
+  it("guarda el carrito en localStorage al agregar", async () => {
+    const user = userEvent.setup();
+    montar();
+    await user.click(screen.getByText("+bulto"));
+
+    const guardado = JSON.parse(localStorage.getItem("carrito"));
+    expect(guardado).toHaveLength(1);
+    expect(guardado[0].unidad).toBe("bulto");
+    expect(guardado[0].precioElegido).toBe(390000);
+  });
+
+  it("recupera el carrito al volver a montar", async () => {
+    const user = userEvent.setup();
+    const { unmount } = montar();
+    await user.click(screen.getByText("+unidad"));
+    await user.click(screen.getByText("+unidad"));
+    unmount();
+
+    montar();
+    expect(screen.getByTestId("cantidad")).toHaveTextContent("2");
+    expect(screen.getByTestId("total")).toHaveTextContent("9000");
+  });
+
+  it("refleja el borrado en localStorage", async () => {
+    const user = userEvent.setup();
+    montar();
+    await user.click(screen.getByText("+unidad"));
+    await user.click(screen.getByText("borrar primero"));
+
+    expect(JSON.parse(localStorage.getItem("carrito"))).toEqual([]);
+  });
+
+  it("arranca vacío si lo guardado está corrupto, sin romper la app", () => {
+    localStorage.setItem("carrito", "esto no es json");
+    montar();
+    expect(screen.getByTestId("renglones")).toHaveTextContent("0");
+  });
+
+  it("ignora lo guardado si no es un arreglo", () => {
+    localStorage.setItem("carrito", JSON.stringify({ truco: true }));
+    montar();
+    expect(screen.getByTestId("renglones")).toHaveTextContent("0");
+  });
+
+  it("descarta renglones sin clave o sin precio", () => {
+    localStorage.setItem(
+      "carrito",
+      JSON.stringify([
+        { clave: "1__unitario", precioElegido: 100, cantidad: 2, codigo: "1" },
+        { codigo: "2", cantidad: 1 },
+        { clave: "3__bulto", precioElegido: 0, cantidad: 1, codigo: "3" },
+      ])
+    );
+    montar();
+    expect(screen.getByTestId("renglones")).toHaveTextContent("1");
+    expect(screen.getByTestId("total")).toHaveTextContent("200");
   });
 });

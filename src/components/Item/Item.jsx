@@ -9,7 +9,7 @@ function Item({ item }) {
   const foto = item.fotoUrl || item.image;
   const categoria = item.categoria || item.category;
 
-  const meta = [categoria, item.duracion ? `${item.duracion} seg` : null]
+  const meta = [item.marca, categoria, item.duracion ? `${item.duracion} seg` : null]
     .filter(Boolean)
     .join(" · ");
 

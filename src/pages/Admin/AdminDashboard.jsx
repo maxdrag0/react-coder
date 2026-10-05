@@ -5,6 +5,7 @@ import { obtenerProductos, crearProducto, actualizarProducto, eliminarProducto }
 import { obtenerTodasLasCompras } from "../../services/firebase/comprasFirebase";
 import { obtenerMensajes, marcarMensajeComoLeido, eliminarMensaje } from "../../services/firebase/contactoFirebase";
 import { uploadFile } from "../../services/firebase/storageFirebase";
+import { CATEGORIES } from "../../constants/categories";
 import "./AdminDashboard.css";
 import { CheckCircle, Circle, Trash2 } from "lucide-react";
 
@@ -80,10 +81,24 @@ const AdminDashboard = () => {
   const handleOpenModal = (product = null) => {
     if (product) {
       setIsEditing(true);
+      // El catálogo convive con dos esquemas: los productos sembrados usan
+      // nombre/precioUnitario/fotoUrl/categoria y los creados desde acá usan
+      // name/price/image/category. Leer solo uno dejaba el formulario vacío
+      // en todo producto existente, y guardar una foto borraba el precio.
       setCurrentProduct({
         ...product,
-        name: product.name || product.nombre || "",
-        ventas: product.ventas || 0
+        name: product.name ?? product.nombre ?? "",
+        price: product.price ?? product.precioUnitario ?? "",
+        precioDisplay: product.precioDisplay ?? "",
+        precioBulto: product.precioBulto ?? "",
+        category: product.category ?? product.categoria ?? "",
+        description: product.description ?? product.descripcion ?? "",
+        image: product.image ?? product.fotoUrl ?? "",
+        marca: product.marca ?? "",
+        subcategoria: product.subcategoria ?? "",
+        duracion: product.duracion ?? "",
+        stock: product.stock ?? 0,
+        ventas: product.ventas ?? 0,
       });
     } else {
       setIsEditing(false);
@@ -94,6 +109,9 @@ const AdminDashboard = () => {
         precioDisplay: "",
         precioBulto: "",
         category: "",
+        subcategoria: "",
+        marca: "",
+        duracion: "",
         description: "",
         image: "",
         stock: 0,
@@ -120,14 +138,24 @@ const AdminDashboard = () => {
         imageUrl = await uploadFile(file);
       }
       
+      // Se escriben los dos esquemas en paralelo para que la tienda lea lo
+      // mismo sin importar cuál mire. Unificarlos exige migrar los datos y
+      // es el subproyecto E.
       const productData = {
         ...currentProduct,
-        name: currentProduct.name, // ensure name is saved uniformly
-        nombre: currentProduct.name, // keep backwards compatibility
+        name: currentProduct.name,
+        nombre: currentProduct.name,
         price: Number(currentProduct.price),
         precioUnitario: Number(currentProduct.price),
         precioDisplay: currentProduct.precioDisplay ? Number(currentProduct.precioDisplay) : null,
         precioBulto: currentProduct.precioBulto ? Number(currentProduct.precioBulto) : null,
+        category: currentProduct.category,
+        categoria: currentProduct.category,
+        description: currentProduct.description,
+        descripcion: currentProduct.description,
+        marca: currentProduct.marca?.trim() || null,
+        subcategoria: currentProduct.subcategoria?.trim() || null,
+        duracion: currentProduct.duracion ? Number(currentProduct.duracion) : null,
         stock: Number(currentProduct.stock),
         ventas: Number(currentProduct.ventas) || 0,
         image: imageUrl,
@@ -438,12 +466,50 @@ const AdminDashboard = () => {
                 <small>Dejalo vacío si no se vende por bulto.</small>
               </div>
               <div className="form-group">
-                <label>Categoría</label>
-                <input 
-                  type="text" 
-                  value={currentProduct.category}
+                <label htmlFor="marca">Marca</label>
+                <input
+                  id="marca"
+                  type="text"
+                  value={currentProduct.marca ?? ""}
+                  onChange={(e) => setCurrentProduct({...currentProduct, marca: e.target.value})}
+                />
+                <small>Punto Austral, Cienfuegos, Jupiter... Se usa para filtrar.</small>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="duracion">Duración en segundos</label>
+                <input
+                  id="duracion"
+                  type="number"
+                  min="0"
+                  value={currentProduct.duracion ?? ""}
+                  onChange={(e) => setCurrentProduct({...currentProduct, duracion: e.target.value})}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="categoria">Categoría</label>
+                <select
+                  id="categoria"
+                  value={currentProduct.category ?? ""}
                   onChange={(e) => setCurrentProduct({...currentProduct, category: e.target.value})}
                   required
+                >
+                  <option value="">Elegir categoría</option>
+                  {Object.values(CATEGORIES).sort((a, b) => a.localeCompare(b)).map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                <small>Escribirla a mano fue lo que dejó el catálogo con 20 variantes.</small>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="subcategoria">Subcategoría</label>
+                <input
+                  id="subcategoria"
+                  type="text"
+                  value={currentProduct.subcategoria ?? ""}
+                  onChange={(e) => setCurrentProduct({...currentProduct, subcategoria: e.target.value})}
                 />
               </div>
               <div className="form-group">

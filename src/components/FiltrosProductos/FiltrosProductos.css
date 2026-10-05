@@ -1,0 +1,144 @@
+/* En celular el panel se abre desde un botón y ocupa la pantalla. */
+.filtros-abrir {
+  position: relative;
+  width: 100%;
+}
+
+.filtros-punto {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--gold);
+}
+
+.filtros {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: none;
+  grid-template-rows: auto 1fr auto;
+  align-content: start;
+  overflow-y: auto;
+  padding: var(--e-4);
+  background: var(--ground);
+}
+
+.filtros-abiertos { display: grid; }
+
+.filtros-fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: rgba(14, 23, 38, 0.6);
+}
+
+.filtros-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-3);
+  padding-bottom: var(--e-4);
+  border-bottom: 1px solid var(--gold-linea);
+}
+
+.filtros-cabecera h2 { font-size: var(--t-lg); }
+
+.filtro-grupo {
+  display: grid;
+  gap: var(--e-2);
+  border: none;
+  padding: var(--e-4) 0;
+  border-bottom: 1px solid var(--gold-linea);
+}
+
+.filtro-grupo legend {
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--text);
+  padding: 0 0 var(--e-2);
+}
+
+.filtro-lista {
+  display: grid;
+  gap: var(--e-1);
+  list-style: none;
+  max-height: 16rem;
+  overflow-y: auto;
+}
+
+.filtro-opcion {
+  width: 100%;
+  min-height: 40px;
+  padding: var(--e-2) var(--e-3);
+  border: none;
+  border-radius: var(--r-control);
+  background: none;
+  text-align: left;
+  font-size: var(--t-sm);
+  color: var(--text-suave);
+  transition: background-color var(--mov-rapido), color var(--mov-rapido);
+}
+
+.filtro-opcion:hover { background: var(--surface); color: var(--text); }
+
+.filtro-opcion.activa {
+  background: var(--surface-alto);
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.filtro-check {
+  display: flex;
+  align-items: center;
+  gap: var(--e-3);
+  min-height: 40px;
+  padding-inline: var(--e-3);
+  border-radius: var(--r-control);
+  font-size: var(--t-sm);
+  color: var(--text-suave);
+  cursor: pointer;
+}
+
+.filtro-check:hover { background: var(--surface); color: var(--text); }
+.filtro-check input { accent-color: var(--gold); width: 16px; height: 16px; }
+.filtro-check em { color: var(--text-tenue); font-style: normal; }
+
+.filtro-grupo input[type="range"] {
+  width: 100%;
+  accent-color: var(--gold);
+}
+
+.filtro-rango {
+  font-size: var(--t-sm);
+  color: var(--text-suave);
+  font-variant-numeric: tabular-nums;
+  margin: 0;
+}
+
+.filtros-pie {
+  display: grid;
+  gap: var(--e-2);
+  padding-top: var(--e-4);
+}
+
+@media (min-width: 900px) {
+  /* En escritorio es una columna fija a la izquierda, siempre visible. */
+  .filtros-abrir,
+  .filtros-cerrar,
+  .filtros-fondo,
+  .filtros-ver { display: none; }
+
+  .filtros {
+    display: grid;
+    position: sticky;
+    top: calc(64px + var(--e-5));
+    inset: auto;
+    z-index: auto;
+    max-height: calc(100dvh - 64px - var(--e-7));
+    padding: 0;
+    background: none;
+  }
+
+  .filtros-cabecera { padding-bottom: var(--e-3); }
+  .filtros-pie { padding-top: var(--e-4); }
+}

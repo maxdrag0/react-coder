@@ -2,26 +2,64 @@
 
 .productos-cabecera {
   display: grid;
-  gap: var(--e-3);
-  padding-block: var(--e-4);
+  gap: var(--e-4);
+  padding-block: var(--e-4) var(--e-5);
+}
+
+.productos-filtros { display: grid; gap: var(--e-3); }
+
+.productos-buscador {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.productos-buscador-icono {
+  position: absolute;
+  left: var(--e-3);
+  color: var(--text-tenue);
+  pointer-events: none;
+}
+
+.productos-buscador .campo-control {
+  padding-left: calc(var(--e-3) * 2 + 18px);
+  border-radius: var(--r-pill);
 }
 
 .productos-cuenta {
   font-size: var(--t-sm);
   color: var(--text-suave);
   font-variant-numeric: tabular-nums;
+  margin: 0 0 var(--e-4);
+}
+
+.productos-cargando {
+  display: grid;
+  place-items: center;
+  padding-block: var(--e-8);
 }
 
 .productos-vacio {
   display: grid;
   gap: var(--e-4);
   justify-items: start;
-  padding-block: var(--e-8);
+  padding-block: var(--e-7);
   color: var(--text-suave);
 }
+
+.productos-vacio strong { color: var(--text); }
 
 .productos-mas {
   display: flex;
   justify-content: center;
   padding-block: var(--e-6);
+}
+
+@media (min-width: 900px) {
+  .productos-filtros {
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    gap: var(--e-5);
+  }
+  .productos-buscador { min-width: 280px; }
 }

@@ -33,15 +33,8 @@ function NavBar() {
       <div className="nav-inner">
         <Logo />
 
-        <nav className="nav-links" aria-label="Principal">
-          {LINKS.map((l) => (
-            <NavLink key={l.a} to={l.a} end={l.a === "/"}>
-              {l.texto}
-            </NavLink>
-          ))}
-        </nav>
-
         <form className="nav-buscador" onSubmit={buscar} role="search">
+          <Search size={18} className="nav-buscador-icono" aria-hidden="true" />
           <input
             type="search"
             className="campo-control"
@@ -50,24 +43,35 @@ function NavBar() {
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
           />
-          <button type="submit" className="nav-accion" aria-label="Buscar">
-            <Search size={18} />
-          </button>
         </form>
+
+        {/* Los links viven en el panel en celular y acá en escritorio. */}
+        <nav className="nav-links" aria-label="Principal">
+          {LINKS.map((l) => (
+            <NavLink key={l.a} to={l.a} end={l.a === "/"}>
+              {l.texto}
+            </NavLink>
+          ))}
+        </nav>
 
         <div className="nav-acciones">
           {isAdmin && (
-            <NavLink to="/admin" className="nav-accion" title="Panel de administración">
+            <NavLink to="/admin" className="nav-accion nav-solo-escritorio" title="Panel">
               <Shield size={20} />
               <span className="nav-accion-texto">Admin</span>
             </NavLink>
           )}
 
-          <NavLink to={user ? "/profile" : "/login"} className="nav-accion">
+          <NavLink
+            to={user ? "/profile" : "/login"}
+            className="nav-accion nav-solo-escritorio"
+          >
             <User size={20} />
             <span className="nav-accion-texto">{user ? "Perfil" : "Ingresar"}</span>
           </NavLink>
 
+          {/* El carrito queda fuera del menú a propósito: es la acción de
+              compra y su contador tiene que verse siempre. */}
           <CartMenu />
 
           <button
@@ -87,6 +91,20 @@ function NavBar() {
             {l.texto}
           </NavLink>
         ))}
+
+        <hr className="nav-panel-separador" />
+
+        <NavLink to={user ? "/profile" : "/login"} onClick={cerrarMenu}>
+          <User size={18} />
+          {user ? "Mi perfil" : "Ingresar"}
+        </NavLink>
+
+        {isAdmin && (
+          <NavLink to="/admin" onClick={cerrarMenu}>
+            <Shield size={18} />
+            Panel de administración
+          </NavLink>
+        )}
       </nav>
     </header>
   );

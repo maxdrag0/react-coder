@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import Precio from "@/components/common/Precio/Precio";
-import BarraStock from "@/components/common/BarraStock/BarraStock";
 import MediaPlaceholder from "@/components/common/MediaPlaceholder/MediaPlaceholder";
 import "./Item.css";
 
@@ -25,6 +24,8 @@ function Item({ item }) {
           <h3 className="item-titulo">{nombre}</h3>
           {meta && <p className="item-meta">{meta}</p>}
 
+          {/* El stock no se muestra: hasta definir si se cuenta por unidad,
+              display o bulto, cualquier número sería engañoso. */}
           <Precio
             unitario={item.precioUnitario ?? item.price}
             display={item.precioDisplay}
@@ -32,10 +33,6 @@ function Item({ item }) {
           />
         </div>
       </Link>
-
-      <div className="item-pie">
-        <BarraStock stock={item.stock} />
-      </div>
     </article>
   );
 }

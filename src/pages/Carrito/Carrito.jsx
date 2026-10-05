@@ -76,7 +76,7 @@ function Carrito() {
         <div className="carrito-grid">
           <div className="carrito-lista">
             {cartList.map((item) => (
-              <CarritoCard key={item.codigo} item={item} />
+              <CarritoCard key={item.clave} item={item} />
             ))}
           </div>
 

@@ -1,11 +1,11 @@
 import { PuffLoader } from "react-spinners";
+import { useState, useEffect } from "react";
+import { useParams, useSearchParams, Link } from "react-router-dom";
+import { Search } from "lucide-react";
 import ItemListContainer from "../../components/ItemListContainer/ItemListContainer";
 import CategoryFilter from "../../components/CategoryFilter/CategoryFilter";
 import { useProducts } from "../../hooks/useProducts";
 import "./Products.css";
-import { useParams, useSearchParams } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { Search } from "lucide-react";
 
 function Products() {
   const { category } = useParams();
@@ -19,75 +19,80 @@ function Products() {
     setLocalSearch(urlSearch);
   }, [urlSearch]);
 
-  const handleLocalSearchChange = (e) => {
-    const value = e.target.value;
-    setLocalSearch(value);
-    
-    if (value) {
-      setSearchParams({ search: value });
-    } else {
-      setSearchParams({});
-    }
+  const cambiarBusqueda = (e) => {
+    const valor = e.target.value;
+    setLocalSearch(valor);
+    setSearchParams(valor ? { search: valor } : {});
   };
 
-  const filteredItems = items.filter(item => {
+  const filtrados = items.filter((item) => {
     if (!localSearch) return true;
-    const lowerSearch = localSearch.toLowerCase();
-    const nameMatch = (item.nombre || item.name || "").toLowerCase().includes(lowerSearch);
-    const catMatch = (item.categoria || item.category || "").toLowerCase().includes(lowerSearch);
-    return nameMatch || catMatch;
+    const q = localSearch.toLowerCase();
+    const nombre = (item.nombre || item.name || "").toLowerCase();
+    const cat = (item.categoria || item.category || "").toLowerCase();
+    return nombre.includes(q) || cat.includes(q);
   });
 
   return (
-    <div className="product-page">
-      <CategoryFilter activeCategory={category} />
-      
-      <div className="product-content">
-        <div className="products-search-bar">
-          <Search size={20} className="search-icon" />
-          <input 
-            type="text" 
-            placeholder="Filtrar resultados por nombre o categoría..."
-            value={localSearch}
-            onChange={handleLocalSearchChange}
-            className="products-search-input"
-          />
-        </div>
+    <div className="productos contenedor">
+      <header className="productos-cabecera">
+        <h1>{category || "Todos los productos"}</h1>
 
-        {loading && items.length === 0 ? (
-          <div className="loader-container">
-            <PuffLoader color="#4361ee" size={60} />
+        <div className="productos-filtros">
+          <CategoryFilter activeCategory={category} />
+
+          <div className="productos-buscador">
+            <Search size={18} className="productos-buscador-icono" aria-hidden="true" />
+            <input
+              type="search"
+              className="campo-control"
+              placeholder="Filtrar por nombre o categoría"
+              aria-label="Filtrar productos"
+              value={localSearch}
+              onChange={cambiarBusqueda}
+            />
           </div>
-        ) : (
-          <>
-            <div className="product-header">
-              {category ? <h1>{category}</h1> : <h1>Todos los productos</h1>}
-              <p className="product-count">{filteredItems.length} productos encontrados</p>
+        </div>
+      </header>
+
+      {loading && items.length === 0 ? (
+        <div className="productos-cargando">
+          <PuffLoader color="#E6B32E" size={60} aria-label="Cargando productos" />
+        </div>
+      ) : (
+        <>
+          <p className="productos-cuenta">
+            {filtrados.length} {filtrados.length === 1 ? "producto" : "productos"}
+          </p>
+
+          {filtrados.length > 0 ? (
+            <ItemListContainer items={filtrados} />
+          ) : (
+            <div className="productos-vacio">
+              <h2>No encontramos nada</h2>
+              <p>
+                Ningún producto coincide con <strong>{localSearch}</strong>.
+                Probá con otra palabra o mirá el catálogo completo.
+              </p>
+              <Link to="/products" className="boton boton-secundario">
+                Ver todo el catálogo
+              </Link>
             </div>
-            
-            {filteredItems.length > 0 ? (
-              <ItemListContainer items={filteredItems} />
-            ) : (
-              <div className="no-results" style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
-                No se encontraron productos que coincidan con "{localSearch}".
-              </div>
-            )}
-            
-            {hasMore && (
-              <div className="load-more-container" style={{ textAlign: 'center', marginTop: '2rem' }}>
-                <button 
-                  onClick={loadMore} 
-                  disabled={loading}
-                  className="boton boton-secundario"
-                  style={{ width: 'auto', padding: '10px 30px' }}
-                >
-                  {loading ? "Cargando..." : "Cargar más productos"}
-                </button>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+          )}
+
+          {hasMore && (
+            <div className="productos-mas">
+              <button
+                onClick={loadMore}
+                disabled={loading}
+                className="boton boton-secundario"
+              >
+                {loading ? "Cargando..." : "Cargar más productos"}
+              </button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

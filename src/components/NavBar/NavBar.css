@@ -2,41 +2,54 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  background: color-mix(in srgb, var(--ground) 94%, transparent);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--gold-linea);
 }
 
 .nav-inner {
   display: grid;
-  grid-template-columns: auto 1fr auto auto;
+  /* logo | buscador estirado | acciones */
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: var(--e-2);
   width: 100%;
   max-width: var(--ancho-max);
   margin-inline: auto;
-  padding: var(--e-3) var(--e-4);
+  padding: var(--e-2) var(--e-3);
 }
 
-.nav-logo img { height: 36px; width: auto; }
+.nav-logo { flex-shrink: 0; }
+.nav-logo img { height: 32px; width: auto; }
 
-/* El buscador deja de aparecer y desaparecer con un botón: es siempre
-   visible, compacto en celular y ancho en escritorio. */
+/* El buscador ocupa todo el espacio que queda. */
 .nav-buscador {
+  position: relative;
   display: flex;
+  align-items: center;
   min-width: 0;
-  gap: var(--e-1);
+}
+
+.nav-buscador-icono {
+  position: absolute;
+  left: var(--e-3);
+  color: var(--text-tenue);
+  pointer-events: none;
 }
 
 .nav-buscador .campo-control {
   min-width: 0;
+  height: 40px;
+  min-height: 40px;
+  padding-left: calc(var(--e-3) * 2 + 18px);
+  padding-right: var(--e-3);
   border-radius: var(--r-pill);
-  padding-inline: var(--e-4);
+  font-size: var(--t-sm);
 }
 
-.nav-buscador-enviar {
-  display: none;
-}
+/* En celular los links y el perfil viven dentro de la hamburguesa. */
+.nav-links,
+.nav-solo-escritorio { display: none; }
 
 .nav-acciones {
   display: flex;
@@ -59,8 +72,6 @@
 .nav-accion:hover { color: var(--gold); background: var(--surface); }
 .nav-accion-texto { display: none; }
 
-.nav-links { display: none; }
-
 .nav-hamburguesa {
   display: inline-flex;
   align-items: center;
@@ -72,24 +83,37 @@
   color: var(--text);
 }
 
-/* Panel desplegable en celular */
 .nav-panel {
   display: none;
   gap: var(--e-1);
-  padding: var(--e-3) var(--e-4) var(--e-5);
+  padding: var(--e-2) var(--e-3) var(--e-4);
   border-top: 1px solid var(--gold-linea);
 }
 
 .nav-panel.abierto { display: grid; }
 
 .nav-panel a {
-  padding: var(--e-3);
+  display: flex;
+  align-items: center;
+  gap: var(--e-3);
+  min-height: 48px;
+  padding: var(--e-2) var(--e-3);
   border-radius: var(--r-control);
   color: var(--text-suave);
+  font-size: var(--t-base);
 }
 
 .nav-panel a:hover,
-.nav-panel a.active { background: var(--surface); color: var(--gold); }
+.nav-panel a.active {
+  background: var(--surface);
+  color: var(--gold);
+}
+
+.nav-panel-separador {
+  border: none;
+  border-top: 1px solid var(--gold-linea);
+  margin-block: var(--e-2);
+}
 
 .nav-carrito-cuenta {
   position: absolute;
@@ -112,20 +136,26 @@
   .nav-inner {
     grid-template-columns: auto auto 1fr auto;
     gap: var(--e-5);
+    padding: var(--e-3) var(--e-4);
   }
+
+  .nav-logo img { height: 36px; }
 
   .nav-hamburguesa { display: none; }
   .nav-panel { display: none !important; }
 
-  .nav-links {
-    display: flex;
-    gap: var(--e-5);
-  }
+  /* El DOM va logo, buscador, links, acciones; en escritorio se quieren
+     en el orden logo, links, buscador, acciones. Columnas explícitas. */
+  .nav-logo { grid-column: 1; }
+  .nav-links { grid-column: 2; display: flex; gap: var(--e-5); }
+  .nav-buscador { grid-column: 3; }
+  .nav-acciones { grid-column: 4; }
 
-  .nav-links a { color: var(--text-suave); }
+  .nav-links a { color: var(--text-suave); white-space: nowrap; }
   .nav-links a:hover,
   .nav-links a.active { color: var(--gold); }
 
+  .nav-solo-escritorio { display: inline-flex; }
   .nav-accion-texto { display: inline; font-size: var(--t-sm); }
-  .nav-buscador { max-width: 300px; justify-self: end; }
+  .nav-buscador { max-width: 340px; justify-self: end; }
 }

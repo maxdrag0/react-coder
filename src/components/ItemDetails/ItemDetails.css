@@ -64,3 +64,78 @@
      mientras se lee la ficha. */
   .detalle-media { position: sticky; top: calc(64px + var(--e-5)); }
 }
+
+/* --- Selector de unidad de compra --- */
+
+.detalle-unidades {
+  display: grid;
+  gap: var(--e-2);
+  border: none;
+  padding: 0;
+  min-width: 0;
+}
+
+.detalle-unidades legend {
+  font-size: var(--t-sm);
+  color: var(--text-suave);
+  padding: 0 0 var(--e-2);
+}
+
+.unidad {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--e-3);
+  min-height: 56px;
+  padding: var(--e-3) var(--e-4);
+  border: 1px solid var(--gold-linea);
+  border-radius: var(--r-control);
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color var(--mov-rapido), background-color var(--mov-rapido);
+}
+
+.unidad:hover { border-color: var(--blue); }
+
+.unidad-elegida {
+  border-color: var(--gold);
+  background: var(--surface-alto);
+}
+
+.unidad input { accent-color: var(--gold); width: 18px; height: 18px; }
+
+.unidad-nombre { font-size: var(--t-sm); min-width: 0; }
+.unidad-nombre small { color: var(--text-tenue); }
+
+.unidad-precio {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--text-suave);
+  white-space: nowrap;
+}
+
+.unidad-elegida .unidad-precio { color: var(--gold); }
+
+.unidad:has(input:focus-visible) {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.detalle-subtotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--e-3);
+  margin: 0;
+  padding-top: var(--e-3);
+  border-top: 1px solid var(--gold-linea);
+  color: var(--text-suave);
+  font-size: var(--t-sm);
+}
+
+.detalle-subtotal strong {
+  font-size: var(--t-xl);
+  font-stretch: var(--ancho-display);
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}

@@ -34,7 +34,9 @@
 .item-cuerpo {
   display: grid;
   gap: var(--e-2);
+  align-content: start;
   padding: var(--e-4);
+  flex: 1;
   min-width: 0;
 }
 
@@ -56,10 +58,6 @@
   font-size: var(--t-sm);
   color: var(--text-suave);
   margin: 0;
-}
-
-.item-pie {
-  padding: 0 var(--e-4) var(--e-4);
 }
 
 /* El único movimiento es un cambio de color: nada de elevarse ni escalar. */

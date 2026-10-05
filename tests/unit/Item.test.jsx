@@ -89,8 +89,10 @@ describe("Item", () => {
     expect(screen.getByText("$1.200")).toBeInTheDocument();
   });
 
-  it("marca el stock bajo", () => {
+  it("NO muestra el stock", () => {
+    // Se quitó a propósito: mientras no esté definido si el stock se cuenta
+    // por unidad, display o bulto, cualquier número sería engañoso.
     montar({ ...COMPLETO, stock: 4 });
-    expect(screen.getByText(/últimas 4/i)).toBeInTheDocument();
+    expect(screen.queryByText(/stock|últimas/i)).not.toBeInTheDocument();
   });
 });

@@ -6,7 +6,15 @@ const ENFOCABLES =
 
 // `tittle` está mal escrito desde el original. Se mantiene para no tocar a sus
 // consumidores; renombrarlo es trabajo del subproyecto E.
-const Modal = ({ isOpen, onClose, onAccept, tittle, message }) => {
+const Modal = ({
+  isOpen,
+  onClose,
+  onAccept,
+  tittle,
+  message,
+  textoAceptar = "Entendido",
+  acciones = null,
+}) => {
   const caja = useRef(null);
   const previo = useRef(null);
 
@@ -43,8 +51,6 @@ const Modal = ({ isOpen, onClose, onAccept, tittle, message }) => {
 
     return () => {
       document.removeEventListener("keydown", alTeclear);
-      // Devolver el foco a donde estaba: si no, queda en el body y la
-      // persona que navega con teclado pierde su lugar.
       devolverFocoA?.focus?.();
     };
   }, [isOpen, onClose]);
@@ -65,9 +71,10 @@ const Modal = ({ isOpen, onClose, onAccept, tittle, message }) => {
         <h2 id="modal-titulo">{tittle}</h2>
         <div className="modal-cuerpo">{message}</div>
         <div className="modal-acciones">
-          <button type="button" className="boton boton-primario" onClick={onAccept}>
-            Entendido
+          <button type="button" className="boton boton-secundario" onClick={onAccept}>
+            {textoAceptar}
           </button>
+          {acciones}
         </div>
       </div>
     </div>

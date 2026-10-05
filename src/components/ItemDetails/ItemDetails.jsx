@@ -2,29 +2,32 @@ import { useState, useContext } from "react";
 import { CartContext } from "../../contexts/cart/CartContext";
 import { Counter } from "../common/Counter/Counter";
 import Modal from "../common/Modal/Modal";
-import Precio from "@/components/common/Precio/Precio";
-import BarraStock from "@/components/common/BarraStock/BarraStock";
 import MediaPlaceholder from "@/components/common/MediaPlaceholder/MediaPlaceholder";
+import { formatearPrecio } from "@/utils/formatearPrecio";
+import { unidadesDisponibles, precioDe, multiplicadorDe } from "@/constants/unidades";
+import { Link } from "react-router-dom";
 import "./ItemDetails.css";
 
 function ItemDetails({ item }) {
-  const { cartList, addToCart } = useContext(CartContext);
-  const itemInCart = cartList.find((prod) => prod.codigo === item.codigo);
-  const inCartQuantity = itemInCart ? itemInCart.cantidad : 0;
-  const availableStock = item.stock - inCartQuantity;
+  const { addToCart } = useContext(CartContext);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const unidades = unidadesDisponibles(item);
+  const [unidad, setUnidad] = useState(unidades[0]?.clave ?? "unitario");
   const [count, setCount] = useState(1);
+  const [modalAbierto, setModalAbierto] = useState(false);
 
-  const sumar = () => { if (count < availableStock) setCount(count + 1); };
+  // Sin límite por stock: hasta definir si el stock se cuenta por unidad,
+  // display o bulto, limitar la compra daría un número equivocado.
+  const sumar = () => setCount(count + 1);
   const restar = () => { if (count > 1) setCount(count - 1); };
 
-  const handleAdd = () => {
-    if (count <= availableStock) {
-      addToCart(item, count);
-      setIsModalOpen(true);
-      setCount(1);
-    }
+  const precio = precioDe(item, unidad);
+  const subtotal = precio ? precio * count : 0;
+
+  const agregar = () => {
+    addToCart(item, count, unidad);
+    setModalAbierto(true);
+    setCount(1);
   };
 
   const nombre = item.nombre || item.name;
@@ -47,13 +50,9 @@ function ItemDetails({ item }) {
 
       <div className="detalle-info">
         <h1>{nombre}</h1>
-        {descripcion && <p className="detalle-desc">{descripcion}</p>}
-
-        <Precio
-          unitario={item.precioUnitario ?? item.price}
-          display={item.precioDisplay}
-          bulto={item.precioBulto}
-        />
+        {descripcion && descripcion !== nombre && (
+          <p className="detalle-desc">{descripcion}</p>
+        )}
 
         {ficha.length > 0 && (
           <dl className="detalle-ficha">
@@ -66,26 +65,71 @@ function ItemDetails({ item }) {
           </dl>
         )}
 
-        <BarraStock stock={item.stock} />
+        {unidades.length > 0 && (
+          <fieldset className="detalle-unidades">
+            <legend>Cómo lo querés comprar</legend>
 
-        {availableStock > 0 ? (
-          <div className="detalle-compra">
-            <Counter count={count} sumar={sumar} restar={restar} />
-            <button type="button" className="boton boton-primario" onClick={handleAdd}>
-              Agregar al carrito
-            </button>
-          </div>
-        ) : (
-          <p className="detalle-agotado">Sin stock disponible.</p>
+            {unidades.map((u) => {
+              const mult = multiplicadorDe(item, u.clave);
+              const elegida = unidad === u.clave;
+              return (
+                <label
+                  key={u.clave}
+                  className={`unidad ${elegida ? "unidad-elegida" : ""}`}
+                >
+                  <input
+                    type="radio"
+                    name="unidad"
+                    value={u.clave}
+                    checked={elegida}
+                    onChange={() => setUnidad(u.clave)}
+                  />
+                  <span className="unidad-nombre">
+                    {u.etiqueta}
+                    {mult && <small> · {mult} unidades</small>}
+                  </span>
+                  <span className="unidad-precio">
+                    {formatearPrecio(precioDe(item, u.clave))}
+                  </span>
+                </label>
+              );
+            })}
+          </fieldset>
+        )}
+
+        <div className="detalle-compra">
+          <Counter count={count} sumar={sumar} restar={restar} />
+          <button type="button" className="boton boton-primario" onClick={agregar}>
+            Agregar al carrito
+          </button>
+        </div>
+
+        {subtotal > 0 && (
+          <p className="detalle-subtotal">
+            Subtotal <strong>{formatearPrecio(subtotal)}</strong>
+          </p>
         )}
       </div>
 
       <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onAccept={() => setIsModalOpen(false)}
-        tittle="Agregado al carrito"
-        message={`${nombre} está en tu carrito.`}
+        isOpen={modalAbierto}
+        onClose={() => setModalAbierto(false)}
+        onAccept={() => setModalAbierto(false)}
+        tittle="Listo, lo agregamos"
+        textoAceptar="Seguir comprando"
+        acciones={
+          <Link to="/carrito" className="boton boton-primario">
+            Ir al carrito
+          </Link>
+        }
+        message={
+          <>
+            <strong>{nombre}</strong>
+            <br />
+            {count} {count === 1 ? "unidad de compra" : "unidades de compra"} ·{" "}
+            {unidades.find((u) => u.clave === unidad)?.etiqueta}
+          </>
+        }
       />
     </article>
   );

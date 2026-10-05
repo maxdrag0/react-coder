@@ -5,47 +5,66 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: rgba(14, 23, 38, 0.7);
+  padding: 0;
+  background: rgba(14, 23, 38, 0.72);
   backdrop-filter: blur(8px);
 }
 
 .modal {
+  /* align-self y align-content explícitos: sin ellos el flex estira la caja
+     a toda la altura y el grid reparte las filas, que es lo que hacía que el
+     botón apareciera como un bloque enorme abajo. */
+  align-self: flex-end;
+  align-content: start;
   width: 100%;
-  max-width: 480px;
-  background: var(--surface);
-  box-shadow: var(--elev-2);
-  padding: var(--e-5);
+  max-width: 460px;
+  max-height: 88dvh;
+  overflow-y: auto;
   display: grid;
   gap: var(--e-4);
-  /* En celular sube desde abajo como una hoja, que es lo que se espera
-     en un teléfono; en pantallas grandes se centra como caja. */
+  padding: var(--e-5);
+  background: var(--surface);
+  box-shadow: var(--elev-2);
   border-radius: var(--r-card) var(--r-card) 0 0;
   animation: modal-subir var(--mov-base);
 }
 
 @keyframes modal-subir {
-  from { transform: translateY(8px); opacity: 0; }
-  to   { transform: translateY(0);   opacity: 1; }
+  from { transform: translateY(12px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
 }
 
-.modal h2 { font-size: var(--t-lg); }
+.modal h2 {
+  font-size: var(--t-lg);
+  margin: 0;
+}
 
 .modal-cuerpo {
   color: var(--text-suave);
   font-size: var(--t-sm);
+  line-height: 1.5;
 }
+
+.modal-cuerpo strong { color: var(--text); }
 
 .modal-acciones {
   display: flex;
-  justify-content: flex-end;
+  flex-wrap: wrap;
   gap: var(--e-2);
 }
+
+.modal-acciones > * { flex: 1 1 auto; }
 
 .modal:focus-visible { outline: none; }
 
 @media (min-width: 640px) {
   .modal-fondo { align-items: center; padding: var(--e-4); }
-  .modal { border-radius: var(--r-card); }
+  .modal {
+    align-self: center;
+    border-radius: var(--r-card);
+  }
+  .modal-acciones { justify-content: flex-end; }
+  .modal-acciones > * { flex: 0 0 auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {

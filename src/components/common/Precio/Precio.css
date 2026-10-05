@@ -1,0 +1,35 @@
+.precio {
+  display: grid;
+  gap: var(--e-1);
+  font-variant-numeric: tabular-nums;
+}
+
+.precio-fila {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: baseline;
+  gap: var(--e-2);
+}
+
+.precio-fila dt {
+  font-size: var(--t-xs);
+  color: var(--text-tenue);
+}
+
+.precio-fila dd {
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--text-suave);
+}
+
+.precio-mult {
+  font-size: var(--t-xs);
+  color: var(--text-tenue);
+}
+
+/* El bulto es el que se compra: es el único que lleva el acento. */
+.precio-bulto dd {
+  font-size: var(--t-md);
+  font-weight: 600;
+  color: var(--gold);
+}

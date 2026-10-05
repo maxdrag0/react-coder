@@ -1,17 +1,10 @@
-.logo-container {
-  display: flex;
+.nav-logo {
+  display: inline-flex;
   align-items: center;
-  height: 100%;
+  min-height: 44px;
 }
 
-.logo {
-  height: 40px;
-  display: flex;
-  align-items: center;
-}
-
-.logo-img {
-  height: 100%;
+.nav-logo img {
+  height: 36px;
   width: auto;
-  object-fit: contain;
 }

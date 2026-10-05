@@ -4,13 +4,9 @@ import "./Logo.css";
 
 function Logo() {
   return (
-    <>
-      <div className="logo-container">
-        <NavLink to="/" className="logo">
-          <img src={logo} alt="Vite logo" className="logo-img" />
-        </NavLink>
-      </div>
-    </>
+    <NavLink to="/" className="nav-logo" aria-label="Inicio">
+      <img src={logo} alt="Pirotecnia" />
+    </NavLink>
   );
 }
 

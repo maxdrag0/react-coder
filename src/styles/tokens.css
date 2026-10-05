@@ -1,0 +1,153 @@
+/* Tokens del sistema visual. Única fuente de verdad.
+
+   El tema oscuro vive en :root a propósito: es el que se diseña primero y el
+   que se ve antes de que corra el JavaScript.
+
+   Dirección: la interfaz es la noche; el producto es la única luz. Un show de
+   pirotecnia es 95% oscuridad y 5% luz, y el color pleno aparece únicamente
+   dentro del media del producto. */
+
+:root {
+  /* Color — el fondo es el azul del logo al 12% de luminosidad, no negro.
+     Negro puro es el cliché del rubro; el cielo nocturno real es azul. */
+  --ground: #0E1726;
+  --surface: #162233;
+  --surface-alto: #1E2D42;
+
+  --gold: #E6B32E;
+  --gold-suave: #F0CC6B;
+  --gold-linea: rgba(230, 179, 46, 0.15);
+
+  --blue: #3B7CB8;
+  --blue-suave: #5B9AD4;
+
+  --danger: #E2565C;
+  --danger-fondo: rgba(226, 86, 92, 0.12);
+  --exito: #4FBF85;
+  --exito-fondo: rgba(79, 191, 133, 0.12);
+
+  --text: #F2F0EB;
+  --text-suave: #9FB2C9;
+  --text-tenue: #76889F;
+
+  /* Elevación — sin sombras: sobre fondo oscuro no se leen. */
+  --elev-1: 0 0 0 1px var(--gold-linea);
+  --elev-2: 0 0 0 1px var(--gold-linea), 0 8px 24px rgba(0, 0, 0, 0.4);
+
+  /* Tipografía */
+  --fuente: 'Archivo', system-ui, -apple-system, sans-serif;
+  --ancho-display: 110%;
+  --ancho-cuerpo: 100%;
+
+  --t-xs: 0.75rem;
+  --t-sm: 0.875rem;
+  --t-base: 1rem;
+  --t-md: 1.25rem;
+  --t-lg: 1.563rem;
+  --t-xl: 1.953rem;
+  --t-2xl: 2.441rem;
+  --t-3xl: 3.052rem;
+
+  /* Espacio — escala de 4px, sin valores sueltos fuera de acá */
+  --e-1: 0.25rem;
+  --e-2: 0.5rem;
+  --e-3: 0.75rem;
+  --e-4: 1rem;
+  --e-5: 1.5rem;
+  --e-6: 2rem;
+  --e-7: 3rem;
+  --e-8: 4rem;
+
+  /* Radios por rol, no uniformes: el radio codifica jerarquía */
+  --r-media: 0;
+  --r-card: 12px;
+  --r-control: 8px;
+  --r-pill: 999px;
+
+  /* Movimiento — solo responde a acciones de la persona */
+  --mov-rapido: 120ms ease-out;
+  --mov-base: 200ms ease-out;
+
+  --ancho-max: 1200px;
+  --medida: 72ch;
+}
+
+[data-theme="light"] {
+  --ground: #F5F6F8;
+  --surface: #FFFFFF;
+  --surface-alto: #EDF0F4;
+
+  /* El dorado de marca da 2.1:1 sobre blanco: ilegible. Se oscurece hasta
+     alcanzar 4.5:1 sin dejar de ser el mismo color. */
+  --gold: #7A5A0E;
+  --gold-suave: #5E460A;
+  --gold-linea: rgba(122, 90, 14, 0.18);
+
+  --blue: #1F4E76;
+  --blue-suave: #163A58;
+
+  --danger: #A81F25;
+  --danger-fondo: rgba(168, 31, 37, 0.08);
+  --exito: #1F6B44;
+  --exito-fondo: rgba(31, 107, 68, 0.08);
+
+  --text: #16202E;
+  --text-suave: #46566A;
+  --text-tenue: #5E6E84;
+
+  /* En claro las sombras sí funcionan */
+  --elev-1: 0 1px 2px rgba(22, 32, 46, 0.06), 0 0 0 1px rgba(22, 32, 46, 0.06);
+  --elev-2: 0 12px 32px rgba(22, 32, 46, 0.12), 0 0 0 1px rgba(22, 32, 46, 0.08);
+}
+
+/* ---------------------------------------------------------------------------
+   Capa de compatibilidad — TEMPORAL
+
+   Los CSS de componentes todavía referencian 32 nombres del sistema anterior.
+   Sin esto, las vistas que aún no se migraron quedarían sin estilo durante la
+   migración. Cada vista deja de usarlos en su propia tarea; la tarea final
+   verifica con grep que no quede ninguno y borra este bloque.
+   --------------------------------------------------------------------------- */
+
+:root {
+  --bg-page: var(--ground);
+  --bg-primary: var(--surface);
+  --bg-secondary: var(--surface-alto);
+  --bg-input: var(--surface-alto);
+  --bg-nav: var(--ground);
+  --secondary-color: var(--surface-alto);
+
+  --text-primary: var(--text);
+  --text-secondary: var(--text-suave);
+  --text-light: var(--text);
+
+  --accent-color: var(--gold);
+  --accent-hover: var(--gold-suave);
+  --border-color: var(--gold-linea);
+
+  --danger-color: var(--danger);
+  --danger-bg: var(--danger-fondo);
+  --success-color: var(--exito);
+  --success-bg: var(--exito-fondo);
+  --success-text: var(--exito);
+  --warning-color: var(--gold);
+  --warning-bg: var(--gold-linea);
+  --warning-text: var(--gold);
+
+  --radius-sm: var(--r-control);
+  --radius-md: var(--r-control);
+  --radius-lg: var(--r-card);
+  --radius-xl: var(--r-card);
+
+  --shadow-sm: var(--elev-1);
+  --shadow-md: var(--elev-1);
+  --shadow-lg: var(--elev-2);
+  --shadow-xl: var(--elev-2);
+
+  --transition-fast: var(--mov-rapido);
+  --transition-base: var(--mov-base);
+  --transition-slow: var(--mov-base);
+
+  --font-family: var(--fuente);
+  --max-width: var(--ancho-max);
+}

@@ -1,0 +1,113 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scrollbar-gutter: stable;
+  scroll-behavior: smooth;
+  /* El color de arranque antes de que corra el JS: sin esto hay un
+     parpadeo blanco al cargar en un equipo configurado en oscuro. */
+  background-color: var(--ground);
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+}
+
+body {
+  min-height: 100dvh;
+  font-family: var(--fuente);
+  font-size: var(--t-base);
+  font-weight: 400;
+  font-stretch: var(--ancho-cuerpo);
+  line-height: 1.6;
+  background-color: var(--ground);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4 {
+  font-stretch: var(--ancho-display);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+h1 { font-size: clamp(var(--t-xl), 5vw, var(--t-3xl)); }
+h2 { font-size: clamp(var(--t-lg), 3.5vw, var(--t-2xl)); }
+h3 { font-size: var(--t-md); }
+
+p { max-width: var(--medida); }
+
+a {
+  color: var(--blue-suave);
+  text-decoration: none;
+  transition: color var(--mov-rapido);
+}
+
+a:hover { color: var(--gold); }
+
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button { cursor: pointer; }
+
+/* Foco visible en todo lo enfocable. Nunca outline:none sin reemplazo. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: var(--r-control);
+}
+
+img, video, svg { display: block; max-width: 100%; }
+
+/* Área táctil mínima en todo lo clickeable */
+button, a[role="button"], [role="tab"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.contenedor {
+  width: 100%;
+  max-width: var(--ancho-max);
+  margin-inline: auto;
+  padding-inline: var(--e-4);
+}
+
+.page-container {
+  width: 100%;
+  max-width: var(--ancho-max);
+  margin-inline: auto;
+  padding-inline: var(--e-4);
+}
+
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

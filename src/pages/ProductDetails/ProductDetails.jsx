@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { PuffLoader } from "react-spinners";
+import { Link } from "react-router-dom";
 import ItemDetails from "../../components/ItemDetails/ItemDetails";
 import "./ProductDetails.css";
 import useProductDetails from "../../hooks/useProductDetails.jsx";
@@ -17,13 +18,23 @@ function ProductDetail() {
   }
 
   return (
-    <div className="product-details-container">
+    <div className="detalle-pagina">
       {loading ? (
-        <PuffLoader></PuffLoader>
+        <div className="detalle-cargando">
+          <PuffLoader color="currentColor" aria-label="Cargando el producto" />
+          {/* Con movimiento reducido la animación se congela en opacidad 0,
+              así que el texto es lo único que queda. */}
+          <p>Cargando el producto...</p>
+        </div>
       ) : itemSeleccionado ? (
         <ItemDetails item={itemSeleccionado} />
       ) : (
-        <div className="not-found">Producto no encontrado.</div>
+        <div className="detalle-cargando">
+          <p>No encontramos ese producto.</p>
+          <Link to="/products" className="boton boton-secundario">
+            Ver el catálogo
+          </Link>
+        </div>
       )}
     </div>
   );

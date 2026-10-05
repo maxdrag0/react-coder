@@ -48,8 +48,10 @@ function CategoryFilter({ activeCategory }) {
 
       {/* Mobile Select */}
       <div className="category-select-container">
-        <select 
-          className="category-select" 
+        <select
+          className="category-select"
+          aria-label="Filtrar por categoría"
+
           value={activeCategory || "all"} 
           onChange={handleSelectChange}
         >

@@ -22,14 +22,14 @@
   --blue: #3B7CB8;
   --blue-suave: #5B9AD4;
 
-  --danger: #E2565C;
-  --danger-fondo: rgba(226, 86, 92, 0.12);
+  --danger: #F07A80;
+  --danger-fondo: rgba(240, 122, 128, 0.14);
   --exito: #4FBF85;
   --exito-fondo: rgba(79, 191, 133, 0.12);
 
   --text: #F2F0EB;
   --text-suave: #9FB2C9;
-  --text-tenue: #76889F;
+  --text-tenue: #93A5BC;
 
   /* Elevación — sin sombras: sobre fondo oscuro no se leen. */
   --elev-1: 0 0 0 1px var(--gold-linea);

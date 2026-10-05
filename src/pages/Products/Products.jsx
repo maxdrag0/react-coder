@@ -13,7 +13,11 @@ function Products() {
   const urlSearch = searchParams.get("search") || "";
   const [localSearch, setLocalSearch] = useState(urlSearch);
 
-  const { items, loading, loadMore, hasMore } = useProducts(category);
+  // Con búsqueda activa se trae el catálogo completo: el filtro corre en el
+  // cliente y con una sola página de 8 productos no encontraba casi nada.
+  const { items, loading, loadMore, hasMore } = useProducts(category, {
+    traerTodo: Boolean(localSearch),
+  });
 
   useEffect(() => {
     setLocalSearch(urlSearch);
@@ -57,7 +61,8 @@ function Products() {
 
       {loading && items.length === 0 ? (
         <div className="productos-cargando">
-          <PuffLoader color="#E6B32E" size={60} aria-label="Cargando productos" />
+          <PuffLoader color="currentColor" size={60} aria-label="Cargando productos" />
+            <p>Cargando productos...</p>
         </div>
       ) : (
         <>

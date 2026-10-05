@@ -10,3 +10,5 @@
   place-items: center;
   padding-block: var(--e-8);
 }
+
+.detalle-cargando p { color: var(--text-suave); margin: 0; }

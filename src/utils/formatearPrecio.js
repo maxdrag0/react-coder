@@ -17,3 +17,7 @@ export const formatearPrecio = (valor) => {
   }
   return formateador.format(valor).replace(/\s/g, "");
 };
+
+/** Como formatearPrecio pero siempre devuelve texto, incluido el cero. */
+export const formatearTotal = (valor) =>
+  formateador.format(Number.isFinite(valor) ? valor : 0).replace(/s/g, "");

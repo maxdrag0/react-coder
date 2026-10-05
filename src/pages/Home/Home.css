@@ -25,3 +25,6 @@
   justify-content: center;
   padding-block: var(--e-6);
 }
+
+.home-cargando { gap: var(--e-3); }
+.home-cargando p { color: var(--text-suave); margin: 0; }

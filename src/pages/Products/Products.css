@@ -63,3 +63,6 @@
   }
   .productos-buscador { min-width: 280px; }
 }
+
+.productos-cargando { gap: var(--e-3); }
+.productos-cargando p { color: var(--text-suave); margin: 0; }

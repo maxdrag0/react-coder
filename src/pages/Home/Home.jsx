@@ -6,7 +6,9 @@ import "./Home.css";
 
 function Home() {
   const { items, loading, loadMore, hasMore } = useProducts();
-  const masVendidos = [...items].sort((a, b) => (b.ventas || 0) - (a.ventas || 0));
+  // El campo de popularidad es `compras`; `ventas` no existe en el catálogo,
+  // así que el orden anterior era un no-op y el título decía algo falso.
+  const masVendidos = [...items].sort((a, b) => (b.compras || 0) - (a.compras || 0));
 
   return (
     <div className="home contenedor">
@@ -22,7 +24,8 @@ function Home() {
 
         {loading && items.length === 0 ? (
           <div className="home-cargando">
-            <PuffLoader color="#E6B32E" aria-label="Cargando productos" />
+            <PuffLoader color="currentColor" aria-label="Cargando productos" />
+            <p>Cargando productos...</p>
           </div>
         ) : (
           <>

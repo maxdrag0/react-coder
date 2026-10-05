@@ -91,6 +91,8 @@ const AdminDashboard = () => {
         codigo: "",
         name: "",
         price: "",
+        precioDisplay: "",
+        precioBulto: "",
         category: "",
         description: "",
         image: "",
@@ -124,6 +126,8 @@ const AdminDashboard = () => {
         nombre: currentProduct.name, // keep backwards compatibility
         price: Number(currentProduct.price),
         precioUnitario: Number(currentProduct.price),
+        precioDisplay: currentProduct.precioDisplay ? Number(currentProduct.precioDisplay) : null,
+        precioBulto: currentProduct.precioBulto ? Number(currentProduct.precioBulto) : null,
         stock: Number(currentProduct.stock),
         ventas: Number(currentProduct.ventas) || 0,
         image: imageUrl,
@@ -296,7 +300,7 @@ const AdminDashboard = () => {
                     <ul>
                       {order.items?.map((item, idx) => (
                         <li key={idx}>
-                          {item.cantidad}x {item.nombre || item.name}
+                          {item.cantidad}x {item.nombre || item.name}{item.unidad && item.unidad !== "unitario" ? ` (${item.unidad})` : ""}
                         </li>
                       ))}
                     </ul>
@@ -395,13 +399,43 @@ const AdminDashboard = () => {
                 />
               </div>
               <div className="form-group">
-                <label>Precio</label>
-                <input 
-                  type="number" 
+                <label htmlFor="precio-unidad">Precio por unidad</label>
+                <input
+                  id="precio-unidad"
+                  type="number"
+                  min="0"
                   value={currentProduct.price}
                   onChange={(e) => setCurrentProduct({...currentProduct, price: e.target.value})}
                   required
                 />
+              </div>
+
+              {/* La tienda vende por unidad, display y bulto, pero el panel
+                  solo dejaba cargar el unitario: todo producto nuevo quedaba
+                  con una sola forma de compra. Vacío significa "no se vende
+                  en esa unidad" y la tienda no la ofrece. */}
+              <div className="form-group">
+                <label htmlFor="precio-display">Precio por display</label>
+                <input
+                  id="precio-display"
+                  type="number"
+                  min="0"
+                  value={currentProduct.precioDisplay ?? ""}
+                  onChange={(e) => setCurrentProduct({...currentProduct, precioDisplay: e.target.value})}
+                />
+                <small>Dejalo vacío si no se vende por display.</small>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="precio-bulto">Precio por bulto</label>
+                <input
+                  id="precio-bulto"
+                  type="number"
+                  min="0"
+                  value={currentProduct.precioBulto ?? ""}
+                  onChange={(e) => setCurrentProduct({...currentProduct, precioBulto: e.target.value})}
+                />
+                <small>Dejalo vacío si no se vende por bulto.</small>
               </div>
               <div className="form-group">
                 <label>Categoría</label>

@@ -155,32 +155,7 @@
   background: var(--danger-fondo);
 }
 
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(6px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  padding: 1rem;
-}
-
-.modal-content {
-  background: var(--surface);
-  padding: 2rem;
-  border-radius: var(--r-card);
-  width: 90%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: var(--elev-2);
-}
+/* Modal — la definición vive más abajo, con el sistema visual. */
 
 .modal-content h3 {
   font-size: 1.25rem;

@@ -53,13 +53,20 @@
   .carrito-resumen { position: sticky; top: calc(64px + var(--e-5)); }
 }
 
-/* En celular el resumen queda fijo abajo: el total siempre a la vista. */
+/* En celular el resumen queda fijo abajo: el total siempre a la vista.
+   position:fixed y no sticky: un sticky dentro de su propia celda de grid
+   no tiene recorrido para moverse, así que no hacía nada. */
 @media (max-width: 899px) {
   .carrito-resumen {
-    position: sticky;
+    position: fixed;
+    left: 0;
+    right: 0;
     bottom: 0;
-    z-index: 20;
+    z-index: 30;
     border-radius: var(--r-card) var(--r-card) 0 0;
     box-shadow: var(--elev-2);
   }
+
+  /* Aire para que el resumen fijo no tape el último producto. */
+  .carrito-grid { padding-bottom: 13rem; }
 }

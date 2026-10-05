@@ -112,3 +112,23 @@ describe("texto sobre el dorado — el botón primario", () => {
       .toBeGreaterThanOrEqual(4.5);
   });
 });
+
+// El test original solo medía contra --ground, pero el texto secundario vive
+// sobre las superficies de card. Ahí es donde se leen los precios, las
+// etiquetas de la ficha y los placeholders de los campos.
+describe("contraste sobre las superficies, no solo sobre el fondo", () => {
+  const SUPERFICIES = ["--surface", "--surface-alto"];
+  const TEXTOS = ["--text", "--text-suave", "--text-tenue", "--gold", "--danger"];
+
+  for (const tema of [OSCURO, CLARO]) {
+    const nombre = tema === OSCURO ? "oscuro" : "claro";
+    for (const fondo of SUPERFICIES) {
+      for (const texto of TEXTOS) {
+        it(`${texto} sobre ${fondo} en tema ${nombre}`, () => {
+          expect(contraste(token(tema, texto), token(tema, fondo)))
+            .toBeGreaterThanOrEqual(4.5);
+        });
+      }
+    }
+  }
+});

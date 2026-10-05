@@ -1,10 +1,4 @@
-.nav-logo {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-}
-
-.nav-logo img {
-  height: 36px;
-  width: auto;
-}
+/* El tamaño del logo lo define NavBar.css, que es donde vive el layout
+   de la barra. Tenerlo en dos archivos hacía que ganara el que se
+   inyectara último. */
+.nav-logo { flex: 0 0 auto; }

@@ -7,7 +7,7 @@ import { useNavigate, Link } from "react-router-dom";
 import Modal from "../../components/common/Modal/Modal";
 import "./Carrito.css";
 import { services } from "../../services";
-import { formatearPrecio } from "@/utils/formatearPrecio";
+import { formatearTotal } from "@/utils/formatearPrecio";
 
 function Carrito() {
   const { removeList, cartList, total } = useContext(CartContext);
@@ -83,7 +83,7 @@ function Carrito() {
           <aside className="carrito-resumen">
             <div className="carrito-total">
               <span>Total</span>
-              <strong>{formatearPrecio(total)}</strong>
+              <strong>{formatearTotal(total)}</strong>
             </div>
 
             <Button

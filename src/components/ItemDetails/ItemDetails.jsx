@@ -97,12 +97,19 @@ function ItemDetails({ item }) {
           </fieldset>
         )}
 
-        <div className="detalle-compra">
-          <Counter count={count} sumar={sumar} restar={restar} />
-          <button type="button" className="boton boton-primario" onClick={agregar}>
-            Agregar al carrito
-          </button>
-        </div>
+        {unidades.length === 0 ? (
+          <p className="detalle-agotado">
+            Este producto todavía no tiene precio cargado. Escribinos y te lo
+            pasamos.
+          </p>
+        ) : (
+          <div className="detalle-compra">
+            <Counter count={count} sumar={sumar} restar={restar} />
+            <button type="button" className="boton boton-primario" onClick={agregar}>
+              Agregar al carrito
+            </button>
+          </div>
+        )}
 
         {subtotal > 0 && (
           <p className="detalle-subtotal">

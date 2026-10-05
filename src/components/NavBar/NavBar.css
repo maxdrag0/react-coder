@@ -7,10 +7,11 @@
   border-bottom: 1px solid var(--gold-linea);
 }
 
+/* Flex y no grid: el orden visual de escritorio (logo, links, buscador,
+   acciones) no coincide con el del DOM, y `order` solo reordena en flex.
+   Con grid y columnas explícitas los elementos caían a una segunda fila. */
 .nav-inner {
-  display: grid;
-  /* logo | buscador estirado | acciones */
-  grid-template-columns: auto 1fr auto;
+  display: flex;
   align-items: center;
   gap: var(--e-2);
   width: 100%;
@@ -19,14 +20,20 @@
   padding: var(--e-2) var(--e-3);
 }
 
-.nav-logo { flex-shrink: 0; }
+.nav-logo {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
 .nav-logo img { height: 32px; width: auto; }
 
-/* El buscador ocupa todo el espacio que queda. */
+/* El buscador se come todo el espacio que sobra. */
 .nav-buscador {
   position: relative;
   display: flex;
   align-items: center;
+  flex: 1 1 auto;
   min-width: 0;
 }
 
@@ -47,7 +54,7 @@
   font-size: var(--t-sm);
 }
 
-/* En celular los links y el perfil viven dentro de la hamburguesa. */
+/* En celular los links y la cuenta viven dentro de la hamburguesa. */
 .nav-links,
 .nav-solo-escritorio { display: none; }
 
@@ -55,6 +62,7 @@
   display: flex;
   align-items: center;
   gap: var(--e-1);
+  flex: 0 0 auto;
 }
 
 .nav-accion {
@@ -126,7 +134,7 @@
   padding-inline: 4px;
   border-radius: var(--r-pill);
   background: var(--gold);
-  color: #16202E;
+  color: var(--ground);
   font-size: 11px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -134,28 +142,35 @@
 
 @media (min-width: 900px) {
   .nav-inner {
-    grid-template-columns: auto auto 1fr auto;
     gap: var(--e-5);
     padding: var(--e-3) var(--e-4);
   }
 
-  .nav-logo img { height: 36px; }
+  .nav-logo img { height: 38px; }
 
   .nav-hamburguesa { display: none; }
   .nav-panel { display: none !important; }
 
-  /* El DOM va logo, buscador, links, acciones; en escritorio se quieren
-     en el orden logo, links, buscador, acciones. Columnas explícitas. */
-  .nav-logo { grid-column: 1; }
-  .nav-links { grid-column: 2; display: flex; gap: var(--e-5); }
-  .nav-buscador { grid-column: 3; }
-  .nav-acciones { grid-column: 4; }
+  /* El logo tiene order 0 por defecto; el resto se acomoda detrás. */
+  .nav-links {
+    order: 1;
+    display: flex;
+    gap: var(--e-5);
+    flex: 0 0 auto;
+  }
 
   .nav-links a { color: var(--text-suave); white-space: nowrap; }
   .nav-links a:hover,
   .nav-links a.active { color: var(--gold); }
 
+  .nav-buscador {
+    order: 2;
+    flex: 0 1 320px;
+    margin-left: auto;
+  }
+
+  .nav-acciones { order: 3; }
+
   .nav-solo-escritorio { display: inline-flex; }
   .nav-accion-texto { display: inline; font-size: var(--t-sm); }
-  .nav-buscador { max-width: 340px; justify-self: end; }
 }

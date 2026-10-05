@@ -67,6 +67,16 @@ const AdminDashboard = () => {
     }
   }, [isAdmin]);
 
+  // El modal del panel se escribió a mano y no cerraba con Escape.
+  useEffect(() => {
+    if (!showModal) return;
+    const alTeclearModal = (e) => {
+      if (e.key === "Escape") handleCloseModal();
+    };
+    document.addEventListener("keydown", alTeclearModal);
+    return () => document.removeEventListener("keydown", alTeclearModal);
+  }, [showModal]);
+
   const handleOpenModal = (product = null) => {
     if (product) {
       setIsEditing(true);
@@ -232,12 +242,23 @@ const AdminDashboard = () => {
                 {filteredProducts.map((prod) => (
                   <tr key={prod.codigo}>
                     <td>
-                      <img src={prod.image || prod.fotoUrl} alt={prod.name || prod.nombre} className="admin-prod-img" />
+                      {(prod.image || prod.fotoUrl) ? (
+                        <img
+                          src={prod.image || prod.fotoUrl}
+                          alt=""
+                          className="admin-prod-img"
+                        />
+                      ) : (
+                        <div
+                          className="admin-prod-img admin-prod-sin-foto"
+                          aria-hidden="true"
+                        />
+                      )}
                     </td>
-                    <td>{prod.codigo}</td>
-                    <td>{prod.name || prod.nombre}</td>
-                    <td>${prod.price || prod.precioUnitario}</td>
-                    <td>{prod.category || prod.categoria}</td>
+                    <td data-etiqueta="Código">{prod.codigo}</td>
+                    <td data-etiqueta="Nombre">{prod.name || prod.nombre}</td>
+                    <td data-etiqueta="Precio">${prod.price || prod.precioUnitario}</td>
+                    <td data-etiqueta="Categoría">{prod.category || prod.categoria}</td>
                     <td>
                       <button className="btn-action edit" onClick={() => handleOpenModal(prod)}>Editar</button>
                       <button className="btn-action delete" onClick={() => handleDelete(prod.codigo)}>Eliminar</button>
@@ -266,11 +287,11 @@ const AdminDashboard = () => {
             <tbody>
               {orders.map((order) => (
                 <tr key={order.id}>
-                  <td>{order.id}</td>
+                  <td data-etiqueta="N° de orden">{order.id}</td>
                   <td>{new Date(order.date).toLocaleString()}</td>
-                  <td>{order.buyer?.name || 'N/A'}</td>
-                  <td>{order.buyer?.email || 'N/A'}</td>
-                  <td>${order.total}</td>
+                  <td data-etiqueta="Usuario">{order.buyer?.name || 'N/A'}</td>
+                  <td data-etiqueta="Email">{order.buyer?.email || 'N/A'}</td>
+                  <td data-etiqueta="Total">${order.total}</td>
                   <td>
                     <ul>
                       {order.items?.map((item, idx) => (
@@ -319,8 +340,8 @@ const AdminDashboard = () => {
                     </button>
                   </td>
                   <td>{new Date(msg.date).toLocaleString()}</td>
-                  <td>{msg.nombre}</td>
-                  <td>{msg.email}</td>
+                  <td data-etiqueta="Nombre">{msg.nombre}</td>
+                  <td data-etiqueta="Email">{msg.email}</td>
                   <td style={{ maxWidth: '300px', whiteSpace: 'pre-wrap' }}>{msg.mensaje}</td>
                   <td>
                     <button 
@@ -346,8 +367,13 @@ const AdminDashboard = () => {
 
       {showModal && (
         <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>{isEditing ? "Editar Producto" : "Nuevo Producto"}</h3>
+          <div
+            className="modal-content"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-producto-titulo"
+          >
+            <h3 id="modal-producto-titulo">{isEditing ? "Editar Producto" : "Nuevo Producto"}</h3>
             <form onSubmit={handleSave} className="admin-form">
               <div className="form-group">
                 <label>Código (ID único)</label>

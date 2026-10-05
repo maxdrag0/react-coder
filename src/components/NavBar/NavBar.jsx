@@ -32,7 +32,7 @@ function NavBar() {
   };
 
   return (
-    <header className="container-nav">
+    <header className="nav">
       <div className="nav-inner">
         <Logo />
 

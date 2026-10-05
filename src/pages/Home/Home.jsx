@@ -15,13 +15,13 @@ function Home() {
         </div>
       ) : (
         <>
-          <ItemListContainer items={items} />
+          <ItemListContainer items={[...items].sort((a, b) => (b.ventas || 0) - (a.ventas || 0))} />
           {hasMore && (
             <div className="load-more-container">
               <button
                 onClick={loadMore}
                 disabled={loading}
-                className="btn btn-outline"
+                className="boton boton-secundario"
               >
                 {loading ? "Cargando..." : "Cargar más"}
               </button>

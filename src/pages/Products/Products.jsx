@@ -78,7 +78,7 @@ function Products() {
                 <button 
                   onClick={loadMore} 
                   disabled={loading}
-                  className="auth-btn"
+                  className="boton boton-secundario"
                   style={{ width: 'auto', padding: '10px 30px' }}
                 >
                   {loading ? "Cargando..." : "Cargar más productos"}

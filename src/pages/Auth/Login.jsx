@@ -56,7 +56,7 @@ const Login = () => {
 
         <PasswordResetLink />
 
-        <button type="submit" className="auth-btn" disabled={cargando}>
+        <button type="submit" className="boton boton-primario boton-ancho" disabled={cargando}>
           {cargando ? "Ingresando..." : "Ingresar"}
         </button>
       </form>

@@ -29,7 +29,8 @@ const AdminDashboard = () => {
     category: "",
     description: "",
     image: "",
-    stock: 0
+    stock: 0,
+    ventas: 0
   });
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -71,7 +72,8 @@ const AdminDashboard = () => {
       setIsEditing(true);
       setCurrentProduct({
         ...product,
-        name: product.name || product.nombre || ""
+        name: product.name || product.nombre || "",
+        ventas: product.ventas || 0
       });
     } else {
       setIsEditing(false);
@@ -82,7 +84,8 @@ const AdminDashboard = () => {
         category: "",
         description: "",
         image: "",
-        stock: 0
+        stock: 0,
+        ventas: 0
       });
     }
     setFile(null);
@@ -112,6 +115,7 @@ const AdminDashboard = () => {
         price: Number(currentProduct.price),
         precioUnitario: Number(currentProduct.price),
         stock: Number(currentProduct.stock),
+        ventas: Number(currentProduct.ventas) || 0,
         image: imageUrl,
         fotoUrl: imageUrl,
       };
@@ -207,7 +211,7 @@ const AdminDashboard = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button className="auth-btn btn-add" onClick={() => handleOpenModal()}>
+            <button className="boton boton-primario" onClick={() => handleOpenModal()}>
               + Agregar Producto
             </button>
           </div>
@@ -392,6 +396,14 @@ const AdminDashboard = () => {
                 />
               </div>
               <div className="form-group">
+                <label>Ventas (Popularidad)</label>
+                <input 
+                  type="number" 
+                  value={currentProduct.ventas}
+                  onChange={(e) => setCurrentProduct({...currentProduct, ventas: e.target.value})}
+                />
+              </div>
+              <div className="form-group">
                 <label>Descripción</label>
                 <textarea 
                   value={currentProduct.description}
@@ -412,10 +424,10 @@ const AdminDashboard = () => {
                 )}
               </div>
               <div className="modal-actions">
-                <button type="button" className="btn-cancel" onClick={handleCloseModal} disabled={uploading}>
+                <button type="button" className="boton boton-secundario" onClick={handleCloseModal} disabled={uploading}>
                   Cancelar
                 </button>
-                <button type="submit" className="auth-btn btn-save" disabled={uploading}>
+                <button type="submit" className="boton boton-primario" disabled={uploading}>
                   {uploading ? "Guardando..." : "Guardar"}
                 </button>
               </div>

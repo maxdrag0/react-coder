@@ -1,11 +1,18 @@
 import "./Button.css";
 
-function Button({ callback, children, className, ...props }) {
-  return (
-    <button className={`boton-common ${className}`} onClick={callback} {...props}>
-      {children}
-    </button>
-  );
-}
-
-export { Button };
+export const Button = ({
+  children,
+  callback,
+  className = "",
+  disabled = false,
+  type = "button",
+}) => (
+  <button
+    type={type}
+    className={`boton boton-primario ${className}`}
+    onClick={callback}
+    disabled={disabled}
+  >
+    {children}
+  </button>
+);

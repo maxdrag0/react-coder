@@ -77,7 +77,7 @@ const Register = () => {
           autoComplete="new-password"
         />
 
-        <button type="submit" className="auth-btn" disabled={cargando}>
+        <button type="submit" className="boton boton-primario boton-ancho" disabled={cargando}>
           {cargando ? "Creando tu cuenta..." : "Registrarse"}
         </button>
       </form>

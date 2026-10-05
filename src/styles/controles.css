@@ -1,0 +1,82 @@
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e-2);
+  min-height: 44px;
+  padding: var(--e-3) var(--e-5);
+  border: 1px solid transparent;
+  border-radius: var(--r-control);
+  background: none;
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--text);
+  transition: background-color var(--mov-rapido), border-color var(--mov-rapido),
+    color var(--mov-rapido);
+}
+
+.boton:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.boton-primario {
+  background: var(--gold);
+  color: #16202E;
+  font-weight: 600;
+}
+.boton-primario:hover:not(:disabled) { background: var(--gold-suave); }
+
+.boton-secundario {
+  border-color: var(--gold-linea);
+  color: var(--text);
+}
+.boton-secundario:hover:not(:disabled) { background: var(--surface-alto); }
+
+.boton-fantasma { color: var(--text-suave); }
+.boton-fantasma:hover:not(:disabled) { color: var(--text); }
+
+/* Solo para acciones destructivas. */
+.boton-peligro {
+  background: var(--danger-fondo);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.boton-peligro:hover:not(:disabled) { background: var(--danger); color: var(--ground); }
+
+.boton-ancho { width: 100%; }
+
+/* Campos de formulario */
+.campo-control {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--e-3);
+  border: 1px solid var(--gold-linea);
+  border-radius: var(--r-control);
+  background: var(--surface-alto);
+  color: var(--text);
+  transition: border-color var(--mov-rapido);
+}
+
+.campo-control::placeholder { color: var(--text-tenue); }
+.campo-control:hover { border-color: var(--blue); }
+
+/* Chips de categoría */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: var(--e-2) var(--e-4);
+  border: 1px solid var(--gold-linea);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--text-suave);
+  font-size: var(--t-sm);
+  transition: border-color var(--mov-rapido), color var(--mov-rapido);
+}
+
+.chip:hover { color: var(--text); border-color: var(--blue); }
+
+.chip[aria-current] {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #16202E;
+  font-weight: 600;
+}

@@ -5,7 +5,7 @@ function ItemListContainer({ items }) {
   return (
     <>
       {items ? (
-        <div className="items-listado">
+        <div className="lista-items">
           <ItemList items={items} />
         </div>
       ) : (

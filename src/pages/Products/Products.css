@@ -1,88 +1,27 @@
-.product-page {
-  display: flex;
-  gap: 2rem;
-  align-items: flex-start;
+.productos { padding-block: var(--e-5) var(--e-8); }
+
+.productos-cabecera {
+  display: grid;
+  gap: var(--e-3);
+  padding-block: var(--e-4);
 }
 
-.product-content {
-  flex: 1;
-  min-width: 0;
+.productos-cuenta {
+  font-size: var(--t-sm);
+  color: var(--text-suave);
+  font-variant-numeric: tabular-nums;
 }
 
-.products-search-bar {
-  display: flex;
-  align-items: center;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 0.6rem 1rem;
-  margin-bottom: 1.5rem;
-  box-shadow: var(--shadow-sm);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+.productos-vacio {
+  display: grid;
+  gap: var(--e-4);
+  justify-items: start;
+  padding-block: var(--e-8);
+  color: var(--text-suave);
 }
 
-.products-search-bar:focus-within {
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
-}
-
-.products-search-bar .search-icon {
-  color: var(--text-secondary);
-  margin-right: 0.5rem;
-}
-
-.products-search-input {
-  border: none;
-  background: transparent;
-  width: 100%;
-  font-size: 1rem;
-  color: var(--text-primary);
-  outline: none;
-  font-family: var(--font-family);
-}
-
-.product-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.product-header h1 {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: 1.75rem;
-  font-weight: 700;
-}
-
-.product-count {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  margin: 0;
-  font-weight: 500;
-}
-
-.loader-container {
+.productos-mas {
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: 300px;
-}
-
-@media (max-width: 768px) {
-  .product-page {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .product-header {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .product-header h1 {
-    font-size: 1.35rem;
-  }
+  padding-block: var(--e-6);
 }

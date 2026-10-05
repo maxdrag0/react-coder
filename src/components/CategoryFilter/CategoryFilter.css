@@ -1,104 +1,56 @@
-.category-filter {
-  background: var(--bg-primary);
-  padding: 1.25rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
-  min-width: 220px;
-  position: sticky;
-  top: 80px;
-  max-height: calc(100vh - 100px);
-  overflow-y: auto;
-}
+.category-filter { display: grid; gap: var(--e-3); }
 
-.category-filter::-webkit-scrollbar {
-  width: 4px;
-}
-.category-filter::-webkit-scrollbar-track {
-  background: transparent;
-}
-.category-filter::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 100px;
-}
-
-.category-filter h3 {
-  color: var(--text-primary);
-  margin: 0 0 1rem 0;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--border-color);
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.category-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.category-link {
-  display: block;
-  text-decoration: none;
-  color: var(--text-secondary);
-  padding: 0.6rem 0.75rem;
-  border-radius: var(--radius-sm);
-  transition: all var(--transition-fast);
+.category-title {
+  font-size: var(--t-sm);
+  font-stretch: var(--ancho-cuerpo);
   font-weight: 500;
-  font-size: 0.9rem;
+  color: var(--text-tenue);
 }
 
-.category-link:hover {
-  background: var(--secondary-color);
-  color: var(--text-primary);
+/* En celular manda el select nativo: con 15 categorías es más rápido que
+   deslizar una fila de chips. */
+.category-list { display: none; }
+.category-select-container { display: block; }
+
+.category-select {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--e-3);
+  border: 1px solid var(--gold-linea);
+  border-radius: var(--r-control);
+  background: var(--surface-alto);
+  color: var(--text);
 }
 
-.category-link.active {
-  background: var(--accent-color);
-  color: var(--text-light);
-}
+@media (min-width: 900px) {
+  .category-select-container { display: none; }
 
-.category-select-container {
-  display: none;
-}
-
-@media (max-width: 768px) {
-  .category-filter {
-    position: static;
-    min-width: auto;
-    max-height: none;
-    padding: 0;
-    background: transparent;
-    border: none;
+  .category-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-2);
+    list-style: none;
   }
 
-  .category-list, .category-title {
-    display: none;
+  .category-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: var(--e-2) var(--e-4);
+    border: 1px solid var(--gold-linea);
+    border-radius: var(--r-pill);
+    background: var(--surface);
+    color: var(--text-suave);
+    font-size: var(--t-sm);
+    transition: border-color var(--mov-rapido), color var(--mov-rapido);
   }
 
-  .category-select-container {
-    display: block;
-    width: 100%;
-  }
+  .category-link:hover { color: var(--text); border-color: var(--blue); }
 
-  .category-select {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border-color);
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    font-family: var(--font-family);
-    font-size: 0.95rem;
-    outline: none;
-    cursor: pointer;
-    box-shadow: var(--shadow-sm);
-    transition: border-color var(--transition-fast);
-  }
-  
-  .category-select:focus {
-    border-color: var(--accent-color);
+  .category-link.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #16202E;
+    font-weight: 600;
   }
 }

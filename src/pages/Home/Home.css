@@ -1,24 +1,27 @@
-.container-home {
+.home { padding-block: var(--e-6) var(--e-8); }
+
+.home-hero {
+  display: grid;
+  gap: var(--e-4);
+  padding-block: var(--e-5) var(--e-7);
+}
+
+.home-bajada {
+  font-size: var(--t-md);
+  color: var(--text-suave);
+  margin: 0;
+}
+
+.home-seccion { display: grid; gap: var(--e-5); }
+
+.home-cargando {
+  display: grid;
+  place-items: center;
+  padding-block: var(--e-8);
+}
+
+.home-mas {
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.container-home h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  text-align: center;
-  padding-top: 0.5rem;
-}
-
-.load-more-container {
-  text-align: center;
-  padding: 1.5rem 0 2rem;
-}
-
-@media (max-width: 768px) {
-  .container-home h1 {
-    font-size: 1.35rem;
-  }
+  justify-content: center;
+  padding-block: var(--e-6);
 }

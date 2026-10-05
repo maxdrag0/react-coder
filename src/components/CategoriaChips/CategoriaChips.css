@@ -1,0 +1,10 @@
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e-2);
+}
+
+.chip-todo {
+  border-color: var(--blue);
+  color: var(--blue-suave);
+}

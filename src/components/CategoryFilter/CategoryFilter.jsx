@@ -26,6 +26,7 @@ function CategoryFilter({ activeCategory }) {
           <Link
             to="/products"
             className={`category-link ${!activeCategory ? "active" : ""}`}
+            aria-current={!activeCategory ? "page" : undefined}
           >
             Todos los productos
           </Link>
@@ -37,6 +38,7 @@ function CategoryFilter({ activeCategory }) {
               className={`category-link ${
                 activeCategory === category ? "active" : ""
               }`}
+              aria-current={activeCategory === category ? "page" : undefined}
             >
               {category}
             </Link>

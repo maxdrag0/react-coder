@@ -334,3 +334,9 @@
   .barra-seleccion { gap: var(--e-3); }
   .barra-seleccion-acciones .boton { flex: 1; font-size: var(--t-xs); }
 }
+
+/* BottomNav llega hasta 899px, no hasta 767: entre esos dos anchos la
+   barra de seleccion quedaba encima de la navegacion. */
+@media (max-width: 899px) {
+  .barra-seleccion { bottom: calc(var(--alto-nav-abajo) + var(--e-2)); }
+}

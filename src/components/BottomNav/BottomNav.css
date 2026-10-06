@@ -1,0 +1,58 @@
+/* Solo celular: en escritorio los mismos destinos ya están en la barra de
+   arriba, y repetirlos abajo sería ruido. */
+.nav-abajo {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  background: color-mix(in srgb, var(--ground) 96%, transparent);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--gold-linea);
+  /* El área del gesto de inicio en iPhone se come la última franja. */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.nav-abajo-item {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 3px;
+  min-height: var(--alto-nav-abajo);
+  padding: var(--e-2) 2px;
+  color: var(--text-tenue);
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.nav-abajo-item.activa { color: var(--gold); }
+
+.nav-abajo-icono {
+  position: relative;
+  display: inline-flex;
+}
+
+.nav-abajo-cuenta {
+  position: absolute;
+  top: -5px;
+  left: 60%;
+  min-width: 17px;
+  height: 17px;
+  display: grid;
+  place-items: center;
+  padding-inline: 4px;
+  border-radius: var(--r-pill);
+  background: var(--gold);
+  color: var(--sobre-gold);
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 900px) {
+  .nav-abajo { display: none; }
+}

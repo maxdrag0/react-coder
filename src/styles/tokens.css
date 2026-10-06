@@ -69,7 +69,13 @@
   --mov-rapido: 120ms ease-out;
   --mov-base: 200ms ease-out;
 
-  --ancho-max: 1200px;
+  /* 1200 dejaba 360px de vacio por lado en una pantalla de 1920 y la
+     grilla de productos quedaba apretada en el centro. */
+  --ancho-max: 1440px;
+
+  /* Alto de la barra inferior de celular. Lo referencian el carrito y la
+     barra de seleccion del panel, que tambien estan fijos abajo. */
+  --alto-nav-abajo: 4.25rem;
   --medida: 72ch;
 }
 

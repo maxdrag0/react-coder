@@ -54,7 +54,7 @@
   font-size: var(--t-sm);
 }
 
-/* En celular los links y la cuenta viven dentro de la hamburguesa. */
+/* En celular los links y la cuenta viven en BottomNav. */
 .nav-links,
 .nav-solo-escritorio { display: none; }
 
@@ -79,49 +79,6 @@
 
 .nav-accion:hover { color: var(--gold); background: var(--surface); }
 .nav-accion-texto { display: none; }
-
-.nav-hamburguesa {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
-  border: none;
-  background: none;
-  color: var(--text);
-}
-
-.nav-panel {
-  display: none;
-  gap: var(--e-1);
-  padding: var(--e-2) var(--e-3) var(--e-4);
-  border-top: 1px solid var(--gold-linea);
-}
-
-.nav-panel.abierto { display: grid; }
-
-.nav-panel a {
-  display: flex;
-  align-items: center;
-  gap: var(--e-3);
-  min-height: 48px;
-  padding: var(--e-2) var(--e-3);
-  border-radius: var(--r-control);
-  color: var(--text-suave);
-  font-size: var(--t-base);
-}
-
-.nav-panel a:hover,
-.nav-panel a.active {
-  background: var(--surface);
-  color: var(--gold);
-}
-
-.nav-panel-separador {
-  border: none;
-  border-top: 1px solid var(--gold-linea);
-  margin-block: var(--e-2);
-}
 
 .nav-carrito-cuenta {
   position: absolute;
@@ -148,9 +105,6 @@
 
   .nav-logo img { height: 38px; }
 
-  .nav-hamburguesa { display: none; }
-  .nav-panel { display: none !important; }
-
   /* El logo tiene order 0 por defecto; el resto se acomoda detrás. */
   .nav-links {
     order: 1;
@@ -165,7 +119,7 @@
 
   .nav-buscador {
     order: 2;
-    flex: 0 1 320px;
+    flex: 0 1 380px;
     margin-left: auto;
   }
 

@@ -90,6 +90,12 @@ button, a[role="button"], [role="tab"] {
   padding-inline: var(--e-4);
 }
 
+/* La barra inferior es fixed, así que no empuja nada: sin este aire tapa el
+   final de cada página. */
+@media (max-width: 899px) {
+  .page-container { padding-bottom: calc(var(--alto-nav-abajo) + var(--e-4)); }
+}
+
 .solo-lectores {
   position: absolute;
   width: 1px;

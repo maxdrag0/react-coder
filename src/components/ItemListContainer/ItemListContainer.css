@@ -1,18 +1,20 @@
+/*
+  auto-fill en vez de una escalera de breakpoints: la grilla vive en dos
+  contextos con anchos muy distintos (el inicio a todo lo ancho, y productos
+  con la columna de filtros al lado), y un breakpoint mira el viewport, no el
+  espacio que realmente tiene. Con 4 columnas fijas desde 1200px las cards
+  del inicio se estiraban y las de productos quedaban apretadas.
+
+  El min() es para el teléfono: sin él, 16rem es más que la pantalla y la
+  grilla se desborda en vez de pasar a una sola columna.
+*/
 .lista-items {
   display: grid;
   align-items: stretch;
-  grid-template-columns: 1fr;
   gap: var(--e-4);
-}
-
-@media (min-width: 640px) {
-  .lista-items { grid-template-columns: repeat(2, 1fr); }
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
 }
 
 @media (min-width: 900px) {
-  .lista-items { grid-template-columns: repeat(3, 1fr); gap: var(--e-5); }
-}
-
-@media (min-width: 1200px) {
-  .lista-items { grid-template-columns: repeat(4, 1fr); }
+  .lista-items { gap: var(--e-5); }
 }

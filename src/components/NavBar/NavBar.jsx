@@ -5,7 +5,7 @@ import CartMenu from "./CartMenu/CartMenu";
 import Logo from "./Logo/Logo";
 import { useAuth } from "../../contexts/AuthContext";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Menu, X, User, Shield, Search } from "lucide-react";
+import { User, Shield, Search } from "lucide-react";
 
 const LINKS = [
   { a: "/", texto: "Inicio" },
@@ -13,13 +13,15 @@ const LINKS = [
   { a: "/contact", texto: "Contacto" },
 ];
 
+/**
+ * Barra de arriba. En celular es solo logo y buscador: los destinos viven en
+ * BottomNav, que los deja a un toque en vez de esconderlos tras una
+ * hamburguesa. En escritorio lleva los links y la cuenta.
+ */
 function NavBar() {
-  const [menuAbierto, setMenuAbierto] = useState(false);
   const [busqueda, setBusqueda] = useState("");
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
-
-  const cerrarMenu = () => setMenuAbierto(false);
 
   // Filtra mientras se escribe, sin disparar una navegación por tecla.
   const busquedaRetrasada = useDebounce(busqueda, 250);
@@ -40,17 +42,16 @@ function NavBar() {
     });
   }, [busquedaRetrasada, navigate]);
 
-  const buscar = (e) => {
-    e.preventDefault();
-    cerrarMenu();
-  };
-
   return (
     <header className="nav">
       <div className="nav-inner">
         <Logo />
 
-        <form className="nav-buscador" onSubmit={buscar} role="search">
+        <form
+          className="nav-buscador"
+          onSubmit={(e) => e.preventDefault()}
+          role="search"
+        >
           <Search size={18} className="nav-buscador-icono" aria-hidden="true" />
           <input
             type="search"
@@ -62,7 +63,7 @@ function NavBar() {
           />
         </form>
 
-        {/* Los links viven en el panel en celular y acá en escritorio. */}
+        {/* Los links viven en BottomNav en celular y acá en escritorio. */}
         <nav className="nav-links" aria-label="Principal">
           {LINKS.map((l) => (
             <NavLink key={l.a} to={l.a} end={l.a === "/"}>
@@ -72,8 +73,10 @@ function NavBar() {
         </nav>
 
         <div className="nav-acciones">
+          {/* El panel es el único destino que BottomNav no lleva, así que su
+              acceso en celular es este escudo. Solo lo ve un admin. */}
           {isAdmin && (
-            <NavLink to="/admin" className="nav-accion nav-solo-escritorio" title="Panel">
+            <NavLink to="/admin" className="nav-accion" title="Panel">
               <Shield size={20} />
               <span className="nav-accion-texto">Admin</span>
             </NavLink>
@@ -87,42 +90,9 @@ function NavBar() {
             <span className="nav-accion-texto">{user ? "Perfil" : "Ingresar"}</span>
           </NavLink>
 
-          {/* El carrito queda fuera del menú a propósito: es la acción de
-              compra y su contador tiene que verse siempre. */}
           <CartMenu />
-
-          <button
-            className="nav-hamburguesa"
-            onClick={() => setMenuAbierto(!menuAbierto)}
-            aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
-            aria-expanded={menuAbierto}
-          >
-            {menuAbierto ? <X size={24} /> : <Menu size={24} />}
-          </button>
         </div>
       </div>
-
-      <nav className={`nav-panel ${menuAbierto ? "abierto" : ""}`} aria-label="Menú">
-        {LINKS.map((l) => (
-          <NavLink key={l.a} to={l.a} end={l.a === "/"} onClick={cerrarMenu}>
-            {l.texto}
-          </NavLink>
-        ))}
-
-        <hr className="nav-panel-separador" />
-
-        <NavLink to={user ? "/profile" : "/login"} onClick={cerrarMenu}>
-          <User size={18} />
-          {user ? "Mi perfil" : "Ingresar"}
-        </NavLink>
-
-        {isAdmin && (
-          <NavLink to="/admin" onClick={cerrarMenu}>
-            <Shield size={18} />
-            Panel de administración
-          </NavLink>
-        )}
-      </nav>
     </header>
   );
 }

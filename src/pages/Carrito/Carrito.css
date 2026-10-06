@@ -61,7 +61,8 @@
     position: fixed;
     left: 0;
     right: 0;
-    bottom: 0;
+    /* Apoyado sobre BottomNav: en bottom:0 quedaban uno encima del otro. */
+    bottom: var(--alto-nav-abajo);
     z-index: 30;
     border-radius: var(--r-card) var(--r-card) 0 0;
     box-shadow: var(--elev-2);

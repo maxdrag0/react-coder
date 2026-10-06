@@ -2,11 +2,13 @@ import { useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import { CATEGORIES } from "@/constants/categories";
 import { formatearPrecio } from "@/utils/formatearPrecio";
+import { SIN_MARCA } from "@/constants/marcas";
 import "./FiltrosProductos.css";
 
 const CATEGORIAS = Object.values(CATEGORIES).sort((a, b) => a.localeCompare(b));
 
-const SIN_MARCA = "Sin marca";
+const porcentaje = (valor, min, max) =>
+  max > min ? `${((valor - min) / (max - min)) * 100}%` : "100%";
 
 /**
  * Panel de filtros. En escritorio es una columna a la izquierda; en celular
@@ -19,6 +21,7 @@ const FiltrosProductos = ({
   marcas,
   marcasElegidas,
   onMarca,
+  conteoMarcas = {},
   precioMin,
   precioMax,
   rango,
@@ -89,38 +92,52 @@ const FiltrosProductos = ({
           <fieldset className="filtro-grupo">
             <legend>Marca</legend>
             <ul className="filtro-lista">
-              {marcas.map((m) => (
-                <li key={m}>
-                  <label className="filtro-check">
-                    <input
-                      type="checkbox"
-                      checked={marcasElegidas.includes(m)}
-                      onChange={() => onMarca(m)}
-                    />
-                    {m === SIN_MARCA ? <em>{m}</em> : m}
-                  </label>
-                </li>
-              ))}
+              {marcas.map((m) => {
+                // El conteo ignora el filtro de marca: cada casilla dice
+                // cuántos productos suma si la tildás. En cero se apaga en
+                // vez de desaparecer, para no mover la lista al escribir.
+                const cuenta = conteoMarcas[m] ?? 0;
+                return (
+                  <li key={m}>
+                    <label
+                      className={`filtro-check ${cuenta === 0 ? "filtro-check-vacia" : ""}`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={marcasElegidas.includes(m)}
+                        onChange={() => onMarca(m)}
+                      />
+                      <span className="filtro-check-texto">
+                        {m === SIN_MARCA ? <em>{m}</em> : m}
+                      </span>
+                      <span className="filtro-cuenta">{cuenta}</span>
+                    </label>
+                  </li>
+                );
+              })}
             </ul>
           </fieldset>
         )}
 
         <fieldset className="filtro-grupo">
-          <legend>Precio por unidad</legend>
+          <legend>Precio</legend>
           <label className="solo-lectores" htmlFor="filtro-precio">
-            Precio máximo
+            Precio máximo por unidad
           </label>
           <input
             id="filtro-precio"
+            className="filtro-precio"
             type="range"
             min={precioMin}
             max={precioMax}
             step={Math.max(1, Math.round((precioMax - precioMin) / 100))}
             value={rango[1]}
             onChange={(e) => onRango([precioMin, Number(e.target.value)])}
+            aria-valuetext={formatearPrecio(rango[1]) ?? "$0"}
+            style={{ "--relleno": porcentaje(rango[1], precioMin, precioMax) }}
           />
           <p className="filtro-rango">
-            {formatearPrecio(precioMin) ?? "$0"} — {formatearPrecio(rango[1]) ?? "$0"}
+            Hasta <strong>{formatearPrecio(rango[1]) ?? "$0"}</strong> por unidad
           </p>
         </fieldset>
 
@@ -148,4 +165,3 @@ const FiltrosProductos = ({
 };
 
 export default FiltrosProductos;
-export { SIN_MARCA };

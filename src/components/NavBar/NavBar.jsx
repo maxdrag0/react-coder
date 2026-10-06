@@ -23,13 +23,16 @@ function NavBar() {
 
   // Filtra mientras se escribe, sin disparar una navegación por tecla.
   const busquedaRetrasada = useDebounce(busqueda, 250);
-  const primeraVez = useRef(true);
+  const ultimaBusqueda = useRef(busquedaRetrasada);
 
   useEffect(() => {
-    if (primeraVez.current) {
-      primeraVez.current = false;
-      return;
-    }
+    // `navigate` cambia de identidad en cada cambio de ruta, así que este
+    // efecto se re-ejecuta al navegar. Solo tiene que actuar cuando lo que
+    // cambió es el texto buscado: si no, secuestra toda la navegación y la
+    // app queda clavada en /products.
+    if (busquedaRetrasada === ultimaBusqueda.current) return;
+    ultimaBusqueda.current = busquedaRetrasada;
+
     const q = busquedaRetrasada.trim();
     // replace y no push: escribir no debe llenar el historial del navegador.
     navigate(q ? `/products?search=${encodeURIComponent(q)}` : "/products", {

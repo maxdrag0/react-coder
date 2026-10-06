@@ -3,10 +3,29 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, useSearchParams, useNavigate, Link } from "react-router-dom";
 import { Search } from "lucide-react";
 import ItemListContainer from "../../components/ItemListContainer/ItemListContainer";
-import FiltrosProductos, { SIN_MARCA } from "../../components/FiltrosProductos/FiltrosProductos";
+import FiltrosProductos from "../../components/FiltrosProductos/FiltrosProductos";
 import { useProducts } from "../../hooks/useProducts";
 import { precioDe } from "../../constants/unidades";
+import { SIN_MARCA } from "../../constants/marcas";
 import "./Products.css";
+
+const coincideTexto = (item, busqueda) => {
+  if (!busqueda) return true;
+  const q = busqueda.toLowerCase();
+  return (
+    (item.nombre || item.name || "").toLowerCase().includes(q) ||
+    (item.categoria || item.category || "").toLowerCase().includes(q) ||
+    (item.marca || "").toLowerCase().includes(q)
+  );
+};
+
+// Un producto sin precio no se oculta por el filtro de precio.
+const coincidePrecio = (item, tope) => {
+  const precio = precioDe(item, "unitario");
+  return precio === null || precio <= tope;
+};
+
+const marcaDe = (item) => item.marca || SIN_MARCA;
 
 function Products() {
   const { category } = useParams();
@@ -28,7 +47,7 @@ function Products() {
   }, [urlSearch]);
 
   const marcas = useMemo(() => {
-    const vistas = new Set(items.map((i) => i.marca || SIN_MARCA));
+    const vistas = new Set(items.map(marcaDe));
     return [...vistas].sort((a, b) =>
       a === SIN_MARCA ? 1 : b === SIN_MARCA ? -1 : a.localeCompare(b)
     );
@@ -45,29 +64,28 @@ function Products() {
 
   const filtrados = useMemo(
     () =>
-      items.filter((item) => {
-        if (localSearch) {
-          const q = localSearch.toLowerCase();
-          const nombre = (item.nombre || item.name || "").toLowerCase();
-          const cat = (item.categoria || item.category || "").toLowerCase();
-          const marca = (item.marca || "").toLowerCase();
-          if (!nombre.includes(q) && !cat.includes(q) && !marca.includes(q)) {
-            return false;
-          }
-        }
-
-        if (marcasElegidas.length > 0) {
-          if (!marcasElegidas.includes(item.marca || SIN_MARCA)) return false;
-        }
-
-        // Un producto sin precio no se oculta por el filtro de precio.
-        const precio = precioDe(item, "unitario");
-        if (precio !== null && precio > tope) return false;
-
-        return true;
-      }),
+      items.filter(
+        (item) =>
+          coincideTexto(item, localSearch) &&
+          coincidePrecio(item, tope) &&
+          (marcasElegidas.length === 0 || marcasElegidas.includes(marcaDe(item)))
+      ),
     [items, localSearch, marcasElegidas, tope]
   );
+
+  // El conteo por marca aplica los demás filtros pero NO el de marca: así
+  // cada casilla dice cuántos productos suma si la tildás, que es lo que
+  // uno quiere saber antes de tildarla.
+  const conteoMarcas = useMemo(() => {
+    const cuenta = {};
+    for (const item of items) {
+      if (!coincideTexto(item, localSearch)) continue;
+      if (!coincidePrecio(item, tope)) continue;
+      const marca = marcaDe(item);
+      cuenta[marca] = (cuenta[marca] ?? 0) + 1;
+    }
+    return cuenta;
+  }, [items, localSearch, tope]);
 
   const cambiarBusqueda = (e) => {
     const valor = e.target.value;
@@ -100,7 +118,7 @@ function Products() {
             type="search"
             className="campo-control"
             placeholder="Buscar por nombre, categoría o marca"
-            aria-label="Buscar productos"
+            aria-label="Buscar productos en el catálogo"
             value={localSearch}
             onChange={cambiarBusqueda}
           />
@@ -117,6 +135,7 @@ function Products() {
             marcas={marcas}
             marcasElegidas={marcasElegidas}
             onMarca={alternarMarca}
+            conteoMarcas={conteoMarcas}
             precioMin={0}
             precioMax={precioMax}
             rango={[0, tope]}

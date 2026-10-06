@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import { CartContext } from "../../contexts/cart/CartContext";
 import { Counter } from "../common/Counter/Counter";
 import Modal from "../common/Modal/Modal";
-import MediaPlaceholder from "@/components/common/MediaPlaceholder/MediaPlaceholder";
+import Media from "@/components/common/Media/Media";
 import { formatearPrecio } from "@/utils/formatearPrecio";
 import { unidadesDisponibles, precioDe, multiplicadorDe } from "@/constants/unidades";
 import { sePuedeComprar } from "@/constants/estadoProducto";
@@ -50,7 +50,7 @@ function ItemDetails({ item }) {
   return (
     <article className="detalle">
       <div className="detalle-media">
-        {foto ? <img src={foto} alt="" /> : <MediaPlaceholder />}
+        <Media foto={foto} video={item.videoUrl} titulo={nombre} modo="completo" />
       </div>
 
       <div className="detalle-info">

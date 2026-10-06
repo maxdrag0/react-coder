@@ -189,3 +189,13 @@
 @media (max-width: 639px) {
   .modal-pie-botones .boton { flex: 1; }
 }
+
+/* Campo con un valor que no sirve. El borde solo no alcanza: el texto de
+   ayuda de abajo explica qué pasa, y el boton de guardar queda bloqueado. */
+.campo-mal {
+  border-color: var(--danger);
+}
+
+.campo:has(.campo-mal) .campo-ayuda {
+  color: var(--danger);
+}

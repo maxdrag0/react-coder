@@ -10,7 +10,7 @@ vi.mock("firebase/storage", () => ({
 }));
 vi.mock("@/utils/firebase", () => ({ storage: {} }));
 
-const { uploadFile, LIMITE_IMAGEN, LIMITE_VIDEO } = await import(
+const { uploadFile, LIMITE_IMAGEN } = await import(
   "@/services/firebase/storageFirebase"
 );
 
@@ -49,21 +49,20 @@ describe("uploadFile - validación antes de subir", () => {
     await expect(uploadFile(archivo("image/jpeg", 5 * MB))).rejects.toThrow(/5 MB/);
   });
 
-  it("rechaza un video de 60 MB con un mensaje que dice el límite", async () => {
+  it("rechaza cualquier video y manda a YouTube, por chico que sea", async () => {
+    // El plan gratuito da 1 GB de descarga por día compartido con todo el
+    // catálogo: un video visto veinte veces deja la tienda sin fotos. Por eso
+    // no es un límite de tamaño sino un no.
     await expect(
-      uploadFile(archivo("video/mp4", 60 * MB, "demo.mp4"))
-    ).rejects.toThrow(/50 MB/);
+      uploadFile(archivo("video/mp4", 2 * MB, "demo.mp4"))
+    ).rejects.toThrow(/YouTube/i);
     expect(uploadBytesMock).not.toHaveBeenCalled();
-  });
-
-  it("acepta un video de 20 MB", async () => {
-    await expect(uploadFile(archivo("video/mp4", 20 * MB, "demo.mp4"))).resolves.toBeTruthy();
   });
 
   it("rechaza un PDF explicando qué tipos se aceptan", async () => {
     await expect(
       uploadFile(archivo("application/pdf", 1024, "manual.pdf"))
-    ).rejects.toThrow(/imagen|video/i);
+    ).rejects.toThrow(/im[áa]gen/i);
     expect(uploadBytesMock).not.toHaveBeenCalled();
   });
 
@@ -77,8 +76,7 @@ describe("uploadFile - validación antes de subir", () => {
     expect(uploadBytesMock).not.toHaveBeenCalled();
   });
 
-  it("expone los límites para que la interfaz pueda mostrarlos", () => {
+  it("expone el límite para que la interfaz pueda mostrarlo", () => {
     expect(LIMITE_IMAGEN).toBe(5 * MB);
-    expect(LIMITE_VIDEO).toBe(50 * MB);
   });
 });

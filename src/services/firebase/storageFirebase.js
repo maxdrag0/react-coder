@@ -7,7 +7,6 @@ const MB = 1024 * 1024;
 // ocurrir en el servidor y el usuario ve "Error al guardar el producto" sin
 // ninguna pista de que el problema era el tamanio.
 export const LIMITE_IMAGEN = 5 * MB;
-export const LIMITE_VIDEO = 50 * MB;
 
 const enMB = (bytes) => Math.round(bytes / MB);
 
@@ -20,7 +19,7 @@ const validarArchivo = (file) => {
   const tipo = file.type ?? "";
 
   if (!tipo) {
-    return "No pudimos detectar el tipo del archivo. Convertilo a JPG, PNG o MP4 y probá de nuevo.";
+    return "No pudimos detectar el tipo del archivo. Convertilo a JPG o PNG y probá de nuevo.";
   }
 
   if (tipo.startsWith("image/")) {
@@ -29,13 +28,14 @@ const validarArchivo = (file) => {
       : null;
   }
 
+  // El video no se sube: el plan gratuito da 1 GB de descarga por día
+  // compartido con todo el catálogo, así que un video visto veinte veces
+  // deja la tienda sin fotos. Los videos van por YouTube, con videoUrl.
   if (tipo.startsWith("video/")) {
-    return file.size >= LIMITE_VIDEO
-      ? `El video pesa ${enMB(file.size)} MB y el máximo es ${enMB(LIMITE_VIDEO)} MB.`
-      : null;
+    return "Los videos no se suben acá: pegá el link de YouTube en el campo de video.";
   }
 
-  return "Solo se pueden subir imágenes o videos.";
+  return "Solo se pueden subir imágenes.";
 };
 
 /**

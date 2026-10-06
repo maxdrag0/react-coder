@@ -44,6 +44,7 @@ const PRODUCTO_VACIO = {
   duracion: "",
   description: "",
   image: "",
+  videoUrl: "",
   estado: ACTIVO,
 };
 
@@ -61,6 +62,7 @@ const aFormulario = (p) => ({
   category: p.category ?? p.categoria ?? "",
   description: p.description ?? p.descripcion ?? "",
   image: p.image ?? p.fotoUrl ?? "",
+  videoUrl: p.videoUrl ?? "",
   marca: p.marca ?? "",
   subcategoria: p.subcategoria ?? "",
   duracion: p.duracion ?? "",
@@ -86,6 +88,7 @@ const aFirestore = (form, imagen) => ({
   subcategoria: textoOpcional(form.subcategoria),
   duracion: numeroOpcional(form.duracion),
   estado: form.estado ?? ACTIVO,
+  videoUrl: textoOpcional(form.videoUrl),
   image: imagen,
   fotoUrl: imagen,
 });

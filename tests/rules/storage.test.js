@@ -49,9 +49,12 @@ describe("storage products/", () => {
     );
   });
 
-  it("permite que un admin suba un video de 10 MB (límite 50 MB)", async () => {
+  it("NIEGA un video aunque lo suba el admin y sea chico", async () => {
+    // El plan gratuito da 1 GB de descarga por día compartido con todas las
+    // imágenes del catálogo: un video visto veinte veces deja la tienda sin
+    // fotos. Los videos van por YouTube, en el campo videoUrl del producto.
     const admin = env.authenticatedContext("max", { admin: true });
-    await assertSucceeds(
+    await assertFails(
       uploadBytes(ref(admin.storage(), "products/demo.mp4"), videoMediano(), {
         contentType: "video/mp4",
       })

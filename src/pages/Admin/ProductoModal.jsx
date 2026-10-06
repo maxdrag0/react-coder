@@ -1,6 +1,7 @@
 import { X } from "lucide-react";
 import { CATEGORIES } from "../../constants/categories";
 import { ESTADOS, estadoDe } from "../../constants/estadoProducto";
+import { idDeYoutube } from "../../utils/videoEmbed";
 import "./ProductoModal.css";
 
 const CATEGORIAS = Object.values(CATEGORIES).sort((a, b) => a.localeCompare(b));
@@ -45,6 +46,11 @@ const ProductoModal = ({
   onCerrar,
 }) => {
   const cambiar = (campo) => (e) => onCampo(campo, e.target.value);
+
+  // Se valida mientras se escribe: enterarse al guardar de que el link no
+  // servía obliga a reabrir el modal y recargar todo el formulario.
+  const videoCrudo = (producto.videoUrl ?? "").trim();
+  const videoMal = videoCrudo !== "" && idDeYoutube(videoCrudo) === null;
 
   return (
     <div
@@ -207,19 +213,48 @@ const ProductoModal = ({
             </div>
           </Seccion>
 
-          <Seccion titulo="Imagen o video">
-            <Campo id="p-archivo" etiqueta="Subir archivo" ancho>
+          <Seccion titulo="Imagen y video">
+            <Campo
+              id="p-archivo"
+              etiqueta="Foto"
+              ayuda="JPG o PNG, hasta 5 MB."
+              ancho
+            >
               <input
                 id="p-archivo"
                 className="campo-control"
                 type="file"
-                accept="image/*,video/*"
+                accept="image/*"
                 onChange={(e) => onArchivo(e.target.files[0])}
               />
             </Campo>
+
+            {/* El video va por YouTube y no subido: el plan gratuito da 1 GB
+                de descarga por día compartido con todo el catálogo. */}
+            <Campo
+              id="p-video"
+              etiqueta="Video de YouTube"
+              ayuda={
+                videoMal
+                  ? "No reconocemos ese link. Pegá la dirección del video como aparece en YouTube."
+                  : "Opcional. Pegá el link tal como lo copiás del navegador."
+              }
+              ancho
+            >
+              <input
+                id="p-video"
+                className={`campo-control ${videoMal ? "campo-mal" : ""}`}
+                type="text"
+                placeholder="https://youtu.be/..."
+                value={producto.videoUrl ?? ""}
+                onChange={cambiar("videoUrl")}
+                aria-invalid={videoMal || undefined}
+              />
+            </Campo>
+
             {producto.image && !archivo && (
               <div className="campo campo-ancho">
-                <span className="campo-etiqueta">Actual</span>
+                <span className="campo-etiqueta">Foto actual</span>
                 <img src={producto.image} alt="" className="modal-miniatura" />
               </div>
             )}
@@ -245,7 +280,7 @@ const ProductoModal = ({
               type="submit"
               form={FORM_ID}
               className="boton boton-primario"
-              disabled={guardando}
+              disabled={guardando || videoMal}
             >
               {guardando ? "Guardando..." : "Guardar"}
             </button>

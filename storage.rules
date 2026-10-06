@@ -2,11 +2,15 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // Fotos y videos de producto: lectura publica, escritura solo admin.
-    // El accept="image/*,video/*" del formulario de admin es solo el
-    // selector del navegador y no valida nada: el limite real esta aca.
-    // Los dos umbrales son distintos a proposito: 5 MB no alcanza para un
-    // video y 50 MB es absurdo para una foto de producto.
+    // Fotos de producto: lectura publica, escritura solo admin.
+    // El accept="image/*" del formulario de admin es solo el selector del
+    // navegador y no valida nada: el limite real esta aca.
+    //
+    // Video NO: el plan gratuito da 1 GB de descarga por dia compartido con
+    // todas las imagenes del catalogo, asi que un video de 50 MB visto veinte
+    // veces deja la tienda sin fotos hasta el dia siguiente. Los videos van
+    // por YouTube, en el campo videoUrl del producto.
+    //
     // create y delete van por separado a proposito: en un delete
     // `request.resource` es null, asi que evaluar request.resource.contentType
     // revienta con "Null value error" y un `allow write` unico niega el
@@ -17,13 +21,8 @@ service firebase.storage {
 
       allow create, update: if request.auth != null
                    && request.auth.token.admin == true
-                   && (
-                        (request.resource.contentType.matches('image/.*')
-                         && request.resource.size < 5 * 1024 * 1024)
-                        ||
-                        (request.resource.contentType.matches('video/.*')
-                         && request.resource.size < 50 * 1024 * 1024)
-                      );
+                   && request.resource.contentType.matches('image/.*')
+                   && request.resource.size < 5 * 1024 * 1024;
 
       allow delete: if request.auth != null && request.auth.token.admin == true;
     }

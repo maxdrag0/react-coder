@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import Precio from "@/components/common/Precio/Precio";
 import MediaPlaceholder from "@/components/common/MediaPlaceholder/MediaPlaceholder";
+import { sePuedeComprar } from "@/constants/estadoProducto";
 import "./Item.css";
 
 function Item({ item }) {
@@ -18,6 +19,9 @@ function Item({ item }) {
       <Link to={`/product/${item.codigo}`} className="item-link">
         <div className="item-media">
           {foto ? <img src={foto} alt="" loading="lazy" /> : <MediaPlaceholder />}
+          {!sePuedeComprar(item) && (
+            <span className="item-agotado">Sin stock</span>
+          )}
         </div>
 
         <div className="item-cuerpo">

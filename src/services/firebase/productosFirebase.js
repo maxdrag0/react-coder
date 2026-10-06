@@ -11,8 +11,14 @@ import {
   startAfter,
   deleteDoc,
   setDoc,
+  writeBatch,
 } from "firebase/firestore";
 import { db } from "../../utils/firebase";
+import { enLotes } from "../../utils/enLotes";
+
+// Los IDs de Firestore no admiten /, y varios códigos del catálogo lo traen.
+const idSeguro = (codigo) => String(codigo).replace(/\//g, "-");
+const refDe = (codigo) => doc(db, "products", idSeguro(codigo));
 
 export const obtenerProductos = async (categoria, lastVisible = null, pageSize = 8) => {
   try {
@@ -51,10 +57,7 @@ export const obtenerProductos = async (categoria, lastVisible = null, pageSize =
 
 export const obtenerProductosPorCodigo = async (codigo) => {
   try {
-    // Los IDs en Firebase son strings. Aseguramos que el código sea un string y reemplazamos / por -
-    const idSeguro = String(codigo).replace(/\//g, "-");
-    const docRef = doc(db, "products", idSeguro);
-    const docSnap = await getDoc(docRef);
+    const docSnap = await getDoc(refDe(codigo));
 
     if (docSnap.exists()) {
       return { codigo: docSnap.id, ...docSnap.data() };
@@ -71,9 +74,7 @@ export const obtenerProductosPorCodigo = async (codigo) => {
 export const crearProducto = async (producto, customId = null) => {
   try {
     if (customId) {
-      const idSeguro = String(customId).replace(/\//g, "-");
-      const docRef = doc(db, "products", idSeguro);
-      await setDoc(docRef, producto);
+      await setDoc(refDe(customId), producto);
     } else {
       await addDoc(collection(db, "products"), producto);
     }
@@ -85,10 +86,8 @@ export const crearProducto = async (producto, customId = null) => {
 
 export const actualizarProducto = async (id, producto) => {
   try {
-    const idSeguro = String(id).replace(/\//g, "-");
-    const docRef = doc(db, "products", idSeguro);
-    // setDoc with merge: true acts as an update but creates if it doesn't exist. UpdateDoc only works if it exists.
-    await setDoc(docRef, producto, { merge: true });
+    // setDoc con merge actúa como update pero crea si no existe; updateDoc falla.
+    await setDoc(refDe(id), producto, { merge: true });
   } catch (error) {
     console.error("Error al actualizar producto:", error);
     throw error;
@@ -97,11 +96,30 @@ export const actualizarProducto = async (id, producto) => {
 
 export const eliminarProducto = async (id) => {
   try {
-    const idSeguro = String(id).replace(/\//g, "-");
-    const docRef = doc(db, "products", idSeguro);
-    await deleteDoc(docRef);
+    await deleteDoc(refDe(id));
   } catch (error) {
     console.error("Error al eliminar producto:", error);
     throw error;
+  }
+};
+
+/*
+  Operaciones sobre varios productos a la vez. Van en batches porque hacer
+  una escritura por producto son 321 round-trips y el panel queda colgado.
+*/
+
+export const actualizarEstados = async (codigos, estado) => {
+  for (const lote of enLotes(codigos)) {
+    const batch = writeBatch(db);
+    lote.forEach((codigo) => batch.set(refDe(codigo), { estado }, { merge: true }));
+    await batch.commit();
+  }
+};
+
+export const eliminarProductos = async (codigos) => {
+  for (const lote of enLotes(codigos)) {
+    const batch = writeBatch(db);
+    lote.forEach((codigo) => batch.delete(refDe(codigo)));
+    await batch.commit();
   }
 };

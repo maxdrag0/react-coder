@@ -5,6 +5,7 @@ import Modal from "../common/Modal/Modal";
 import MediaPlaceholder from "@/components/common/MediaPlaceholder/MediaPlaceholder";
 import { formatearPrecio } from "@/utils/formatearPrecio";
 import { unidadesDisponibles, precioDe, multiplicadorDe } from "@/constants/unidades";
+import { sePuedeComprar } from "@/constants/estadoProducto";
 import { Link } from "react-router-dom";
 import "./ItemDetails.css";
 
@@ -12,6 +13,9 @@ function ItemDetails({ item }) {
   const { addToCart } = useContext(CartContext);
 
   const unidades = unidadesDisponibles(item);
+  // Se puede llegar acá por URL directa sin pasar por el listado, así que
+  // filtrar el catálogo no alcanza: el botón se bloquea igual.
+  const comprable = sePuedeComprar(item);
   const [unidad, setUnidad] = useState(unidades[0]?.clave ?? "unitario");
   const [count, setCount] = useState(1);
   const [modalAbierto, setModalAbierto] = useState(false);
@@ -98,7 +102,12 @@ function ItemDetails({ item }) {
           </fieldset>
         )}
 
-        {unidades.length === 0 ? (
+        {!comprable ? (
+          <p className="detalle-agotado">
+            Ahora mismo no tenemos stock de este producto. Escribinos y te
+            avisamos cuando entre.
+          </p>
+        ) : unidades.length === 0 ? (
           <p className="detalle-agotado">
             Este producto todavía no tiene precio cargado. Escribinos y te lo
             pasamos.

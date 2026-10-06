@@ -2,13 +2,16 @@ import { PuffLoader } from "react-spinners";
 import ItemListContainer from "@/components/ItemListContainer/ItemListContainer";
 import CategoriaChips from "@/components/CategoriaChips/CategoriaChips";
 import { useProducts } from "@/hooks/useProducts";
+import { seMuestra } from "@/constants/estadoProducto";
 import "./Home.css";
 
 function Home() {
   const { items, loading, loadMore, hasMore } = useProducts();
   // El campo de popularidad es `compras`; `ventas` no existe en el catálogo,
   // así que el orden anterior era un no-op y el título decía algo falso.
-  const masVendidos = [...items].sort((a, b) => (b.compras || 0) - (a.compras || 0));
+  const masVendidos = [...items]
+    .filter(seMuestra)
+    .sort((a, b) => (b.compras || 0) - (a.compras || 0));
 
   return (
     <div className="home contenedor">

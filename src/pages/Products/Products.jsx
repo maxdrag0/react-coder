@@ -7,6 +7,7 @@ import FiltrosProductos from "../../components/FiltrosProductos/FiltrosProductos
 import { useProducts } from "../../hooks/useProducts";
 import { precioDe } from "../../constants/unidades";
 import { SIN_MARCA } from "../../constants/marcas";
+import { seMuestra } from "../../constants/estadoProducto";
 import "./Products.css";
 
 const coincideTexto = (item, busqueda) => {
@@ -39,6 +40,10 @@ function Products() {
   // también hace que filtrar sea instantáneo mientras se escribe.
   const { items, loading } = useProducts(category, { traerTodo: true });
 
+  // Un producto oculto no existe para la tienda: se va antes de calcular
+  // marcas, precio máximo y conteos, para que no infle ningún número.
+  const visibles = useMemo(() => items.filter(seMuestra), [items]);
+
   const [marcasElegidas, setMarcasElegidas] = useState([]);
   const [topePrecio, setTopePrecio] = useState(null);
 
@@ -47,30 +52,30 @@ function Products() {
   }, [urlSearch]);
 
   const marcas = useMemo(() => {
-    const vistas = new Set(items.map(marcaDe));
+    const vistas = new Set(visibles.map(marcaDe));
     return [...vistas].sort((a, b) =>
       a === SIN_MARCA ? 1 : b === SIN_MARCA ? -1 : a.localeCompare(b)
     );
-  }, [items]);
+  }, [visibles]);
 
   const precioMax = useMemo(() => {
-    const precios = items
+    const precios = visibles
       .map((i) => precioDe(i, "unitario"))
       .filter((p) => p !== null);
     return precios.length ? Math.max(...precios) : 0;
-  }, [items]);
+  }, [visibles]);
 
   const tope = topePrecio ?? precioMax;
 
   const filtrados = useMemo(
     () =>
-      items.filter(
+      visibles.filter(
         (item) =>
           coincideTexto(item, localSearch) &&
           coincidePrecio(item, tope) &&
           (marcasElegidas.length === 0 || marcasElegidas.includes(marcaDe(item)))
       ),
-    [items, localSearch, marcasElegidas, tope]
+    [visibles, localSearch, marcasElegidas, tope]
   );
 
   // El conteo por marca aplica los demás filtros pero NO el de marca: así
@@ -78,14 +83,14 @@ function Products() {
   // uno quiere saber antes de tildarla.
   const conteoMarcas = useMemo(() => {
     const cuenta = {};
-    for (const item of items) {
+    for (const item of visibles) {
       if (!coincideTexto(item, localSearch)) continue;
       if (!coincidePrecio(item, tope)) continue;
       const marca = marcaDe(item);
       cuenta[marca] = (cuenta[marca] ?? 0) + 1;
     }
     return cuenta;
-  }, [items, localSearch, tope]);
+  }, [visibles, localSearch, tope]);
 
   const cambiarBusqueda = (e) => {
     const valor = e.target.value;

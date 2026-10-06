@@ -1,568 +1,376 @@
-import { useState, useEffect } from "react";
-import { useAuth } from "../../contexts/AuthContext";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { obtenerProductos, crearProducto, actualizarProducto, eliminarProducto } from "../../services/firebase/productosFirebase";
+import { Plus } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext";
+import {
+  obtenerProductos,
+  crearProducto,
+  actualizarProducto,
+  eliminarProducto,
+  actualizarEstados,
+  eliminarProductos,
+} from "../../services/firebase/productosFirebase";
 import { obtenerTodasLasCompras } from "../../services/firebase/comprasFirebase";
-import { obtenerMensajes, marcarMensajeComoLeido, eliminarMensaje } from "../../services/firebase/contactoFirebase";
+import {
+  obtenerMensajes,
+  marcarMensajeComoLeido,
+  eliminarMensaje,
+} from "../../services/firebase/contactoFirebase";
 import { uploadFile } from "../../services/firebase/storageFirebase";
 import { invalidarCatalogo } from "../../services/firebase/cacheCatalogo";
-import { CATEGORIES } from "../../constants/categories";
+import { ACTIVO } from "../../constants/estadoProducto";
+import ProductoModal from "./ProductoModal";
+import TablaProductos from "./TablaProductos";
+import TablaPedidos from "./TablaPedidos";
+import TablaMensajes from "./TablaMensajes";
+import BarraSeleccion from "./BarraSeleccion";
 import "./AdminDashboard.css";
-import { CheckCircle, Circle, Trash2 } from "lucide-react";
+
+const PESTANAS = [
+  { clave: "productos", etiqueta: "Productos" },
+  { clave: "pedidos", etiqueta: "Pedidos" },
+  { clave: "mensajes", etiqueta: "Mensajes" },
+];
+
+const PRODUCTO_VACIO = {
+  codigo: "",
+  name: "",
+  price: "",
+  precioDisplay: "",
+  precioBulto: "",
+  category: "",
+  subcategoria: "",
+  marca: "",
+  duracion: "",
+  description: "",
+  image: "",
+  estado: ACTIVO,
+};
+
+/* El catálogo convive con dos esquemas: los productos sembrados usan
+   nombre/precioUnitario/fotoUrl/categoria y los creados desde acá usan
+   name/price/image/category. Leer solo uno dejaba el formulario vacío en
+   todo producto existente, y guardar una foto borraba el precio.
+   Unificarlos exige migrar los datos y es el subproyecto E. */
+const aFormulario = (p) => ({
+  ...p,
+  name: p.name ?? p.nombre ?? "",
+  price: p.price ?? p.precioUnitario ?? "",
+  precioDisplay: p.precioDisplay ?? "",
+  precioBulto: p.precioBulto ?? "",
+  category: p.category ?? p.categoria ?? "",
+  description: p.description ?? p.descripcion ?? "",
+  image: p.image ?? p.fotoUrl ?? "",
+  marca: p.marca ?? "",
+  subcategoria: p.subcategoria ?? "",
+  duracion: p.duracion ?? "",
+});
+
+const numeroOpcional = (v) => (v === "" || v == null ? null : Number(v));
+const textoOpcional = (v) => v?.trim() || null;
+
+// Se escriben los dos esquemas en paralelo para que la tienda lea lo mismo
+// sin importar cuál mire.
+const aFirestore = (form, imagen) => ({
+  name: form.name,
+  nombre: form.name,
+  price: Number(form.price),
+  precioUnitario: Number(form.price),
+  precioDisplay: numeroOpcional(form.precioDisplay),
+  precioBulto: numeroOpcional(form.precioBulto),
+  category: form.category,
+  categoria: form.category,
+  description: form.description ?? "",
+  descripcion: form.description ?? "",
+  marca: textoOpcional(form.marca),
+  subcategoria: textoOpcional(form.subcategoria),
+  duracion: numeroOpcional(form.duracion),
+  estado: form.estado ?? ACTIVO,
+  image: imagen,
+  fotoUrl: imagen,
+});
 
 const AdminDashboard = () => {
-  const { user, isAdmin, loading: authLoading } = useAuth();
+  const { isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  
-  const [activeTab, setActiveTab] = useState("productos"); // "productos", "pedidos", or "mensajes"
-  
-  const [products, setProducts] = useState([]);
-  const [orders, setOrders] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(true);
-  
-  // Modal state
-  const [showModal, setShowModal] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [currentProduct, setCurrentProduct] = useState({
-    codigo: "",
-    name: "",
-    price: "",
-    category: "",
-    description: "",
-    image: "",
-    stock: 0,
-    ventas: 0
-  });
-  const [file, setFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const [pestana, setPestana] = useState("productos");
+  const [productos, setProductos] = useState([]);
+  const [pedidos, setPedidos] = useState([]);
+  const [mensajes, setMensajes] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [busqueda, setBusqueda] = useState("");
+
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [editando, setEditando] = useState(false);
+  const [formulario, setFormulario] = useState(PRODUCTO_VACIO);
+  const [archivo, setArchivo] = useState(null);
+  const [guardando, setGuardando] = useState(false);
+  const [errorModal, setErrorModal] = useState("");
+
+  const [seleccion, setSeleccion] = useState(new Set());
+  const [enLote, setEnLote] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && !isAdmin) {
-      navigate("/");
-    }
+    if (!authLoading && !isAdmin) navigate("/");
   }, [authLoading, isAdmin, navigate]);
 
-  const loadData = async () => {
-    setLoading(true);
+  const cargar = useCallback(async () => {
+    setCargando(true);
     try {
-      const [productsData, ordersData, messagesData] = await Promise.all([
-        obtenerProductos(null, null, 100),
+      const [prods, compras, msgs] = await Promise.all([
+        obtenerProductos(null, null, 500),
         obtenerTodasLasCompras(),
-        obtenerMensajes()
+        obtenerMensajes(),
       ]);
-      setProducts(productsData.items);
-      setOrders(ordersData);
-      setMessages(messagesData);
+      setProductos(prods.items);
+      setPedidos(compras);
+      setMensajes(msgs);
     } catch (error) {
-      console.error("Error loading admin data:", error);
+      console.error("Error cargando los datos del panel:", error);
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    if (isAdmin) {
-      loadData();
-    }
-  }, [isAdmin]);
+    if (isAdmin) cargar();
+  }, [isAdmin, cargar]);
 
-  // El modal del panel se escribió a mano y no cerraba con Escape.
+  const cerrarModal = useCallback(() => {
+    setModalAbierto(false);
+    setArchivo(null);
+    setErrorModal("");
+  }, []);
+
+  // El modal se escribió a mano y no cerraba con Escape.
   useEffect(() => {
-    if (!showModal) return;
-    const alTeclearModal = (e) => {
-      if (e.key === "Escape") handleCloseModal();
-    };
-    document.addEventListener("keydown", alTeclearModal);
-    return () => document.removeEventListener("keydown", alTeclearModal);
-  }, [showModal]);
+    if (!modalAbierto) return;
+    const alTeclear = (e) => e.key === "Escape" && cerrarModal();
+    document.addEventListener("keydown", alTeclear);
+    return () => document.removeEventListener("keydown", alTeclear);
+  }, [modalAbierto, cerrarModal]);
 
-  const handleOpenModal = (product = null) => {
-    if (product) {
-      setIsEditing(true);
-      // El catálogo convive con dos esquemas: los productos sembrados usan
-      // nombre/precioUnitario/fotoUrl/categoria y los creados desde acá usan
-      // name/price/image/category. Leer solo uno dejaba el formulario vacío
-      // en todo producto existente, y guardar una foto borraba el precio.
-      setCurrentProduct({
-        ...product,
-        name: product.name ?? product.nombre ?? "",
-        price: product.price ?? product.precioUnitario ?? "",
-        precioDisplay: product.precioDisplay ?? "",
-        precioBulto: product.precioBulto ?? "",
-        category: product.category ?? product.categoria ?? "",
-        description: product.description ?? product.descripcion ?? "",
-        image: product.image ?? product.fotoUrl ?? "",
-        marca: product.marca ?? "",
-        subcategoria: product.subcategoria ?? "",
-        duracion: product.duracion ?? "",
-        stock: product.stock ?? 0,
-        ventas: product.ventas ?? 0,
-      });
-    } else {
-      setIsEditing(false);
-      setCurrentProduct({
-        codigo: "",
-        name: "",
-        price: "",
-        precioDisplay: "",
-        precioBulto: "",
-        category: "",
-        subcategoria: "",
-        marca: "",
-        duracion: "",
-        description: "",
-        image: "",
-        stock: 0,
-        ventas: 0
-      });
-    }
-    setFile(null);
-    setShowModal(true);
+  const abrirModal = (producto = null) => {
+    setEditando(Boolean(producto));
+    setFormulario(producto ? aFormulario(producto) : PRODUCTO_VACIO);
+    setArchivo(null);
+    setErrorModal("");
+    setModalAbierto(true);
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setFile(null);
-  };
+  const cambiarCampo = (campo, valor) =>
+    setFormulario((actual) => ({ ...actual, [campo]: valor }));
 
-  const handleSave = async (e) => {
+  const guardar = async (e) => {
     e.preventDefault();
-    setUploading(true);
-    
+    setGuardando(true);
+    setErrorModal("");
     try {
-      let imageUrl = currentProduct.image || currentProduct.fotoUrl;
-      
-      if (file) {
-        imageUrl = await uploadFile(file);
-      }
-      
-      // Se escriben los dos esquemas en paralelo para que la tienda lea lo
-      // mismo sin importar cuál mire. Unificarlos exige migrar los datos y
-      // es el subproyecto E.
-      const productData = {
-        ...currentProduct,
-        name: currentProduct.name,
-        nombre: currentProduct.name,
-        price: Number(currentProduct.price),
-        precioUnitario: Number(currentProduct.price),
-        precioDisplay: currentProduct.precioDisplay ? Number(currentProduct.precioDisplay) : null,
-        precioBulto: currentProduct.precioBulto ? Number(currentProduct.precioBulto) : null,
-        category: currentProduct.category,
-        categoria: currentProduct.category,
-        description: currentProduct.description,
-        descripcion: currentProduct.description,
-        marca: currentProduct.marca?.trim() || null,
-        subcategoria: currentProduct.subcategoria?.trim() || null,
-        duracion: currentProduct.duracion ? Number(currentProduct.duracion) : null,
-        stock: Number(currentProduct.stock),
-        ventas: Number(currentProduct.ventas) || 0,
-        image: imageUrl,
-        fotoUrl: imageUrl,
-      };
-      
-      if (isEditing) {
-        await actualizarProducto(currentProduct.codigo, productData);
+      const imagen = archivo
+        ? await uploadFile(archivo)
+        : formulario.image || formulario.fotoUrl || "";
+
+      const datos = aFirestore(formulario, imagen);
+
+      if (editando) {
+        await actualizarProducto(formulario.codigo, datos);
       } else {
-        await crearProducto(productData, currentProduct.codigo || null);
+        await crearProducto(datos, formulario.codigo || null);
       }
-      
+
       invalidarCatalogo();
-      await loadData();
-      handleCloseModal();
+      await cargar();
+      cerrarModal();
     } catch (error) {
-      console.error("Error saving product:", error);
-      alert("Error al guardar el producto");
+      console.error("Error guardando el producto:", error);
+      setErrorModal("No se pudo guardar. Revisá la conexión y probá de nuevo.");
     } finally {
-      setUploading(false);
+      setGuardando(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("¿Estás seguro de que quieres eliminar este producto?")) {
-      try {
-        await eliminarProducto(id);
-        invalidarCatalogo();
-        await loadData();
-      } catch (error) {
-        console.error("Error deleting product:", error);
-        alert("Error al eliminar el producto");
-      }
-    }
-  };
-
-  const handleToggleRead = async (id, currentStatus) => {
+  const borrarUno = async (codigo) => {
+    if (!window.confirm("¿Eliminar este producto? No se puede deshacer.")) return;
     try {
-      await marcarMensajeComoLeido(id, !currentStatus);
-      await loadData();
+      await eliminarProducto(codigo);
+      invalidarCatalogo();
+      setSeleccion(new Set());
+      await cargar();
     } catch (error) {
-      console.error("Error toggling message status:", error);
+      console.error("Error eliminando el producto:", error);
     }
   };
 
-  const handleDeleteMessage = async (id) => {
-    if (window.confirm("¿Estás seguro de eliminar este mensaje?")) {
-      try {
-        await eliminarMensaje(id);
-        await loadData();
-      } catch (error) {
-        console.error("Error deleting message:", error);
-      }
+  const filtrados = useMemo(() => {
+    const q = busqueda.toLowerCase();
+    return productos.filter((p) =>
+      (p.name || p.nombre || "").toLowerCase().includes(q)
+    );
+  }, [productos, busqueda]);
+
+  const alternar = (codigo) =>
+    setSeleccion((actual) => {
+      const nueva = new Set(actual);
+      if (nueva.has(codigo)) nueva.delete(codigo);
+      else nueva.add(codigo);
+      return nueva;
+    });
+
+  // Selecciona los que se están viendo, no los 321: si hay una búsqueda
+  // activa, "todos" significa los que coinciden.
+  const alternarTodos = (elegirTodos) =>
+    setSeleccion(elegirTodos ? new Set(filtrados.map((p) => p.codigo)) : new Set());
+
+  const aplicarEstado = async (estado) => {
+    setEnLote(true);
+    try {
+      await actualizarEstados([...seleccion], estado);
+      invalidarCatalogo();
+      setSeleccion(new Set());
+      await cargar();
+    } catch (error) {
+      console.error("Error actualizando los estados:", error);
+    } finally {
+      setEnLote(false);
     }
   };
 
-  const filteredProducts = products.filter(prod => {
-    const prodName = (prod.name || prod.nombre || "").toLowerCase();
-    return prodName.includes(searchTerm.toLowerCase());
-  });
+  const borrarSeleccion = async () => {
+    const cuantos = seleccion.size;
+    const mensaje =
+      cuantos === 1
+        ? "¿Eliminar 1 producto? No se puede deshacer."
+        : `¿Eliminar ${cuantos} productos? No se puede deshacer.`;
+    if (!window.confirm(mensaje)) return;
 
-  if (authLoading || loading) return <div className="loader-container">Cargando dashboard...</div>;
+    setEnLote(true);
+    try {
+      await eliminarProductos([...seleccion]);
+      invalidarCatalogo();
+      setSeleccion(new Set());
+      await cargar();
+    } catch (error) {
+      console.error("Error eliminando los productos:", error);
+    } finally {
+      setEnLote(false);
+    }
+  };
+
+  const alternarLeido = async (id, leido) => {
+    try {
+      await marcarMensajeComoLeido(id, !leido);
+      await cargar();
+    } catch (error) {
+      console.error("Error cambiando el estado del mensaje:", error);
+    }
+  };
+
+  const borrarMensaje = async (id) => {
+    if (!window.confirm("¿Eliminar este mensaje?")) return;
+    try {
+      await eliminarMensaje(id);
+      await cargar();
+    } catch (error) {
+      console.error("Error eliminando el mensaje:", error);
+    }
+  };
+
+  const sinLeer = mensajes.filter((m) => !m.leido).length;
+
+  if (authLoading || cargando) {
+    return <div className="loader-container">Cargando panel...</div>;
+  }
   if (!isAdmin) return null;
 
   return (
     <div className="admin-container">
       <div className="admin-header">
-        <h2>Panel de Administración</h2>
+        <h2>Panel de administración</h2>
         <div className="admin-tabs">
-          <button 
-            className={`admin-tab ${activeTab === "productos" ? "active" : ""}`}
-            onClick={() => setActiveTab("productos")}
-          >
-            Productos
-          </button>
-          <button 
-            className={`admin-tab ${activeTab === "pedidos" ? "active" : ""}`}
-            onClick={() => setActiveTab("pedidos")}
-          >
-            Pedidos
-          </button>
-          <button 
-            className={`admin-tab ${activeTab === "mensajes" ? "active" : ""}`}
-            onClick={() => setActiveTab("mensajes")}
-          >
-            Mensajes {messages.filter(m => !m.leido).length > 0 && `(${messages.filter(m => !m.leido).length})`}
-          </button>
+          {PESTANAS.map((p) => (
+            <button
+              key={p.clave}
+              type="button"
+              className={`admin-tab ${pestana === p.clave ? "active" : ""}`}
+              onClick={() => setPestana(p.clave)}
+            >
+              {p.etiqueta}
+              {p.clave === "mensajes" && sinLeer > 0 && ` (${sinLeer})`}
+            </button>
+          ))}
         </div>
       </div>
 
-      {activeTab === "productos" && (
+      {pestana === "productos" && (
         <>
           <div className="admin-actions-bar">
-            <input 
-              type="text" 
-              placeholder="Buscar por nombre..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+            <input
+              type="search"
+              placeholder="Buscar por nombre..."
+              aria-label="Buscar productos en el panel"
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
             />
-            <button className="boton boton-primario" onClick={() => handleOpenModal()}>
-              + Agregar Producto
+            <button
+              type="button"
+              className="boton boton-primario"
+              onClick={() => abrirModal()}
+            >
+              <Plus size={18} />
+              Agregar producto
             </button>
           </div>
 
           <div className="admin-products">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Imagen</th>
-                  <th>Código</th>
-                  <th>Nombre</th>
-                  <th>Precio</th>
-                  <th>Categoría</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredProducts.map((prod) => (
-                  <tr key={prod.codigo}>
-                    <td>
-                      {(prod.image || prod.fotoUrl) ? (
-                        <img
-                          src={prod.image || prod.fotoUrl}
-                          alt=""
-                          className="admin-prod-img"
-                        />
-                      ) : (
-                        <div
-                          className="admin-prod-img admin-prod-sin-foto"
-                          aria-hidden="true"
-                        />
-                      )}
-                    </td>
-                    <td data-etiqueta="Código">{prod.codigo}</td>
-                    <td data-etiqueta="Nombre">{prod.name || prod.nombre}</td>
-                    <td data-etiqueta="Precio">${prod.price || prod.precioUnitario}</td>
-                    <td data-etiqueta="Categoría">{prod.category || prod.categoria}</td>
-                    <td>
-                      <button className="btn-action edit" onClick={() => handleOpenModal(prod)}>Editar</button>
-                      <button className="btn-action delete" onClick={() => handleDelete(prod.codigo)}>Eliminar</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <TablaProductos
+              productos={filtrados}
+              seleccion={seleccion}
+              onAlternar={alternar}
+              onAlternarTodos={alternarTodos}
+              onEditar={abrirModal}
+              onEliminar={borrarUno}
+            />
           </div>
+
+          <BarraSeleccion
+            cantidad={seleccion.size}
+            trabajando={enLote}
+            onEstado={aplicarEstado}
+            onEliminar={borrarSeleccion}
+            onLimpiar={() => setSeleccion(new Set())}
+          />
         </>
       )}
 
-      {activeTab === "pedidos" && (
+      {pestana === "pedidos" && (
         <div className="admin-products">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>N° de Orden</th>
-                <th>Fecha</th>
-                <th>Usuario</th>
-                <th>Email</th>
-                <th>Total</th>
-                <th>Items</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((order) => (
-                <tr key={order.id}>
-                  <td data-etiqueta="N° de orden">{order.id}</td>
-                  <td>{new Date(order.date).toLocaleString()}</td>
-                  <td data-etiqueta="Usuario">{order.buyer?.name || 'N/A'}</td>
-                  <td data-etiqueta="Email">{order.buyer?.email || 'N/A'}</td>
-                  <td data-etiqueta="Total">${order.total}</td>
-                  <td>
-                    <ul>
-                      {order.items?.map((item, idx) => (
-                        <li key={idx}>
-                          {item.cantidad}x {item.nombre || item.name}{item.unidad && item.unidad !== "unitario" ? ` (${item.unidad})` : ""}
-                        </li>
-                      ))}
-                    </ul>
-                  </td>
-                </tr>
-              ))}
-              {orders.length === 0 && (
-                <tr>
-                  <td colSpan="6" className="empty-state">No hay pedidos registrados.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          <TablaPedidos pedidos={pedidos} />
         </div>
       )}
 
-      {activeTab === "mensajes" && (
+      {pestana === "mensajes" && (
         <div className="admin-products">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Estado</th>
-                <th>Fecha</th>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Mensaje</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {messages.map((msg) => (
-                <tr key={msg.id} className={!msg.leido ? 'msg-unread' : ''}>
-                  <td style={{ textAlign: 'center' }}>
-                    <button 
-                      className="msg-action-btn"
-                      onClick={() => handleToggleRead(msg.id, msg.leido)}
-                      title={msg.leido ? "Marcar como no leído" : "Marcar como leído"}
-                      style={{ color: msg.leido ? 'var(--success-color)' : 'var(--text-secondary)' }}
-                    >
-                      {msg.leido ? <CheckCircle size={20} /> : <Circle size={20} />}
-                    </button>
-                  </td>
-                  <td>{new Date(msg.date).toLocaleString()}</td>
-                  <td data-etiqueta="Nombre">{msg.nombre}</td>
-                  <td data-etiqueta="Email">{msg.email}</td>
-                  <td style={{ maxWidth: '300px', whiteSpace: 'pre-wrap' }}>{msg.mensaje}</td>
-                  <td>
-                    <button 
-                      className="msg-action-btn"
-                      onClick={() => handleDeleteMessage(msg.id)}
-                      title="Eliminar mensaje"
-                      style={{ color: 'var(--danger-color)' }}
-                    >
-                      <Trash2 size={20} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {messages.length === 0 && (
-                <tr>
-                  <td colSpan="6" className="empty-state">No hay mensajes registrados.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          <TablaMensajes
+            mensajes={mensajes}
+            onAlternarLeido={alternarLeido}
+            onEliminar={borrarMensaje}
+          />
         </div>
       )}
 
-      {showModal && (
-        <div className="modal-overlay">
-          <div
-            className="modal-content"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="modal-producto-titulo"
-          >
-            <h3 id="modal-producto-titulo">{isEditing ? "Editar Producto" : "Nuevo Producto"}</h3>
-            <form onSubmit={handleSave} className="admin-form">
-              <div className="form-group">
-                <label>Código (ID único)</label>
-                <input 
-                  type="text" 
-                  value={currentProduct.codigo}
-                  onChange={(e) => setCurrentProduct({...currentProduct, codigo: e.target.value})}
-                  disabled={isEditing}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Nombre</label>
-                <input 
-                  type="text" 
-                  value={currentProduct.name}
-                  onChange={(e) => setCurrentProduct({...currentProduct, name: e.target.value})}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="precio-unidad">Precio por unidad</label>
-                <input
-                  id="precio-unidad"
-                  type="number"
-                  min="0"
-                  value={currentProduct.price}
-                  onChange={(e) => setCurrentProduct({...currentProduct, price: e.target.value})}
-                  required
-                />
-              </div>
-
-              {/* La tienda vende por unidad, display y bulto, pero el panel
-                  solo dejaba cargar el unitario: todo producto nuevo quedaba
-                  con una sola forma de compra. Vacío significa "no se vende
-                  en esa unidad" y la tienda no la ofrece. */}
-              <div className="form-group">
-                <label htmlFor="precio-display">Precio por display</label>
-                <input
-                  id="precio-display"
-                  type="number"
-                  min="0"
-                  value={currentProduct.precioDisplay ?? ""}
-                  onChange={(e) => setCurrentProduct({...currentProduct, precioDisplay: e.target.value})}
-                />
-                <small>Dejalo vacío si no se vende por display.</small>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="precio-bulto">Precio por bulto</label>
-                <input
-                  id="precio-bulto"
-                  type="number"
-                  min="0"
-                  value={currentProduct.precioBulto ?? ""}
-                  onChange={(e) => setCurrentProduct({...currentProduct, precioBulto: e.target.value})}
-                />
-                <small>Dejalo vacío si no se vende por bulto.</small>
-              </div>
-              <div className="form-group">
-                <label htmlFor="marca">Marca</label>
-                <input
-                  id="marca"
-                  type="text"
-                  value={currentProduct.marca ?? ""}
-                  onChange={(e) => setCurrentProduct({...currentProduct, marca: e.target.value})}
-                />
-                <small>Punto Austral, Cienfuegos, Jupiter... Se usa para filtrar.</small>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="duracion">Duración en segundos</label>
-                <input
-                  id="duracion"
-                  type="number"
-                  min="0"
-                  value={currentProduct.duracion ?? ""}
-                  onChange={(e) => setCurrentProduct({...currentProduct, duracion: e.target.value})}
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="categoria">Categoría</label>
-                <select
-                  id="categoria"
-                  value={currentProduct.category ?? ""}
-                  onChange={(e) => setCurrentProduct({...currentProduct, category: e.target.value})}
-                  required
-                >
-                  <option value="">Elegir categoría</option>
-                  {Object.values(CATEGORIES).sort((a, b) => a.localeCompare(b)).map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-                <small>Escribirla a mano fue lo que dejó el catálogo con 20 variantes.</small>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="subcategoria">Subcategoría</label>
-                <input
-                  id="subcategoria"
-                  type="text"
-                  value={currentProduct.subcategoria ?? ""}
-                  onChange={(e) => setCurrentProduct({...currentProduct, subcategoria: e.target.value})}
-                />
-              </div>
-              <div className="form-group">
-                <label>Stock</label>
-                <input 
-                  type="number" 
-                  value={currentProduct.stock}
-                  onChange={(e) => setCurrentProduct({...currentProduct, stock: e.target.value})}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Ventas (Popularidad)</label>
-                <input 
-                  type="number" 
-                  value={currentProduct.ventas}
-                  onChange={(e) => setCurrentProduct({...currentProduct, ventas: e.target.value})}
-                />
-              </div>
-              <div className="form-group">
-                <label>Descripción</label>
-                <textarea 
-                  value={currentProduct.description}
-                  onChange={(e) => setCurrentProduct({...currentProduct, description: e.target.value})}
-                />
-              </div>
-              <div className="form-group">
-                <label>Imagen / Video</label>
-                <input 
-                  type="file" 
-                  accept="image/*,video/*"
-                  onChange={(e) => setFile(e.target.files[0])}
-                />
-                {currentProduct.image && !file && (
-                  <div className="current-image-preview">
-                    <img src={currentProduct.image} alt="Preview" width="100" />
-                  </div>
-                )}
-              </div>
-              <div className="modal-actions">
-                <button type="button" className="boton boton-secundario" onClick={handleCloseModal} disabled={uploading}>
-                  Cancelar
-                </button>
-                <button type="submit" className="boton boton-primario" disabled={uploading}>
-                  {uploading ? "Guardando..." : "Guardar"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+      {modalAbierto && (
+        <ProductoModal
+          producto={formulario}
+          onCampo={cambiarCampo}
+          onArchivo={setArchivo}
+          archivo={archivo}
+          esEdicion={editando}
+          guardando={guardando}
+          error={errorModal}
+          onGuardar={guardar}
+          onCerrar={cerrarModal}
+        />
       )}
     </div>
   );

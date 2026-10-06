@@ -21,6 +21,7 @@
 }
 
 .item-media {
+  position: relative;
   aspect-ratio: 4 / 3;
   background: var(--surface-alto);
   border-radius: var(--r-media);
@@ -84,3 +85,18 @@
 }
 
 .item-link:focus-visible { outline: none; }
+
+/* Marca de no disponible sobre la foto. El producto se sigue viendo a
+   propósito: la idea es que el cliente pregunte, no que crea que no existe. */
+.item-agotado {
+  position: absolute;
+  top: var(--e-2);
+  left: var(--e-2);
+  padding: 2px var(--e-2);
+  border-radius: var(--r-pill);
+  background: var(--ground);
+  color: var(--text-suave);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  border: 1px solid var(--gold-linea);
+}

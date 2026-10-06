@@ -1,26 +1,26 @@
 .admin-container {
-  padding: 0;
+  padding: 0 0 var(--e-8);
 }
 
 .admin-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--e-5);
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: var(--e-4);
 }
 
 .admin-header h2 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: var(--t-xl);
   font-weight: 700;
   color: var(--text);
 }
 
 .admin-tabs {
   display: flex;
-  gap: 0.25rem;
+  gap: 4px;
   background: var(--surface-alto);
   padding: 4px;
   border-radius: var(--r-control);
@@ -29,18 +29,16 @@
 .admin-tab {
   background: none;
   border: none;
-  font-size: 0.9rem;
+  font-size: var(--t-sm);
   font-weight: 500;
   color: var(--text-suave);
   cursor: pointer;
-  padding: 0.5rem 1.25rem;
+  padding: var(--e-2) var(--e-4);
   border-radius: var(--r-control);
-  transition: all var(--mov-rapido);
+  transition: background-color var(--mov-rapido), color var(--mov-rapido);
 }
 
-.admin-tab:hover {
-  color: var(--text);
-}
+.admin-tab:hover { color: var(--text); }
 
 .admin-tab.active {
   background: var(--surface);
@@ -51,32 +49,31 @@
 
 .admin-actions-bar {
   display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  gap: var(--e-3);
+  margin-bottom: var(--e-4);
   justify-content: flex-end;
   flex-wrap: wrap;
 }
 
-.admin-actions-bar input[type="text"] {
-  padding: 0.5rem 0.75rem;
-  border: 1.5px solid var(--gold-linea);
+/* El buscador del panel es type="search": el selector apuntaba a
+   type="text" y desde que cambió no le aplicaba ningún estilo. */
+.admin-actions-bar input {
+  min-width: 14rem;
+  min-height: 40px;
+  padding: var(--e-2) var(--e-3);
+  border: 1px solid var(--gold-linea);
   border-radius: var(--r-control);
-  font-size: 0.9rem;
+  background: var(--surface-alto);
+  color: var(--text);
+  font-size: var(--t-sm);
   font-family: var(--fuente);
-  min-width: 220px;
   transition: border-color var(--mov-rapido);
 }
 
-.admin-actions-bar input[type="text"]:focus {
+.admin-actions-bar input:focus {
   outline: none;
   border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-}
-
-.btn-add {
-  width: auto;
-  padding: 0.5rem 1.25rem;
-  font-size: 0.9rem;
+  box-shadow: 0 0 0 3px var(--gold-linea);
 }
 
 .admin-products {
@@ -93,31 +90,30 @@
 
 .admin-table th,
 .admin-table td {
-  padding: 0.85rem 1rem;
+  padding: var(--e-3) var(--e-4);
   text-align: left;
   border-bottom: 1px solid var(--surface-alto);
-  font-size: 0.9rem;
+  font-size: var(--t-sm);
 }
 
 .admin-table th {
   background: var(--surface-alto);
   font-weight: 600;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-size: var(--t-xs);
+  letter-spacing: 0.04em;
   color: var(--text-suave);
 }
 
-.admin-table tbody tr {
-  transition: background var(--mov-rapido);
-}
+.admin-table tbody tr { transition: background-color var(--mov-rapido); }
+.admin-table tbody tr:hover { background: var(--surface-alto); }
+.admin-table tbody tr:last-child td { border-bottom: none; }
 
-.admin-table tbody tr:hover {
-  background: var(--surface-alto);
-}
+.admin-col-check { width: 1%; }
+.admin-col-check input { accent-color: var(--gold); width: 16px; height: 16px; }
 
-.admin-table tbody tr:last-child td {
-  border-bottom: none;
+.admin-fila-elegida,
+.admin-fila-elegida:hover {
+  background: var(--gold-linea);
 }
 
 .admin-prod-img {
@@ -128,120 +124,154 @@
   border: 1px solid var(--gold-linea);
 }
 
+.admin-prod-sin-foto {
+  background: var(--surface-alto);
+  border-radius: var(--r-control);
+}
+
+/* Estado del producto en la tienda. El activo va en texto apagado y no como
+   badge: es la mayoría de las filas, y marcar lo normal es ruido. */
+.admin-badge-activo {
+  font-size: var(--t-xs);
+  color: var(--text-tenue);
+}
+
+.admin-badge {
+  display: inline-block;
+  padding: 2px var(--e-2);
+  border-radius: var(--r-pill);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.admin-badge-sin_stock {
+  background: var(--danger-fondo);
+  color: var(--danger);
+}
+
+.admin-badge-oculto {
+  background: var(--surface-alto);
+  color: var(--text-suave);
+}
+
+.admin-acciones-fila {
+  display: flex;
+  gap: var(--e-2);
+  flex-wrap: wrap;
+}
+
 .btn-action {
-  padding: 0.35rem 0.75rem;
-  margin-right: 0.4rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--e-2) var(--e-3);
   border: none;
   border-radius: var(--r-control);
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: var(--t-xs);
   font-weight: 500;
-  transition: all var(--mov-rapido);
+  font-family: var(--fuente);
+  transition: opacity var(--mov-rapido);
 }
+
+.btn-action:hover { opacity: 0.8; }
 
 .btn-action.edit {
   background: var(--gold-linea);
   color: var(--gold);
-}
-.btn-action.edit:hover {
-  background: var(--gold-linea);
 }
 
 .btn-action.delete {
   background: var(--danger-fondo);
   color: var(--danger);
 }
-.btn-action.delete:hover {
-  background: var(--danger-fondo);
-}
 
-/* Modal — la definición vive más abajo, con el sistema visual. */
-
-.modal-content h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-}
-
-.modal-actions {
+/* Barra de acciones en lote. Va fija abajo porque la selección se hace
+   scrolleando la tabla y tiene que seguir alcanzable sin volver arriba. */
+.barra-seleccion {
+  position: fixed;
+  left: var(--e-4);
+  right: var(--e-4);
+  bottom: var(--e-4);
+  z-index: 70;
   display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  margin-top: 1.5rem;
-}
-
-.btn-cancel {
-  padding: 0.65rem 1.25rem;
+  align-items: center;
+  gap: var(--e-4);
+  flex-wrap: wrap;
+  padding: var(--e-3) var(--e-4);
   background: var(--surface-alto);
-  color: var(--text);
-  border: none;
-  border-radius: var(--r-control);
-  cursor: pointer;
-  font-weight: 500;
-  transition: all var(--mov-rapido);
+  border: 1px solid var(--gold-linea);
+  border-radius: var(--r-card);
+  box-shadow: var(--elev-2);
 }
 
-.btn-cancel:hover {
-  background: var(--gold-linea);
+.barra-seleccion-cuenta {
+  margin: 0;
+  font-size: var(--t-sm);
+  color: var(--text-suave);
+  font-variant-numeric: tabular-nums;
 }
 
-.btn-save {
-  width: auto;
-  padding: 0.65rem 1.25rem;
+.barra-seleccion-cuenta strong { color: var(--text); }
+
+.barra-seleccion-acciones {
+  display: flex;
+  gap: var(--e-2);
+  flex-wrap: wrap;
+  flex: 1;
 }
 
-.admin-form .form-group textarea {
-  width: 100%;
-  padding: 0.7rem 1rem;
-  border: 1.5px solid var(--gold-linea);
-  border-radius: var(--r-control);
-  font-family: var(--fuente);
-  font-size: 0.95rem;
-  resize: vertical;
-  min-height: 80px;
-  transition: border-color var(--mov-rapido);
+.barra-seleccion-cerrar { padding: var(--e-2); }
+
+.admin-items-pedido {
+  margin: 0;
+  padding-left: var(--e-4);
+  font-size: var(--t-xs);
+  color: var(--text-suave);
 }
 
-.admin-form .form-group textarea:focus {
-  outline: none;
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+.admin-celda-mensaje {
+  max-width: 22rem;
+  white-space: pre-wrap;
 }
 
-/* Messages tab row states */
-.msg-unread {
-  background: var(--surface-alto) !important;
-}
+.msg-unread { background: var(--surface-alto); }
 
 .msg-action-btn {
+  display: inline-flex;
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.3rem;
+  padding: var(--e-2);
   border-radius: var(--r-control);
-  transition: all var(--mov-rapido);
-  display: inline-flex;
+  transition: background-color var(--mov-rapido);
 }
 
-.msg-action-btn:hover {
-  background: var(--surface-alto);
-}
+.msg-action-btn:hover { background: var(--gold-linea); }
+
+/* Estos tres colores venían en estilos inline apuntando a --success-color,
+   --text-secondary y --danger-color: tokens que no existen. */
+.msg-leido { color: var(--exito); }
+.msg-pendiente { color: var(--text-suave); }
+.msg-borrar { color: var(--danger); }
 
 .empty-state {
   text-align: center;
   color: var(--text-suave);
-  padding: 2rem !important;
+  padding: var(--e-7) !important;
 }
 
 .loader-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 200px;
+  min-height: 12rem;
   color: var(--text-suave);
 }
 
-@media (max-width: 768px) {
+/* Una tabla de ocho columnas no entra en un teléfono: se vuelve tarjetas. */
+@media (max-width: 767px) {
   .admin-header {
     flex-direction: column;
     align-items: flex-start;
@@ -252,59 +282,16 @@
     align-items: stretch;
   }
 
-  .admin-actions-bar input[type="text"] {
+  .admin-actions-bar input {
     min-width: auto;
     width: 100%;
   }
 
-  .admin-table th,
-  .admin-table td {
-    padding: 0.6rem 0.5rem;
-    font-size: 0.8rem;
+  .admin-products {
+    background: none;
+    border: none;
   }
 
-  .admin-prod-img {
-    width: 36px;
-    height: 36px;
-  }
-}
-
-/* --- Sistema visual --- */
-
-.admin-prod-sin-foto {
-  background: var(--surface-alto);
-  border-radius: var(--r-control);
-}
-
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  background: rgba(14, 23, 38, 0.7);
-  backdrop-filter: blur(8px);
-}
-
-.modal-content {
-  width: 100%;
-  max-width: 640px;
-  max-height: 90dvh;
-  overflow-y: auto;
-  padding: var(--e-5);
-  background: var(--surface);
-  border-radius: var(--r-card) var(--r-card) 0 0;
-  box-shadow: var(--elev-2);
-}
-
-@media (min-width: 640px) {
-  .modal-overlay { align-items: center; padding: var(--e-4); }
-  .modal-content { border-radius: var(--r-card); }
-}
-
-/* Una tabla de 6 columnas no entra en un teléfono: se convierte en cards. */
-@media (max-width: 767px) {
   .admin-table thead { display: none; }
 
   .admin-table,
@@ -321,8 +308,8 @@
     padding: var(--e-4);
     margin-bottom: var(--e-3);
     background: var(--surface);
+    border: 1px solid var(--gold-linea);
     border-radius: var(--r-card);
-    box-shadow: var(--elev-1);
   }
 
   .admin-table td {
@@ -341,19 +328,9 @@
   }
 
   .admin-table td:not([data-etiqueta]) { grid-template-columns: 1fr; }
-}
 
-.form-group small {
-  font-size: var(--t-xs);
-  color: var(--text-tenue);
-}
+  .admin-prod-img { width: 56px; height: 56px; }
 
-.form-group select {
-  width: 100%;
-  min-height: 44px;
-  padding: var(--e-3);
-  border: 1px solid var(--gold-linea);
-  border-radius: var(--r-control);
-  background: var(--surface-alto);
-  color: var(--text);
+  .barra-seleccion { gap: var(--e-3); }
+  .barra-seleccion-acciones .boton { flex: 1; font-size: var(--t-xs); }
 }

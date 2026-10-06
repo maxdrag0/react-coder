@@ -1,0 +1,191 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(14, 23, 38, 0.7);
+  backdrop-filter: blur(8px);
+}
+
+/* Tres filas: cabecera y pie quedan quietos y solo scrollea el medio. Antes
+   el modal scrolleaba entero y había que bajar 13 campos para encontrar
+   Guardar. */
+.modal-content {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: 100%;
+  max-width: 44rem;
+  max-height: 92dvh;
+  background: var(--surface);
+  border-radius: var(--r-card) var(--r-card) 0 0;
+  box-shadow: var(--elev-2);
+}
+
+.modal-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-3);
+  padding: var(--e-4) var(--e-5);
+  border-bottom: 1px solid var(--gold-linea);
+}
+
+.modal-cabecera h3 {
+  font-size: var(--t-lg);
+  margin: 0;
+}
+
+.modal-cerrar {
+  flex-shrink: 0;
+  padding: var(--e-2);
+}
+
+.modal-cuerpo {
+  overflow-y: auto;
+  padding: var(--e-5);
+  display: grid;
+  gap: var(--e-5);
+}
+
+.modal-seccion {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.modal-seccion legend {
+  padding: 0 0 var(--e-3);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--gold);
+}
+
+.modal-campos {
+  display: grid;
+  gap: var(--e-4);
+}
+
+.campo {
+  display: grid;
+  gap: var(--e-2);
+  align-content: start;
+  min-width: 0;
+}
+
+.campo label,
+.campo-etiqueta {
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.campo-ayuda {
+  font-size: var(--t-xs);
+  color: var(--text-tenue);
+}
+
+.campo textarea.campo-control {
+  resize: vertical;
+  min-height: 5rem;
+  font-family: var(--fuente);
+}
+
+.campo input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Los tres estados como tarjetas con su explicación: "Oculto" y "Sin stock"
+   no se distinguen solos, y la diferencia importa. */
+.modal-estados {
+  display: grid;
+  gap: var(--e-2);
+}
+
+.modal-estado {
+  display: flex;
+  align-items: start;
+  gap: var(--e-3);
+  padding: var(--e-3);
+  border: 1px solid var(--gold-linea);
+  border-radius: var(--r-control);
+  cursor: pointer;
+  transition: border-color var(--mov-rapido), background-color var(--mov-rapido);
+}
+
+.modal-estado:hover { background: var(--surface-alto); }
+
+.modal-estado:has(input:checked) {
+  border-color: var(--gold);
+  background: var(--surface-alto);
+}
+
+.modal-estado input { accent-color: var(--gold); margin-top: 2px; }
+
+.modal-estado-texto {
+  display: grid;
+  gap: 2px;
+}
+
+.modal-estado-texto strong {
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.modal-estado-texto small {
+  font-size: var(--t-xs);
+  color: var(--text-suave);
+}
+
+.modal-miniatura {
+  width: 6rem;
+  height: 6rem;
+  object-fit: cover;
+  border-radius: var(--r-control);
+  border: 1px solid var(--gold-linea);
+}
+
+.modal-pie {
+  display: grid;
+  gap: var(--e-3);
+  padding: var(--e-4) var(--e-5);
+  border-top: 1px solid var(--gold-linea);
+}
+
+.modal-pie-botones {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--e-3);
+}
+
+/* El error va acá y no en un alert() del navegador, que no se puede leer
+   junto al formulario que lo causó. */
+.modal-error {
+  margin: 0;
+  padding: var(--e-3);
+  border-radius: var(--r-control);
+  background: var(--danger-fondo);
+  color: var(--danger);
+  font-size: var(--t-sm);
+}
+
+@media (min-width: 640px) {
+  .modal-overlay {
+    align-items: center;
+    padding: var(--e-4);
+  }
+
+  .modal-content { border-radius: var(--r-card); }
+}
+
+@media (min-width: 700px) {
+  .modal-campos { grid-template-columns: 1fr 1fr; }
+  .campo-ancho { grid-column: 1 / -1; }
+}
+
+@media (max-width: 639px) {
+  .modal-pie-botones .boton { flex: 1; }
+}

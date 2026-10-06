@@ -9,7 +9,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "npm run build",
+    "predeploy": "npm run build && node scripts/copiar-404.mjs",
     "deploy": "gh-pages -d dist",
     "test": "npm run test:unit && npm run test:rules",
     "test:unit": "vitest run tests/unit",

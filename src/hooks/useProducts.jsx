@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { services } from "../services/index.js";
+import { leerCatalogo, guardarCatalogo } from "../services/firebase/cacheCatalogo.js";
 
 const useProducts = (category, { traerTodo = false } = {}) => {
   const [items, setItems] = useState([]);
@@ -13,6 +14,16 @@ const useProducts = (category, { traerTodo = false } = {}) => {
     setError(null);
     try {
       if (traerTodo) {
+        // Primero el caché: traer el catálogo en cada visita son 321
+        // lecturas por persona, y el plan gratuito da 50.000 por día.
+        const cacheado = leerCatalogo(category);
+        if (cacheado) {
+          setItems(cacheado);
+          setLastVisible(null);
+          setHasMore(false);
+          return;
+        }
+
         // El buscador filtra en el cliente, así que con una sola página de 8
         // productos buscar "torta" devolvía "no encontramos nada" en un
         // catálogo con cincuenta. Cuando hay búsqueda se trae todo.
@@ -27,6 +38,7 @@ const useProducts = (category, { traerTodo = false } = {}) => {
           if (pagina.length === 0 || !lastVisibleDoc) break;
         }
 
+        guardarCatalogo(category, acumulado);
         setItems(acumulado);
         setLastVisible(null);
         setHasMore(false);

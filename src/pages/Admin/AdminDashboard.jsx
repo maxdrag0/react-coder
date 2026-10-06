@@ -5,6 +5,7 @@ import { obtenerProductos, crearProducto, actualizarProducto, eliminarProducto }
 import { obtenerTodasLasCompras } from "../../services/firebase/comprasFirebase";
 import { obtenerMensajes, marcarMensajeComoLeido, eliminarMensaje } from "../../services/firebase/contactoFirebase";
 import { uploadFile } from "../../services/firebase/storageFirebase";
+import { invalidarCatalogo } from "../../services/firebase/cacheCatalogo";
 import { CATEGORIES } from "../../constants/categories";
 import "./AdminDashboard.css";
 import { CheckCircle, Circle, Trash2 } from "lucide-react";
@@ -168,6 +169,7 @@ const AdminDashboard = () => {
         await crearProducto(productData, currentProduct.codigo || null);
       }
       
+      invalidarCatalogo();
       await loadData();
       handleCloseModal();
     } catch (error) {
@@ -182,6 +184,7 @@ const AdminDashboard = () => {
     if (window.confirm("¿Estás seguro de que quieres eliminar este producto?")) {
       try {
         await eliminarProducto(id);
+        invalidarCatalogo();
         await loadData();
       } catch (error) {
         console.error("Error deleting product:", error);

@@ -54,9 +54,17 @@
   font-size: var(--t-sm);
 }
 
-/* En celular los links y la cuenta viven en BottomNav. */
+/* En celular los links, la cuenta y el carrito viven en BottomNav: arriba
+   quedan solo el logo, el buscador y el escudo del panel si sos admin.
+
+   El compuesto .nav-accion.nav-solo-escritorio es a proposito. .nav-accion
+   declara display:inline-flex mas abajo en este mismo archivo y, con la
+   misma especificidad, gana el ultimo: por eso el carrito y la cuenta se
+   seguian viendo en celular. Subir la especificidad lo deja a salvo de
+   cualquier reordenamiento futuro. */
 .nav-links,
-.nav-solo-escritorio { display: none; }
+.nav-solo-escritorio,
+.nav-accion.nav-solo-escritorio { display: none; }
 
 .nav-acciones {
   display: flex;
@@ -125,6 +133,7 @@
 
   .nav-acciones { order: 3; }
 
-  .nav-solo-escritorio { display: inline-flex; }
+  .nav-solo-escritorio,
+  .nav-accion.nav-solo-escritorio { display: inline-flex; }
   .nav-accion-texto { display: inline; font-size: var(--t-sm); }
 }

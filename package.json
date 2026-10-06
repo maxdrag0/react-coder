@@ -17,7 +17,8 @@
     "set-admin": "node scripts/set-admin.mjs",
     "seed": "node scripts/seed-productos.mjs",
     "categorias": "node scripts/normalizar-categorias.mjs",
-    "marcas": "node scripts/normalizar-marcas.mjs"
+    "marcas": "node scripts/normalizar-marcas.mjs",
+    "separar-bengalas": "node scripts/separar-bengalas.mjs"
   },
   "dependencies": {
     "axios": "^1.13.2",

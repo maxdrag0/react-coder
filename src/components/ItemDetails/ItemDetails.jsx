@@ -4,7 +4,7 @@ import { Counter } from "../common/Counter/Counter";
 import Modal from "../common/Modal/Modal";
 import Media from "@/components/common/Media/Media";
 import { formatearPrecio } from "@/utils/formatearPrecio";
-import { unidadesDisponibles, precioDe, multiplicadorDe } from "@/constants/unidades";
+import { unidadesDisponibles, precioDe, unidadesQueTrae } from "@/constants/unidades";
 import { sePuedeComprar } from "@/constants/estadoProducto";
 import { Link } from "react-router-dom";
 import "./ItemDetails.css";
@@ -75,7 +75,7 @@ function ItemDetails({ item }) {
             <legend>Cómo lo querés comprar</legend>
 
             {unidades.map((u) => {
-              const mult = multiplicadorDe(item, u.clave);
+              const trae = unidadesQueTrae(item, u.clave);
               const elegida = unidad === u.clave;
               return (
                 <label
@@ -91,7 +91,7 @@ function ItemDetails({ item }) {
                   />
                   <span className="unidad-nombre">
                     {u.etiqueta}
-                    {mult && <small> · {mult} unidades</small>}
+                    {trae && <small> · trae {trae} unidades</small>}
                   </span>
                   <span className="unidad-precio">
                     {formatearPrecio(precioDe(item, u.clave))}

@@ -3,47 +3,71 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import Precio from "@/components/common/Precio/Precio";
 
-describe("Precio", () => {
-  it("muestra los tres niveles cuando los tres existen", () => {
-    render(<Precio unitario={4500} display={45000} bulto={390000} />);
-    expect(screen.getByText("$4.500")).toBeInTheDocument();
-    expect(screen.getByText("$45.000")).toBeInTheDocument();
-    expect(screen.getByText("$390.000")).toBeInTheDocument();
+// Esquema viejo: los 323 productos cargados.
+const viejo = (unitario, display = null, bulto = null) => ({
+  precioUnitario: unitario,
+  precioDisplay: display,
+  precioBulto: bulto,
+});
+
+describe("Precio: qué filas muestra", () => {
+  it("muestra las tres cuando las tres son distintas", () => {
+    render(<Precio item={viejo(4500, 45000, 390000)} />);
+    expect(screen.getByText("unidad")).toBeInTheDocument();
+    expect(screen.getByText("display")).toBeInTheDocument();
+    expect(screen.getByText("bulto")).toBeInTheDocument();
   });
 
-  it("muestra SOLO la unidad cuando no hay display ni bulto", () => {
-    render(<Precio unitario={270} display={null} bulto={null} />);
-    expect(screen.getByText("$270")).toBeInTheDocument();
-    expect(screen.queryByText(/display/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/bulto/i)).not.toBeInTheDocument();
+  it("con solo el unitario muestra una sola fila", () => {
+    const { container } = render(<Precio item={viejo(270)} />);
+    expect(container.querySelectorAll(".precio-fila")).toHaveLength(1);
   });
 
-  it("nunca renderiza el texto undefined", () => {
-    const { container } = render(<Precio unitario={270} />);
-    expect(container.textContent).not.toMatch(/undefined|NaN|\$null/);
+  it("no renderiza nada si no hay ningún precio", () => {
+    const { container } = render(<Precio item={viejo(null)} />);
+    expect(container.querySelector(".precio")).toBeNull();
   });
 
-  it("omite el bulto pero muestra el display si solo falta uno", () => {
-    render(<Precio unitario={270} display={27000} bulto={null} />);
-    expect(screen.getByText("$27.000")).toBeInTheDocument();
-    expect(screen.queryByText(/bulto/i)).not.toBeInTheDocument();
+  it("descarta la presentación con el precio repetido del unitario", () => {
+    // 171 productos tienen precioDisplay igual al unitario: repetir la misma
+    // cifra en dos filas no dice nada.
+    render(<Precio item={viejo(270, 270, 270000)} />);
+    expect(screen.queryByText("display")).toBeNull();
+    expect(screen.getByText("bulto")).toBeInTheDocument();
   });
 
-  it("muestra el multiplicador de cada nivel", () => {
-    render(<Precio unitario={270} display={27000} bulto={270000} />);
-    expect(screen.getByText("×100")).toBeInTheDocument();
-    expect(screen.getByText("×1000")).toBeInTheDocument();
+  it("en modo compacto esconde el display", () => {
+    render(<Precio item={viejo(270, 27000, 270000)} compacto />);
+    expect(screen.queryByText("display")).toBeNull();
+    expect(screen.getByText("bulto")).toBeInTheDocument();
   });
 
-  it("no explota si el unitario tampoco existe", () => {
-    const { container } = render(<Precio unitario={null} />);
-    expect(container.textContent).not.toMatch(/undefined|NaN/);
+  it("no explota sin producto", () => {
+    const { container } = render(<Precio item={undefined} />);
+    expect(container.querySelector(".precio")).toBeNull();
+  });
+});
+
+describe("Precio: la cantidad que trae", () => {
+  it("la muestra cuando el producto la dice", () => {
+    render(
+      <Precio
+        item={{
+          presentaciones: {
+            unitario: { precio: 8000 },
+            display: { precio: 15000, unidades: 5 },
+          },
+        }}
+      />
+    );
+    expect(screen.getByText("×5")).toBeInTheDocument();
   });
 
-  it("en modo compacto muestra solo unidad y bulto", () => {
-    render(<Precio unitario={270} display={27000} bulto={270000} compacto />);
-    expect(screen.getByText("$270")).toBeInTheDocument();
-    expect(screen.getByText("$270.000")).toBeInTheDocument();
-    expect(screen.queryByText("$27.000")).not.toBeInTheDocument();
+  it("NO inventa la cantidad cuando el producto no la dice", () => {
+    // Es el bug: 15000/8000 redondeaba a 2 y el display traía 5. Mostrar un
+    // número equivocado es peor que no mostrar ninguno.
+    const { container } = render(<Precio item={viejo(8000, 15000)} />);
+    expect(container.querySelector(".precio-mult")).toBeNull();
+    expect(screen.getByText("display")).toBeInTheDocument();
   });
 });

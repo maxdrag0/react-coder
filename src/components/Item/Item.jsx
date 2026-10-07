@@ -30,11 +30,7 @@ function Item({ item }) {
 
           {/* El stock no se muestra: hasta definir si se cuenta por unidad,
               display o bulto, cualquier número sería engañoso. */}
-          <Precio
-            unitario={item.precioUnitario ?? item.price}
-            display={item.precioDisplay}
-            bulto={item.precioBulto}
-          />
+          <Precio item={item} />
         </div>
       </Link>
     </article>

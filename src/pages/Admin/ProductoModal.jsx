@@ -2,6 +2,7 @@ import { X } from "lucide-react";
 import { CATEGORIES } from "../../constants/categories";
 import { ESTADOS, estadoDe } from "../../constants/estadoProducto";
 import { idDeYoutube } from "../../utils/videoEmbed";
+import { UNIDADES } from "../../constants/unidades";
 import "./ProductoModal.css";
 
 const CATEGORIAS = Object.values(CATEGORIES).sort((a, b) => a.localeCompare(b));
@@ -21,6 +22,62 @@ const Campo = ({ id, etiqueta, ayuda, ancho = false, children, ...props }) => (
   </div>
 );
 
+/**
+ * Una presentacion opcional (display o bulto). Si la casilla esta destildada
+ * el producto NO se vende asi: la tienda no la ofrece.
+ *
+ * La cantidad es un campo y no un calculo. Antes se deducia dividiendo
+ * precios y mentia: un display de $15.000 con unidad a $8.000 mostraba
+ * "2 unidades" cuando traia 5.
+ */
+const Presentacion = ({ clave, etiqueta, valores, onCampo }) => {
+  const activa = Boolean(valores.activa);
+
+  return (
+    <div className="campo campo-ancho modal-presentacion">
+      <label className="modal-presentacion-check">
+        <input
+          type="checkbox"
+          checked={activa}
+          onChange={(e) => onCampo(clave, "activa", e.target.checked)}
+        />
+        <span>Se vende por {etiqueta.toLowerCase()}</span>
+      </label>
+
+      {activa && (
+        <div className="modal-presentacion-datos">
+          <div className="campo">
+            <label htmlFor={`pres-${clave}-precio`}>Precio</label>
+            <input
+              id={`pres-${clave}-precio`}
+              className="campo-control"
+              type="number"
+              min="0"
+              value={valores.precio ?? ""}
+              onChange={(e) => onCampo(clave, "precio", e.target.value)}
+              required
+            />
+          </div>
+          <div className="campo">
+            <label htmlFor={`pres-${clave}-unidades`}>Cuántas unidades trae</label>
+            <input
+              id={`pres-${clave}-unidades`}
+              className="campo-control"
+              type="number"
+              min="2"
+              value={valores.unidades ?? ""}
+              onChange={(e) => onCampo(clave, "unidades", e.target.value)}
+            />
+            <small className="campo-ayuda">
+              Si lo dejás vacío, la tienda no muestra ninguna cantidad.
+            </small>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const Seccion = ({ titulo, children }) => (
   <fieldset className="modal-seccion">
     <legend>{titulo}</legend>
@@ -37,6 +94,7 @@ const Seccion = ({ titulo, children }) => (
 const ProductoModal = ({
   producto,
   onCampo,
+  onPresentacion,
   onArchivo,
   archivo,
   esEdicion,
@@ -108,36 +166,28 @@ const ProductoModal = ({
             </Campo>
           </Seccion>
 
-          <Seccion titulo="Precios">
-            {/* Vacío significa que no se vende en esa unidad y la tienda no
-                la ofrece. El unitario es el único obligatorio. */}
+          <Seccion titulo="Cómo se vende">
+            {/* El unitario no es opcional: es la referencia de todo lo
+                demas y lo que usa el filtro de precio del catalogo. */}
             <Campo
               id="p-precio"
-              etiqueta="Por unidad"
+              etiqueta="Precio por unidad"
               type="number"
               min="0"
               value={producto.price}
               onChange={cambiar("price")}
               required
             />
-            <Campo
-              id="p-display"
-              etiqueta="Por display"
-              ayuda="Vacío si no se vende así."
-              type="number"
-              min="0"
-              value={producto.precioDisplay ?? ""}
-              onChange={cambiar("precioDisplay")}
-            />
-            <Campo
-              id="p-bulto"
-              etiqueta="Por bulto"
-              ayuda="Vacío si no se vende así."
-              type="number"
-              min="0"
-              value={producto.precioBulto ?? ""}
-              onChange={cambiar("precioBulto")}
-            />
+
+            {UNIDADES.filter((u) => u.clave !== "unitario").map((u) => (
+              <Presentacion
+                key={u.clave}
+                clave={u.clave}
+                etiqueta={u.etiqueta}
+                valores={producto.presentaciones?.[u.clave] ?? {}}
+                onCampo={onPresentacion}
+              />
+            ))}
           </Seccion>
 
           <Seccion titulo="Clasificación">

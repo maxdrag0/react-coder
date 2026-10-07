@@ -199,3 +199,43 @@
 .campo:has(.campo-mal) .campo-ayuda {
   color: var(--danger);
 }
+
+/* Cada presentacion es un bloque que se abre al tildarlo: mostrar precio y
+   cantidad de las tres siempre serian seis campos para un producto que en
+   general se vende de una sola forma. */
+.modal-presentacion {
+  padding: var(--e-3);
+  border: 1px solid var(--gold-linea);
+  border-radius: var(--r-control);
+  gap: var(--e-3);
+}
+
+.modal-presentacion:has(input[type="checkbox"]:checked) {
+  background: var(--surface-alto);
+  border-color: var(--gold-linea);
+}
+
+.modal-presentacion-check {
+  display: flex;
+  align-items: center;
+  gap: var(--e-3);
+  cursor: pointer;
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.modal-presentacion-check input {
+  accent-color: var(--gold);
+  width: 16px;
+  height: 16px;
+}
+
+.modal-presentacion-datos {
+  display: grid;
+  gap: var(--e-3);
+}
+
+@media (min-width: 520px) {
+  .modal-presentacion-datos { grid-template-columns: 1fr 1fr; }
+}

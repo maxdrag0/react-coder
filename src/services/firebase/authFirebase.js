@@ -37,7 +37,7 @@ const intentar = async (accion, aviso, avisos) => {
  * @returns {Promise<{user: object, avisos: string[]}>} `avisos` lista los
  * pasos no criticos que fallaron, para mostrarlos sin bloquear el registro.
  */
-export const registerWithEmail = async (email, password, name) => {
+export const registerWithEmail = async (email, password, name, telefono) => {
   // Si esto falla no hay cuenta, asi que el error ES la verdad y sube.
   const { user } = await createUserWithEmailAndPassword(auth, email, password);
 
@@ -52,7 +52,7 @@ export const registerWithEmail = async (email, password, name) => {
   );
 
   await intentar(
-    () => crearPerfil(user.uid, { name, email }),
+    () => crearPerfil(user.uid, { name, email, telefono }),
     "No pudimos guardar tus datos de perfil. Revisalos desde tu perfil.",
     avisos,
   );

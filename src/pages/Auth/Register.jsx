@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { registerWithEmail, loginWithGoogle } from "@/services/firebase/authFirebase";
 import { mensajeDeError } from "@/constants/authErrors";
 import { validarPassword, PASSWORD_MINIMO } from "@/utils/validarPassword";
+import { errorDeTelefono, soloDigitos } from "@/utils/telefono";
 import AuthCard from "@/components/auth/AuthCard/AuthCard";
 import GoogleAuthButton from "@/components/auth/GoogleAuthButton/GoogleAuthButton";
 import FormField from "@/components/common/FormField/FormField";
@@ -10,7 +11,13 @@ import FormError from "@/components/common/FormError/FormError";
 import "./Auth.css";
 
 const Register = () => {
-  const [datos, setDatos] = useState({ name: "", email: "", password: "", confirmar: "" });
+  const [datos, setDatos] = useState({
+    name: "",
+    email: "",
+    telefono: "",
+    password: "",
+    confirmar: "",
+  });
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(false);
   const navigate = useNavigate();
@@ -49,7 +56,19 @@ const Register = () => {
     const errorPassword = validarPassword(password);
     if (errorPassword) return setError(errorPassword);
 
-    ejecutar(() => registerWithEmail(datos.email.trim(), password, datos.name.trim()));
+    // El telefono es como lo vamos a contactar: sin el, el pedido no se
+    // puede atender. Por eso se pide al registrarse y no despues.
+    const errorTelefono = errorDeTelefono(datos.telefono);
+    if (errorTelefono) return setError(errorTelefono);
+
+    ejecutar(() =>
+      registerWithEmail(
+        datos.email.trim(),
+        password,
+        datos.name.trim(),
+        soloDigitos(datos.telefono)
+      )
+    );
   };
 
   return (
@@ -59,6 +78,15 @@ const Register = () => {
       <form onSubmit={registrar} className="auth-form">
         <FormField label="Nombre completo" id="name" value={datos.name} onChange={cambiar} autoComplete="name" />
         <FormField label="Email" id="email" type="email" value={datos.email} onChange={cambiar} autoComplete="email" />
+        <FormField
+          label="Teléfono"
+          id="telefono"
+          type="tel"
+          value={datos.telefono}
+          onChange={cambiar}
+          autoComplete="tel"
+          ayuda="Con código de área, sin el 0. Es por donde te contactamos."
+        />
         <FormField
           label="Contraseña"
           id="password"

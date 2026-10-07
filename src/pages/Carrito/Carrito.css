@@ -71,3 +71,17 @@
   /* Aire para que el resumen fijo no tape el último producto. */
   .carrito-grid { padding-bottom: 13rem; }
 }
+
+/* Se pide acá cuando el perfil no lo tiene: los usuarios que ya existían y
+   los que entran con Google nunca pasaron por un formulario que lo pida. */
+.carrito-telefono {
+  display: grid;
+  gap: var(--e-2);
+  margin-bottom: var(--e-3);
+}
+
+.carrito-telefono label {
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--text);
+}

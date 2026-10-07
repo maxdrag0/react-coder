@@ -7,40 +7,60 @@ import { useNavigate, Link } from "react-router-dom";
 import Modal from "../../components/common/Modal/Modal";
 import "./Carrito.css";
 import { services } from "../../services";
+import { usePerfil } from "@/hooks/usePerfil";
+import { errorDeTelefono, soloDigitos } from "@/utils/telefono";
 import { formatearTotal } from "@/utils/formatearPrecio";
 
 function Carrito() {
   const { removeList, cartList, total } = useContext(CartContext);
   const { user } = useAuth();
+  const { perfil, cargando: cargandoPerfil, guardar: guardarPerfil } = usePerfil();
+
+  // Los usuarios que ya existian no tienen telefono, y los que entran con
+  // Google tampoco: ahi no hay formulario donde pedirlo. Si falta, se pide
+  // aca antes de dejar mandar el pedido.
+  const [telefono, setTelefono] = useState("");
+  const [errorTelefono, setErrorTelefono] = useState("");
+  const faltaTelefono = !cargandoPerfil && Boolean(user) && !perfil?.telefono;
   const [showModal, setShowModal] = useState(false);
   const [orderId, setOrderId] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
 
-  const handleAbrirModal = () => {
-    setShowModal(true);
-  };
-
   const handleProcesarCompra = async () => {
     if (!user) {
-      alert("Debes iniciar sesión para finalizar la compra.");
       navigate("/login");
       return;
     }
 
+    let telefonoFinal = perfil?.telefono ?? "";
+
+    if (!telefonoFinal) {
+      const malo = errorDeTelefono(telefono);
+      if (malo) return setErrorTelefono(malo);
+      telefonoFinal = soloDigitos(telefono);
+    }
+
     setIsProcessing(true);
+    setErrorTelefono("");
 
     const orden = {
       buyer: {
         uid: user.uid,
         name: user.displayName || "Usuario",
         email: user.email,
+        // Copia y no referencia: si el cliente cambia su telefono mas
+        // adelante, el pedido viejo tiene que seguir mostrando el que dio.
+        telefono: telefonoFinal,
       },
       items: cartList,
       total: total,
       date: new Date().toISOString(),
     };
     try {
+      // Queda guardado para que no lo tenga que escribir la proxima vez.
+      if (!perfil?.telefono) await guardarPerfil({ telefono: telefonoFinal });
+
       const id = await services.firebase.crearCompra(orden);
 
       setOrderId(id);
@@ -86,10 +106,28 @@ function Carrito() {
               <strong>{formatearTotal(total)}</strong>
             </div>
 
+            {faltaTelefono && (
+              <div className="campo carrito-telefono">
+                <label htmlFor="carrito-telefono">Tu teléfono</label>
+                <input
+                  id="carrito-telefono"
+                  className="campo-control"
+                  type="tel"
+                  autoComplete="tel"
+                  placeholder="11 2345-6789"
+                  value={telefono}
+                  onChange={(e) => setTelefono(e.target.value)}
+                />
+                <small className={errorTelefono ? "campo-error" : "campo-ayuda"}>
+                  {errorTelefono || "Es por donde te contactamos para coordinar."}
+                </small>
+              </div>
+            )}
+
             <Button
               callback={handleProcesarCompra}
               className="boton-ancho"
-              disabled={isProcessing}
+              disabled={isProcessing || cargandoPerfil}
             >
               {isProcessing ? "Procesando..." : "Enviar pedido"}
             </Button>

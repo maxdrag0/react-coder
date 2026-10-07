@@ -57,3 +57,26 @@
 @media (min-width: 640px) {
   .info-group { grid-template-columns: 9rem 1fr; align-items: baseline; }
 }
+
+/* El unico campo editable del perfil. Se apila en celular porque el input
+   mas el boton no entran en una fila de 360px. */
+.info-editable {
+  display: grid;
+  gap: var(--e-2);
+}
+
+.perfil-telefono {
+  display: flex;
+  gap: var(--e-2);
+  flex-wrap: wrap;
+}
+
+.perfil-telefono .campo-control {
+  flex: 1;
+  min-width: 10rem;
+}
+
+.campo-ok {
+  font-size: var(--t-xs);
+  color: var(--exito);
+}

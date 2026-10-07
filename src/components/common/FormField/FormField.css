@@ -1,3 +1,10 @@
 .campo { display: grid; gap: var(--e-2); min-width: 0; }
 .campo label { font-size: var(--t-sm); color: var(--text-suave); }
 .campo-ayuda { font-size: var(--t-xs); color: var(--text-tenue); }
+
+/* Misma tipografía que la ayuda: lo que cambia es el color, porque el texto
+   ocupa el mismo lugar y cambiar el tamaño movería el formulario. */
+.campo-error {
+  font-size: var(--t-xs);
+  color: var(--danger);
+}

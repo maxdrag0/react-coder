@@ -1,5 +1,5 @@
 import { ESTADOS, estadoDe } from "@/constants/estadoProducto";
-import { precioDe } from "@/constants/unidades";
+import { precioMinimo } from "@/constants/unidades";
 import { SIN_MARCA } from "@/constants/marcas";
 
 /*
@@ -54,7 +54,8 @@ export const filtrarProductos = (productos, filtros = FILTROS_VACIOS) => {
     if (filtros.sinFoto && tieneFoto(p)) return false;
 
     if (min !== null || max !== null) {
-      const precio = precioDe(p, "unitario");
+      // El piso del rango: un producto con modelos no tiene precio propio.
+      const precio = precioMinimo(p);
       if (precio === null) return false;
       if (min !== null && precio < min) return false;
       if (max !== null && precio > max) return false;

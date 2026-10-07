@@ -71,3 +71,44 @@ describe("Precio: la cantidad que trae", () => {
     expect(screen.getByText("display")).toBeInTheDocument();
   });
 });
+
+describe("Precio: productos con modelos", () => {
+  const conModelos = (precios) => ({
+    codigo: "M100",
+    modelos: precios.map((p, i) => ({
+      id: `m${i}`,
+      etiqueta: `Modelo ${i}`,
+      presentaciones: { unitario: { precio: p } },
+    })),
+  });
+
+  it("muestra el piso del rango con 'desde'", () => {
+    // Elegir el modelo pasa dentro del producto, no en la grilla.
+    render(<Precio item={conModelos([8000, 20000])} />);
+    expect(screen.getByText("desde")).toBeInTheDocument();
+    expect(screen.getByText("$8.000")).toBeInTheDocument();
+  });
+
+  it("dice 'unidad' y no 'desde' si todos los modelos cuestan igual", () => {
+    render(<Precio item={conModelos([8000, 8000])} />);
+    expect(screen.getByText("unidad")).toBeInTheDocument();
+    expect(screen.queryByText("desde")).toBeNull();
+  });
+
+  it("muestra algo: sin esto la card quedaba sin precio", () => {
+    // unidadesDisponibles devuelve vacio mientras no haya modelo elegido, y
+    // la card no renderizaba ningun precio.
+    const { container } = render(<Precio item={conModelos([8000])} />);
+    expect(container.querySelector(".precio-fila")).toBeInTheDocument();
+  });
+
+  it("no renderiza nada si ningun modelo tiene precio unitario", () => {
+    const sinPrecio = {
+      modelos: [
+        { id: "a", etiqueta: "A", presentaciones: { bulto: { precio: 90000 } } },
+      ],
+    };
+    const { container } = render(<Precio item={sinPrecio} />);
+    expect(container.querySelector(".precio")).toBeNull();
+  });
+});

@@ -559,3 +559,9 @@
   .prodfiltros-precio { flex: 1 1 100%; }
   .prodfiltros-precio input { flex: 1; width: auto; }
 }
+
+.admin-modelos-cuenta {
+  display: block;
+  font-size: var(--t-xs);
+  color: var(--gold);
+}

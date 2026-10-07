@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatearPrecio } from "@/utils/formatearPrecio";
+import { formatearPrecio, formatearTotal } from "@/utils/formatearPrecio";
 
 describe("formatearPrecio", () => {
   it("usa punto como separador de miles", () => {
@@ -32,5 +32,22 @@ describe("formatearPrecio", () => {
 
   it("devuelve null para un string", () => {
     expect(formatearPrecio("4500")).toBeNull();
+  });
+});
+
+describe("formatearTotal: el espacio duro", () => {
+  it("no deja el espacio que Intl mete entre el signo y el numero", () => {
+    // El regex decia /s/ sin backslash, asi que borraba la letra "s" en vez
+    // del espacio: el total del carrito mostraba "$ 8.000" y el resto de la
+    // app "$8.000".
+    expect(formatearTotal(8000)).toBe("$8.000");
+  });
+
+  it("formatea el cero, que es para lo que existe", () => {
+    expect(formatearTotal(0)).toBe("$0");
+  });
+
+  it("coincide con formatearPrecio para un valor que los dos aceptan", () => {
+    expect(formatearTotal(1500)).toBe(formatearPrecio(1500));
   });
 });

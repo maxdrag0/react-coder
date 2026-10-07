@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 import ItemListContainer from "../../components/ItemListContainer/ItemListContainer";
 import FiltrosProductos from "../../components/FiltrosProductos/FiltrosProductos";
 import { useProducts } from "../../hooks/useProducts";
-import { precioDe } from "../../constants/unidades";
+import { precioMinimo } from "../../constants/unidades";
 import { SIN_MARCA } from "../../constants/marcas";
 import { seMuestra } from "../../constants/estadoProducto";
 import "./Products.css";
@@ -21,8 +21,10 @@ const coincideTexto = (item, busqueda) => {
 };
 
 // Un producto sin precio no se oculta por el filtro de precio.
+// Con modelos se mira el piso del rango: el producto entra si su modelo mas
+// barato entra.
 const coincidePrecio = (item, tope) => {
-  const precio = precioDe(item, "unitario");
+  const precio = precioMinimo(item);
   return precio === null || precio <= tope;
 };
 
@@ -59,9 +61,7 @@ function Products() {
   }, [visibles]);
 
   const precioMax = useMemo(() => {
-    const precios = visibles
-      .map((i) => precioDe(i, "unitario"))
-      .filter((p) => p !== null);
+    const precios = visibles.map(precioMinimo).filter((p) => p !== null);
     return precios.length ? Math.max(...precios) : 0;
   }, [visibles]);
 

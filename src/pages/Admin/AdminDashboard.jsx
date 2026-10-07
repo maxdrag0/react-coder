@@ -25,6 +25,7 @@ import { uploadFile } from "../../services/firebase/storageFirebase";
 import { invalidarCatalogo } from "../../services/firebase/cacheCatalogo";
 import { ACTIVO } from "../../constants/estadoProducto";
 import { UNIDADES, presentacionesDe } from "../../constants/unidades";
+import { modelosDe, idLibre } from "../../constants/modelos";
 import { estaAbierto } from "../../constants/estadoPedido";
 import ProductoModal from "./ProductoModal";
 import TablaProductos from "./TablaProductos";
@@ -57,6 +58,8 @@ const PRODUCTO_VACIO = {
   name: "",
   price: "",
   presentaciones: {},
+  conModelos: false,
+  modelos: [],
   category: "",
   subcategoria: "",
   marca: "",
@@ -92,6 +95,30 @@ const presentacionesAlFormulario = (p) => {
    name/price/image/category. Leer solo uno dejaba el formulario vacío en
    todo producto existente, y guardar una foto borraba el precio.
    Unificarlos exige migrar los datos y es el subproyecto E. */
+/*
+  Los modelos al formulario: el precio unitario se saca del mapa y se sube a
+  un campo propio, igual que el del producto, porque no es opcional. El id se
+  conserva tal cual: es lo que ata el modelo a los carritos y a los pedidos.
+*/
+const modelosAlFormulario = (p) =>
+  modelosDe(p).map((m) => {
+    const pres = presentacionesDe(p, m.id);
+    const form = {};
+    for (const u of OPCIONALES) {
+      form[u.clave] = {
+        activa: Boolean(pres[u.clave]),
+        precio: pres[u.clave]?.precio ?? "",
+        unidades: pres[u.clave]?.unidades ?? "",
+      };
+    }
+    return {
+      id: m.id,
+      etiqueta: m.etiqueta,
+      precio: pres.unitario?.precio ?? "",
+      presentaciones: form,
+    };
+  });
+
 const aFormulario = (p) => ({
   ...p,
   // Se guarda el original para poder detectar el cambio al guardar.
@@ -99,6 +126,8 @@ const aFormulario = (p) => ({
   name: p.name ?? p.nombre ?? "",
   price: p.price ?? p.precioUnitario ?? "",
   presentaciones: presentacionesAlFormulario(p),
+  conModelos: modelosDe(p).length > 0,
+  modelos: modelosAlFormulario(p),
   category: p.category ?? p.categoria ?? "",
   description: p.description ?? p.descripcion ?? "",
   image: p.image ?? p.fotoUrl ?? "",
@@ -130,17 +159,65 @@ const aPresentaciones = (form) => {
   return presentaciones;
 };
 
+/*
+  Los modelos del formulario a Firestore.
+
+  El id se genera UNA vez, al guardar un modelo que todavia no lo tiene, y
+  nunca mas cambia: va en la clave del carrito y queda guardado en el pedido,
+  asi que cambiarlo dejaria huerfano todo lo que lo referencia. Editar el
+  nombre del modelo no toca el id.
+
+  Se descartan los modelos sin nombre o sin precio unitario: no se podrian ni
+  elegir ni comprar.
+*/
+const aModelos = (form) => {
+  const usados = form.modelos
+    .map((m) => m.id)
+    .filter((id) => typeof id === "string" && id);
+  const salida = [];
+
+  for (const m of form.modelos) {
+    const etiqueta = (m.etiqueta ?? "").trim();
+    const precio = numeroOpcional(m.precio);
+    if (!etiqueta || precio === null) continue;
+
+    const id = m.id || idLibre(etiqueta, usados);
+    if (!m.id) usados.push(id);
+
+    const presentaciones = { unitario: { precio } };
+    for (const u of OPCIONALES) {
+      const p = m.presentaciones?.[u.clave];
+      if (!p?.activa) continue;
+      const precioP = numeroOpcional(p.precio);
+      if (precioP === null) continue;
+      presentaciones[u.clave] = {
+        precio: precioP,
+        unidades: numeroOpcional(p.unidades),
+      };
+    }
+
+    salida.push({ id, etiqueta, presentaciones });
+  }
+
+  return salida;
+};
+
 const aFirestore = (form, imagen) => {
   const presentaciones = aPresentaciones(form);
+  const modelos = form.conModelos ? aModelos(form) : [];
 
   return {
     name: form.name,
     nombre: form.name,
-    price: Number(form.price),
-    precioUnitario: Number(form.price),
+    price: modelos.length > 0 ? null : Number(form.price),
     presentaciones,
-    precioDisplay: presentaciones.display?.precio ?? null,
-    precioBulto: presentaciones.bulto?.precio ?? null,
+    modelos,
+    // Con modelos el precio del producto no significa nada: el precio vive en
+    // cada modelo. Se escriben en null para que ningun lector del esquema
+    // viejo muestre un precio que no existe.
+    precioUnitario: modelos.length > 0 ? null : Number(form.price),
+    precioDisplay: modelos.length > 0 ? null : (presentaciones.display?.precio ?? null),
+    precioBulto: modelos.length > 0 ? null : (presentaciones.bulto?.precio ?? null),
     category: form.category,
     categoria: form.category,
     description: form.description ?? "",
@@ -230,6 +307,46 @@ const AdminDashboard = () => {
 
   const cambiarCampo = (campo, valor) =>
     setFormulario((actual) => ({ ...actual, [campo]: valor }));
+
+  const cambiarModelo = (indice, campo, valor) =>
+    setFormulario((actual) => ({
+      ...actual,
+      modelos: actual.modelos.map((m, i) =>
+        i === indice ? { ...m, [campo]: valor } : m
+      ),
+    }));
+
+  const cambiarModeloPresentacion = (indice, clave, campo, valor) =>
+    setFormulario((actual) => ({
+      ...actual,
+      modelos: actual.modelos.map((m, i) =>
+        i === indice
+          ? {
+              ...m,
+              presentaciones: {
+                ...m.presentaciones,
+                [clave]: { ...m.presentaciones?.[clave], [campo]: valor },
+              },
+            }
+          : m
+      ),
+    }));
+
+  // id en null: se genera al guardar, a partir del nombre que se escriba.
+  const agregarModelo = () =>
+    setFormulario((actual) => ({
+      ...actual,
+      modelos: [
+        ...actual.modelos,
+        { id: null, etiqueta: "", precio: "", presentaciones: {} },
+      ],
+    }));
+
+  const borrarModelo = (indice) =>
+    setFormulario((actual) => ({
+      ...actual,
+      modelos: actual.modelos.filter((_, i) => i !== indice),
+    }));
 
   const cambiarPresentacion = (clave, campo, valor) =>
     setFormulario((actual) => ({
@@ -576,6 +693,10 @@ const AdminDashboard = () => {
           producto={formulario}
           onCampo={cambiarCampo}
           onPresentacion={cambiarPresentacion}
+          onModelo={cambiarModelo}
+          onModeloPresentacion={cambiarModeloPresentacion}
+          onAgregarModelo={agregarModelo}
+          onBorrarModelo={borrarModelo}
           onArchivo={setArchivo}
           archivo={archivo}
           esEdicion={editando}

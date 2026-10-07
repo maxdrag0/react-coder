@@ -6,17 +6,35 @@ import Media from "@/components/common/Media/Media";
 import { formatearPrecio } from "@/utils/formatearPrecio";
 import { unidadesDisponibles, precioDe, unidadesQueTrae } from "@/constants/unidades";
 import { sePuedeComprar } from "@/constants/estadoProducto";
+import { modelosDe } from "@/constants/modelos";
 import { Link } from "react-router-dom";
 import "./ItemDetails.css";
 
 function ItemDetails({ item }) {
   const { addToCart } = useContext(CartContext);
 
-  const unidades = unidadesDisponibles(item);
+  // El modelo se elige primero: de el dependen las presentaciones y los
+  // precios. Si el producto tiene uno solo, se elige solo y no se muestra el
+  // selector: elegir entre una opcion no es elegir.
+  const modelos = modelosDe(item);
+  const [modeloId, setModeloId] = useState(modelos[0]?.id ?? null);
+  const modelo = modelos.find((m) => m.id === modeloId) ?? null;
+
+  const unidades = unidadesDisponibles(item, modeloId);
   // Se puede llegar acá por URL directa sin pasar por el listado, así que
   // filtrar el catálogo no alcanza: el botón se bloquea igual.
   const comprable = sePuedeComprar(item);
   const [unidad, setUnidad] = useState(unidades[0]?.clave ?? "unitario");
+
+  // Al cambiar de modelo, la unidad elegida puede no existir en el nuevo: un
+  // mortero de 3 pulgadas puede venir por display y el de 5 no.
+  const elegirModelo = (id) => {
+    setModeloId(id);
+    const disponibles = unidadesDisponibles(item, id);
+    if (!disponibles.some((u) => u.clave === unidad)) {
+      setUnidad(disponibles[0]?.clave ?? "unitario");
+    }
+  };
   const [count, setCount] = useState(1);
   const [modalAbierto, setModalAbierto] = useState(false);
 
@@ -25,11 +43,11 @@ function ItemDetails({ item }) {
   const sumar = () => setCount(count + 1);
   const restar = () => { if (count > 1) setCount(count - 1); };
 
-  const precio = precioDe(item, unidad);
+  const precio = precioDe(item, unidad, modeloId);
   const subtotal = precio ? precio * count : 0;
 
   const agregar = () => {
-    addToCart(item, count, unidad);
+    addToCart(item, count, unidad, modelo);
     setModalAbierto(true);
     setCount(1);
   };
@@ -70,12 +88,37 @@ function ItemDetails({ item }) {
           </dl>
         )}
 
+        {modelos.length > 1 && (
+          <fieldset className="detalle-unidades">
+            <legend>Elegí el modelo</legend>
+
+            {modelos.map((m) => (
+              <label
+                key={m.id}
+                className={`unidad ${modeloId === m.id ? "unidad-elegida" : ""}`}
+              >
+                <input
+                  type="radio"
+                  name="modelo"
+                  value={m.id}
+                  checked={modeloId === m.id}
+                  onChange={() => elegirModelo(m.id)}
+                />
+                <span className="unidad-nombre">{m.etiqueta}</span>
+                <span className="unidad-precio">
+                  {formatearPrecio(precioDe(item, "unitario", m.id))}
+                </span>
+              </label>
+            ))}
+          </fieldset>
+        )}
+
         {unidades.length > 0 && (
           <fieldset className="detalle-unidades">
             <legend>Cómo lo querés comprar</legend>
 
             {unidades.map((u) => {
-              const trae = unidadesQueTrae(item, u.clave);
+              const trae = unidadesQueTrae(item, u.clave, modeloId);
               const elegida = unidad === u.clave;
               return (
                 <label
@@ -94,7 +137,7 @@ function ItemDetails({ item }) {
                     {trae && <small> · trae {trae} unidades</small>}
                   </span>
                   <span className="unidad-precio">
-                    {formatearPrecio(precioDe(item, u.clave))}
+                    {formatearPrecio(precioDe(item, u.clave, modeloId))}
                   </span>
                 </label>
               );
@@ -143,6 +186,7 @@ function ItemDetails({ item }) {
           <>
             <strong>{nombre}</strong>
             <br />
+            {modelo && <>{modelo.etiqueta} · </>}
             {count} {count === 1 ? "unidad de compra" : "unidades de compra"} ·{" "}
             {unidades.find((u) => u.clave === unidad)?.etiqueta}
           </>

@@ -1,3 +1,5 @@
+import { modelosDe, tieneModelos, modeloPorId } from "./modelos";
+
 /*
   Las tres formas en que se compra pirotecnia, y cuántas unidades trae cada
   una.
@@ -15,6 +17,11 @@
 
   Ahora, cuando no se sabe, se devuelve null y la tienda no muestra ninguna
   cantidad. Es peor mostrar un número equivocado que no mostrar ninguno.
+
+  Un producto puede además tener MODELOS (ver modelos.js), y entonces las
+  presentaciones viven en cada modelo: el display de un mortero de 3 pulgadas
+  no trae lo mismo que el de 5. Un producto con modelos no tiene precio
+  propio; para la card está `rangoUnitario`.
 */
 
 export const UNIDADES = [
@@ -54,11 +61,11 @@ const desdeEsquemaViejo = (item) => {
   return presentaciones;
 };
 
-const desdeEsquemaNuevo = (item) => {
+const desdeMapa = (mapa) => {
   const presentaciones = {};
 
   for (const u of UNIDADES) {
-    const p = item.presentaciones[u.clave];
+    const p = mapa[u.clave];
     if (!p || !esPrecio(p.precio)) continue;
     presentaciones[u.clave] = {
       precio: p.precio,
@@ -71,24 +78,58 @@ const desdeEsquemaNuevo = (item) => {
 };
 
 /**
- * Normaliza cualquiera de los dos esquemas a un mapa de presentaciones.
+ * Normaliza a un mapa de presentaciones, de cualquiera de los esquemas.
+ *
+ * Con modelos hay que elegir uno: sin eso devuelve vacío, porque "cuánto sale
+ * un mortero" no tiene respuesta sin el tamaño. Un `modeloId` que ya no
+ * existe también da vacío — pasa con un carrito viejo cuyo modelo se borró.
+ *
  * @returns {Object<string, {precio: number, unidades: number|null}>}
  */
-export const presentacionesDe = (item) => {
+export const presentacionesDe = (item, modeloId = null) => {
   if (!item) return {};
-  return item.presentaciones
-    ? desdeEsquemaNuevo(item)
-    : desdeEsquemaViejo(item);
+
+  if (tieneModelos(item)) {
+    const modelo = modeloPorId(item, modeloId);
+    return modelo ? desdeMapa(modelo.presentaciones) : {};
+  }
+
+  return item.presentaciones ? desdeMapa(item.presentaciones) : desdeEsquemaViejo(item);
 };
 
-export const precioDe = (item, clave) => presentacionesDe(item)[clave]?.precio ?? null;
+export const precioDe = (item, clave, modeloId = null) =>
+  presentacionesDe(item, modeloId)[clave]?.precio ?? null;
 
 /** Cuántas unidades trae, o null si el producto no lo dice. */
-export const unidadesQueTrae = (item, clave) =>
-  presentacionesDe(item)[clave]?.unidades ?? null;
+export const unidadesQueTrae = (item, clave, modeloId = null) =>
+  presentacionesDe(item, modeloId)[clave]?.unidades ?? null;
 
-/** Las formas de comprar que el dueño cargó para este producto. */
-export const unidadesDisponibles = (item) => {
-  const presentaciones = presentacionesDe(item);
+/** Las formas de comprar que el dueño cargó, para este producto o modelo. */
+export const unidadesDisponibles = (item, modeloId = null) => {
+  const presentaciones = presentacionesDe(item, modeloId);
   return UNIDADES.filter((u) => presentaciones[u.clave]);
 };
+
+/**
+ * El precio unitario más bajo y más alto del producto, mirando todos sus
+ * modelos. Es lo que la card necesita para decir "desde $8.000" y lo que usan
+ * los filtros de precio, que no pueden elegir un modelo por su cuenta.
+ *
+ * @returns {{min: number, max: number}|null}
+ */
+export const rangoUnitario = (item) => {
+  if (!item) return null;
+
+  const precios = tieneModelos(item)
+    ? modelosDe(item)
+        .map((m) => desdeMapa(m.presentaciones).unitario?.precio)
+        .filter((p) => p !== undefined)
+    : [presentacionesDe(item).unitario?.precio].filter((p) => p !== undefined);
+
+  if (precios.length === 0) return null;
+
+  return { min: Math.min(...precios), max: Math.max(...precios) };
+};
+
+/** El piso del rango. Lo usan los filtros y la exportación. */
+export const precioMinimo = (item) => rangoUnitario(item)?.min ?? null;

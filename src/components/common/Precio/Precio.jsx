@@ -1,5 +1,11 @@
 import { formatearPrecio } from "@/utils/formatearPrecio";
-import { unidadesDisponibles, precioDe, unidadesQueTrae } from "@/constants/unidades";
+import {
+  unidadesDisponibles,
+  precioDe,
+  unidadesQueTrae,
+  rangoUnitario,
+} from "@/constants/unidades";
+import { tieneModelos } from "@/constants/modelos";
 import "./Precio.css";
 
 /*
@@ -16,6 +22,28 @@ import "./Precio.css";
   display de $15.000 con unidad a $8.000 mostraba "×2" cuando traía 5.
 */
 const Precio = ({ item, compacto = false }) => {
+  /*
+    Un producto con modelos no tiene precio propio: el precio vive en cada
+    modelo. La card muestra el piso del rango, porque elegir el modelo es algo
+    que pasa dentro del producto y no en la grilla.
+
+    Sin esto la card no mostraria ningun precio, porque unidadesDisponibles
+    devuelve vacio mientras no haya un modelo elegido.
+  */
+  if (tieneModelos(item)) {
+    const rango = rangoUnitario(item);
+    if (!rango) return null;
+
+    return (
+      <dl className="precio">
+        <div className="precio-fila precio-unitario">
+          <dt>{rango.min === rango.max ? "unidad" : "desde"}</dt>
+          <dd>{formatearPrecio(rango.min)}</dd>
+        </div>
+      </dl>
+    );
+  }
+
   const filas = unidadesDisponibles(item)
     .filter((u) => !(compacto && u.clave === "display"))
     .map((u) => ({

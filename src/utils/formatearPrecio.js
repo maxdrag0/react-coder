@@ -20,4 +20,7 @@ export const formatearPrecio = (valor) => {
 
 /** Como formatearPrecio pero siempre devuelve texto, incluido el cero. */
 export const formatearTotal = (valor) =>
-  formateador.format(Number.isFinite(valor) ? valor : 0).replace(/s/g, "");
+  // El \s lleva backslash: sin el borraba la letra "s" en vez del espacio, y
+  // el total del carrito quedaba con un espacio que el resto de la app no
+  // tiene. Intl mete un espacio duro entre el signo y el numero.
+  formateador.format(Number.isFinite(valor) ? valor : 0).replace(/\s/g, "");

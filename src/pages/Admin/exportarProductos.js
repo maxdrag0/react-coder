@@ -1,5 +1,6 @@
 import { estadoDe, ACTIVO } from "@/constants/estadoProducto";
 import { presentacionesDe } from "@/constants/unidades";
+import { modelosDe } from "@/constants/modelos";
 
 /*
   Exporta los productos activos a CSV.
@@ -21,6 +22,7 @@ import { presentacionesDe } from "@/constants/unidades";
 
 const COLUMNAS = [
   "Codigo",
+  "Modelo",
   "Nombre",
   "Precio unidad",
   "Precio display",
@@ -43,11 +45,12 @@ const celda = (valor) => {
   return `"${texto.replace(/"/g, '""')}"`;
 };
 
-const filaDe = (producto) => {
-  const p = presentacionesDe(producto);
+const filaDe = (producto, modelo = null) => {
+  const p = presentacionesDe(producto, modelo?.id ?? null);
 
   return [
     producto.codigo,
+    modelo?.etiqueta ?? "",
     producto.nombre ?? producto.name ?? "",
     p.unitario?.precio,
     p.display?.precio,
@@ -59,9 +62,20 @@ const filaDe = (producto) => {
     .join(SEPARADOR);
 };
 
+/*
+  Un producto con modelos da una fila por modelo: el precio vive en el modelo,
+  asi que una sola fila no podria decir ninguno. El codigo y el nombre se
+  repiten, que es lo que hace util la planilla para leerla de corrido.
+*/
+const filasDe = (producto) => {
+  const modelos = modelosDe(producto);
+  if (modelos.length === 0) return [filaDe(producto)];
+  return modelos.map((m) => filaDe(producto, m));
+};
+
 export const aCsv = (productos) => {
   const activos = productos.filter((p) => estadoDe(p) === ACTIVO);
-  const lineas = [COLUMNAS.join(SEPARADOR), ...activos.map(filaDe)];
+  const lineas = [COLUMNAS.join(SEPARADOR), ...activos.flatMap(filasDe)];
   return `${BOM}${lineas.join("\n")}\n`;
 };
 

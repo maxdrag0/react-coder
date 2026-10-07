@@ -6,8 +6,14 @@ export const CartContext = createContext();
 const CLAVE_GUARDADO = "carrito";
 
 // Un mismo producto puede estar en el carrito en más de una unidad de compra
-// (dos bultos y tres unidades sueltas), así que la clave combina las dos.
-const claveDe = (codigo, unidad) => `${codigo}__${unidad}`;
+// (dos bultos y tres unidades sueltas) y en más de un modelo (dos bengalas
+// rojas y una verde), así que la clave combina los tres.
+//
+// Las claves viejas (codigo__unidad) siguen siendo válidas: la clave solo se
+// usa para identificar el renglón, así que un carrito guardado antes de los
+// modelos no necesita migración.
+const claveDe = (codigo, unidad, modeloId) =>
+  `${codigo}__${modeloId ?? ""}__${unidad}`;
 
 // Lo guardado viene del navegador de alguien, que pudo editarlo, y del
 // formato que tenía la app la última vez. Se valida renglón por renglón en
@@ -53,9 +59,9 @@ const CartContextProvider = ({ children }) => {
 
   const cantidadItems = cartList.reduce((acc, item) => acc + item.cantidad, 0);
 
-  const addToCart = (item, cantidad, unidad = "unitario") => {
-    const clave = claveDe(item.codigo, unidad);
-    const precioElegido = precioDe(item, unidad) ?? 0;
+  const addToCart = (item, cantidad, unidad = "unitario", modelo = null) => {
+    const clave = claveDe(item.codigo, unidad, modelo?.id);
+    const precioElegido = precioDe(item, unidad, modelo?.id) ?? 0;
 
     setCartList((actual) => {
       const existente = actual.find((i) => i.clave === clave);
@@ -66,7 +72,21 @@ const CartContextProvider = ({ children }) => {
         );
       }
 
-      return [...actual, { ...item, clave, unidad, precioElegido, cantidad }];
+      // La etiqueta se copia: el carrito y el pedido tienen que poder decir
+      // "3 pulgadas" sin volver a buscar el producto, y sin romperse si el
+      // modelo se renombra o se borra despues.
+      return [
+        ...actual,
+        {
+          ...item,
+          clave,
+          unidad,
+          modelo: modelo?.id ?? null,
+          modeloEtiqueta: modelo?.etiqueta ?? null,
+          precioElegido,
+          cantidad,
+        },
+      ];
     });
   };
 

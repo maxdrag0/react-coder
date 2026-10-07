@@ -1,10 +1,22 @@
 import { Pencil, Trash2 } from "lucide-react";
 import { estadoDe, etiquetaDe, ACTIVO } from "../../constants/estadoProducto";
 import { formatearPrecio } from "../../utils/formatearPrecio";
+import { rangoUnitario } from "../../constants/unidades";
+import { modelosDe } from "../../constants/modelos";
 
 const nombreDe = (p) => p.name || p.nombre || "";
 const fotoDe = (p) => p.image || p.fotoUrl || "";
-const precioDe = (p) => p.price ?? p.precioUnitario;
+/*
+  Con modelos el producto no tiene precio propio, asi que la celda muestra el
+  rango. Y se avisa cuantos modelos tiene: en una tabla de 300 filas, saber
+  que un producto se vende en cinco variantes importa.
+*/
+const textoDePrecio = (p) => {
+  const rango = rangoUnitario(p);
+  if (!rango) return "—";
+  if (rango.min === rango.max) return formatearPrecio(rango.min);
+  return `${formatearPrecio(rango.min)} – ${formatearPrecio(rango.max)}`;
+};
 const categoriaDe = (p) => p.category || p.categoria || "";
 
 const EstadoBadge = ({ producto }) => {
@@ -75,7 +87,14 @@ const TablaProductos = ({
               </td>
               <td data-etiqueta="Código">{prod.codigo}</td>
               <td data-etiqueta="Nombre">{nombreDe(prod)}</td>
-              <td data-etiqueta="Precio">{formatearPrecio(precioDe(prod)) ?? "—"}</td>
+              <td data-etiqueta="Precio">
+                {textoDePrecio(prod)}
+                {modelosDe(prod).length > 0 && (
+                  <small className="admin-modelos-cuenta">
+                    {modelosDe(prod).length} modelos
+                  </small>
+                )}
+              </td>
               <td data-etiqueta="Categoría">{categoriaDe(prod)}</td>
               <td data-etiqueta="Estado">
                 <EstadoBadge producto={prod} />

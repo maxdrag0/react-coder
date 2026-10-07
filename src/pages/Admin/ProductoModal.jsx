@@ -3,6 +3,7 @@ import { CATEGORIES } from "../../constants/categories";
 import { ESTADOS, estadoDe } from "../../constants/estadoProducto";
 import { idDeYoutube } from "../../utils/videoEmbed";
 import { UNIDADES } from "../../constants/unidades";
+import ModelosEditor from "./ModelosEditor";
 import "./ProductoModal.css";
 
 const CATEGORIAS = Object.values(CATEGORIES).sort((a, b) => a.localeCompare(b));
@@ -95,6 +96,10 @@ const ProductoModal = ({
   producto,
   onCampo,
   onPresentacion,
+  onModelo,
+  onModeloPresentacion,
+  onAgregarModelo,
+  onBorrarModelo,
   onArchivo,
   archivo,
   esEdicion,
@@ -173,27 +178,75 @@ const ProductoModal = ({
           </Seccion>
 
           <Seccion titulo="Cómo se vende">
-            {/* El unitario no es opcional: es la referencia de todo lo
-                demas y lo que usa el filtro de precio del catalogo. */}
-            <Campo
-              id="p-precio"
-              etiqueta="Precio por unidad"
-              type="number"
-              min="0"
-              value={producto.price}
-              onChange={cambiar("price")}
-              required
-            />
+            {/* Un producto con modelos no tiene precio propio: cada modelo
+                tiene el suyo, porque el display de un mortero de 3 pulgadas
+                no trae lo mismo que el de 5. Por eso es uno o el otro y no
+                los dos a la vez. */}
+            <div className="campo campo-ancho">
+              <span className="campo-etiqueta">Tipo de producto</span>
+              <div className="modal-estados">
+                <label className="modal-estado">
+                  <input
+                    type="radio"
+                    name="conModelos"
+                    checked={!producto.conModelos}
+                    onChange={() => onCampo("conModelos", false)}
+                  />
+                  <span className="modal-estado-texto">
+                    <strong>Un solo precio</strong>
+                    <small>Se vende de una sola forma.</small>
+                  </span>
+                </label>
+                <label className="modal-estado">
+                  <input
+                    type="radio"
+                    name="conModelos"
+                    checked={Boolean(producto.conModelos)}
+                    onChange={() => onCampo("conModelos", true)}
+                  />
+                  <span className="modal-estado-texto">
+                    <strong>Por modelo</strong>
+                    <small>
+                      Viene en varios colores o tamaños, cada uno con su precio.
+                    </small>
+                  </span>
+                </label>
+              </div>
+            </div>
 
-            {UNIDADES.filter((u) => u.clave !== "unitario").map((u) => (
-              <Presentacion
-                key={u.clave}
-                clave={u.clave}
-                etiqueta={u.etiqueta}
-                valores={producto.presentaciones?.[u.clave] ?? {}}
-                onCampo={onPresentacion}
+            {producto.conModelos ? (
+              <ModelosEditor
+                modelos={producto.modelos ?? []}
+                onModelo={onModelo}
+                onPresentacion={onModeloPresentacion}
+                onAgregar={onAgregarModelo}
+                onBorrar={onBorrarModelo}
               />
-            ))}
+            ) : (
+              <>
+                {/* El unitario no es opcional: es la referencia de todo lo
+                    demas y lo que usa el filtro de precio del catalogo. */}
+                <Campo
+                  id="p-precio"
+                  etiqueta="Precio por unidad"
+                  type="number"
+                  min="0"
+                  value={producto.price}
+                  onChange={cambiar("price")}
+                  required
+                />
+
+                {UNIDADES.filter((u) => u.clave !== "unitario").map((u) => (
+                  <Presentacion
+                    key={u.clave}
+                    clave={u.clave}
+                    etiqueta={u.etiqueta}
+                    valores={producto.presentaciones?.[u.clave] ?? {}}
+                    onCampo={onPresentacion}
+                  />
+                ))}
+              </>
+            )}
           </Seccion>
 
           <Seccion titulo="Clasificación">

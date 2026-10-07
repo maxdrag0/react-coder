@@ -5,6 +5,8 @@ import {
   precioDe,
   unidadesQueTrae,
   unidadesDisponibles,
+  rangoUnitario,
+  precioMinimo,
 } from "../../src/constants/unidades";
 
 // Esquema nuevo: el dueño dice si se vende así, a cuánto y cuántas trae.
@@ -145,5 +147,113 @@ describe("precioDe", () => {
 describe("UNIDADES", () => {
   it("mantiene las tres y su orden, que es el de mayor a menor cantidad", () => {
     expect(UNIDADES.map((u) => u.clave)).toEqual(["unitario", "display", "bulto"]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Modelos: cada uno con sus propias presentaciones.
+// ---------------------------------------------------------------------------
+
+const CON_MODELOS = {
+  codigo: "M100",
+  modelos: [
+    {
+      id: "tres",
+      etiqueta: "3 pulgadas",
+      presentaciones: {
+        unitario: { precio: 8000 },
+        display: { precio: 15000, unidades: 5 },
+      },
+    },
+    {
+      id: "cinco",
+      etiqueta: "5 pulgadas",
+      presentaciones: { unitario: { precio: 20000 } },
+    },
+  ],
+};
+
+describe("presentacionesDe con modelos", () => {
+  it("devuelve las del modelo elegido", () => {
+    expect(presentacionesDe(CON_MODELOS, "tres").display).toEqual({
+      precio: 15000,
+      unidades: 5,
+    });
+  });
+
+  it("devuelve vacío si hay modelos y no se eligió ninguno", () => {
+    // "Cuanto sale un mortero" no tiene respuesta sin el tamaño. La card
+    // muestra un rango, que se calcula aparte.
+    expect(presentacionesDe(CON_MODELOS)).toEqual({});
+  });
+
+  it("devuelve vacío si el modelo pedido no existe", () => {
+    // Pasa con un carrito viejo: el modelo se borro del producto.
+    expect(presentacionesDe(CON_MODELOS, "borrado")).toEqual({});
+  });
+
+  it("ignora el modelo en un producto que no tiene modelos", () => {
+    // Asi los 323 del catalogo siguen andando pase lo que pase.
+    expect(presentacionesDe(VIEJO, "cualquiera").unitario.precio).toBe(270);
+  });
+});
+
+describe("precioDe y unidadesDisponibles con modelos", () => {
+  it("el precio sale del modelo", () => {
+    expect(precioDe(CON_MODELOS, "unitario", "tres")).toBe(8000);
+    expect(precioDe(CON_MODELOS, "unitario", "cinco")).toBe(20000);
+  });
+
+  it("sin modelo elegido no hay precio", () => {
+    expect(precioDe(CON_MODELOS, "unitario")).toBeNull();
+  });
+
+  it("cada modelo ofrece sus propias presentaciones", () => {
+    expect(unidadesDisponibles(CON_MODELOS, "tres").map((u) => u.clave)).toEqual([
+      "unitario",
+      "display",
+    ]);
+    expect(unidadesDisponibles(CON_MODELOS, "cinco").map((u) => u.clave)).toEqual([
+      "unitario",
+    ]);
+  });
+
+  it("la cantidad tambien es por modelo", () => {
+    expect(unidadesQueTrae(CON_MODELOS, "display", "tres")).toBe(5);
+    expect(unidadesQueTrae(CON_MODELOS, "display", "cinco")).toBeNull();
+  });
+});
+
+describe("rangoUnitario", () => {
+  it("con modelos da el minimo y el maximo entre todos", () => {
+    // Es lo que la card necesita para decir "desde $8.000".
+    expect(rangoUnitario(CON_MODELOS)).toEqual({ min: 8000, max: 20000 });
+  });
+
+  it("sin modelos da el precio del producto en los dos extremos", () => {
+    expect(rangoUnitario(VIEJO)).toEqual({ min: 270, max: 270 });
+  });
+
+  it("devuelve null si no hay ningun precio", () => {
+    expect(rangoUnitario({ nombre: "sin precio" })).toBeNull();
+    expect(rangoUnitario(null)).toBeNull();
+  });
+
+  it("ignora un modelo que no tiene precio unitario", () => {
+    const mixto = {
+      modelos: [
+        { id: "a", etiqueta: "A", presentaciones: { unitario: { precio: 500 } } },
+        { id: "b", etiqueta: "B", presentaciones: { bulto: { precio: 90000 } } },
+      ],
+    };
+    expect(rangoUnitario(mixto)).toEqual({ min: 500, max: 500 });
+  });
+});
+
+describe("precioMinimo", () => {
+  it("es el piso del rango, que es lo que usan los filtros", () => {
+    expect(precioMinimo(CON_MODELOS)).toBe(8000);
+    expect(precioMinimo(VIEJO)).toBe(270);
+    expect(precioMinimo({ nombre: "sin precio" })).toBeNull();
   });
 });

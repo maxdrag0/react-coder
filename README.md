@@ -60,4 +60,8 @@ Después de asignarlo hay que cerrar sesión y volver a entrar, porque los token
 duran una hora.
 
 Los pasos manuales de la consola de Firebase y Google Cloud, incluido el deploy
-de las reglas, están en [docs/runbook-seguridad-consola.md](docs/runbook-seguridad-consola.md).
+de las reglas, están en `docs/runbook-seguridad-consola.md`.
+
+> La carpeta `docs/` queda fuera del repositorio a propósito: son runbooks
+> operativos y notas de decisiones, no documentación del código. Vive solo en
+> la máquina de desarrollo.

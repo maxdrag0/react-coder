@@ -36,3 +36,8 @@ ui-debug.log
 
 # Credencial del Admin SDK - NUNCA commitear
 serviceAccount.json
+
+# Runbooks operativos y notas de decisiones. Quedan fuera del repo: son
+# instrucciones de consola y de infraestructura, no documentacion del codigo.
+# Viven solo en la maquina de desarrollo.
+docs/

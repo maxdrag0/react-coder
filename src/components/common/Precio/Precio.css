@@ -27,8 +27,12 @@
   color: var(--text-tenue);
 }
 
-/* El bulto es el que se compra: es el único que lleva el acento. */
-.precio-bulto dd {
+/* El acento va en la unidad y no en el bulto.
+   La unidad es el único precio que todos los productos tienen: display y
+   bulto son opcionales desde que se cargan por presentación. Acentuar el
+   bulto dejaba sin acento a los productos que solo se venden por unidad, y
+   además movía el acento de fila en fila entre una card y la de al lado. */
+.precio-unitario dd {
   font-size: var(--t-md);
   font-weight: 600;
   color: var(--gold);

@@ -414,3 +414,79 @@
 }
 
 .admin-pedido-cancelado { opacity: 0.55; }
+
+/* --- Filtros de pedidos --- */
+
+.pedidos-filtros {
+  display: grid;
+  gap: var(--e-3);
+  margin-bottom: var(--e-4);
+}
+
+.pedidos-chips {
+  display: flex;
+  gap: var(--e-2);
+  flex-wrap: wrap;
+}
+
+.pedidos-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  padding: var(--e-2) var(--e-3);
+  border: 1px solid var(--gold-linea);
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--text-suave);
+  font-size: var(--t-xs);
+  font-family: var(--fuente);
+  cursor: pointer;
+  transition: background-color var(--mov-rapido), color var(--mov-rapido);
+}
+
+.pedidos-chip:hover { background: var(--surface-alto); color: var(--text); }
+
+.pedidos-chip.activo {
+  background: var(--surface-alto);
+  border-color: var(--gold);
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.pedidos-chip-cuenta {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
+
+.pedidos-buscador {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+  padding-inline: var(--e-3);
+  border: 1px solid var(--gold-linea);
+  border-radius: var(--r-control);
+  background: var(--surface-alto);
+  color: var(--text-tenue);
+  max-width: 32rem;
+}
+
+.pedidos-buscador input {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  border: none;
+  background: none;
+  color: var(--text);
+  font-size: var(--t-sm);
+  font-family: var(--fuente);
+}
+
+.pedidos-buscador input:focus { outline: none; }
+.pedidos-buscador:focus-within { border-color: var(--gold); }
+
+.pedidos-cuenta {
+  margin: 0;
+  font-size: var(--t-xs);
+  color: var(--text-suave);
+  font-variant-numeric: tabular-nums;
+}

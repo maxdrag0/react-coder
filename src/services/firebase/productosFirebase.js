@@ -123,3 +123,34 @@ export const eliminarProductos = async (codigos) => {
     await batch.commit();
   }
 };
+
+/*
+  Cambiar el codigo de un producto NO es editar: el codigo es el id del
+  documento en Firestore y Firestore no tiene renombrar. Hay que crear el
+  nuevo, copiar los datos y borrar el viejo.
+
+  Va en un batch para que set y delete sean atomicos: si fallara entre los
+  dos, quedarian dos productos o ninguno.
+
+  Lo que NO arregla, y por eso el panel avisa antes:
+  - los pedidos ya hechos guardan el codigo viejo
+  - un link a /product/<codigo viejo> deja de funcionar
+*/
+export const renombrarProducto = async (codigoViejo, codigoNuevo, producto) => {
+  const yaExiste = await getDoc(refDe(codigoNuevo));
+  if (yaExiste.exists()) {
+    const error = new Error("Ya existe un producto con ese código.");
+    error.code = "codigo-ocupado";
+    throw error;
+  }
+
+  try {
+    const batch = writeBatch(db);
+    batch.set(refDe(codigoNuevo), producto);
+    batch.delete(refDe(codigoViejo));
+    await batch.commit();
+  } catch (error) {
+    console.error("Error al cambiar el código del producto:", error);
+    throw error;
+  }
+};

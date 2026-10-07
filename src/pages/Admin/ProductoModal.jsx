@@ -137,14 +137,20 @@ const ProductoModal = ({
 
         <form id={FORM_ID} className="modal-cuerpo" onSubmit={onGuardar}>
           <Seccion titulo="Producto">
+            {/* El codigo ES el id del documento en Firestore, asi que
+                cambiarlo mueve el producto: se crea el nuevo y se borra el
+                viejo. Se puede, pero el panel avisa antes de guardar. */}
             <Campo
               id="p-codigo"
               etiqueta="Código"
-              ayuda={esEdicion ? "No se puede cambiar." : "Identificador único."}
+              ayuda={
+                esEdicion && producto.codigo !== producto.codigoOriginal
+                  ? "Al guardar se mueve el producto a este código nuevo."
+                  : "Identificador único del producto."
+              }
               type="text"
               value={producto.codigo}
               onChange={cambiar("codigo")}
-              disabled={esEdicion}
               required
             />
             <Campo

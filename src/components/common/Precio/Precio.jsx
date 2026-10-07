@@ -3,8 +3,10 @@ import { unidadesDisponibles, precioDe, unidadesQueTrae } from "@/constants/unid
 import "./Precio.css";
 
 /*
-  Nadie compra pirotecnia de a una unidad para fin de año: el bulto es el
-  precio que mueve la venta, por eso es el único en dorado.
+  El dorado va en el precio por unidad: es el único que todos los productos
+  tienen. Display y bulto son opcionales desde que se cargan por
+  presentación, así que acentuar el bulto dejaba sin acento a los productos
+  que solo se venden por unidad.
 
   Recibe el producto entero y no precios sueltos: las presentaciones viven en
   el producto, y pasarlas de a tres números perdía las cantidades.

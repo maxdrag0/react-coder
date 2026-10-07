@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Plus, Download } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import {
   obtenerProductos,
@@ -9,6 +9,7 @@ import {
   eliminarProducto,
   actualizarEstados,
   eliminarProductos,
+  renombrarProducto,
 } from "../../services/firebase/productosFirebase";
 import {
   obtenerTodasLasCompras,
@@ -30,6 +31,9 @@ import TablaProductos from "./TablaProductos";
 import TablaPedidos from "./TablaPedidos";
 import TablaMensajes from "./TablaMensajes";
 import BarraSeleccion from "./BarraSeleccion";
+import FiltrosPedidos from "./FiltrosPedidos";
+import { filtrarPedidos, contarPorEstado, ABIERTOS } from "./filtrarPedidos";
+import { descargarCsv } from "./exportarProductos";
 import "./AdminDashboard.css";
 
 const PESTANAS = [
@@ -82,6 +86,8 @@ const presentacionesAlFormulario = (p) => {
    Unificarlos exige migrar los datos y es el subproyecto E. */
 const aFormulario = (p) => ({
   ...p,
+  // Se guarda el original para poder detectar el cambio al guardar.
+  codigoOriginal: p.codigo,
   name: p.name ?? p.nombre ?? "",
   price: p.price ?? p.precioUnitario ?? "",
   presentaciones: presentacionesAlFormulario(p),
@@ -162,6 +168,10 @@ const AdminDashboard = () => {
   const [seleccion, setSeleccion] = useState(new Set());
   const [enLote, setEnLote] = useState(false);
 
+  // "Abiertos" por defecto: al entrar, lo que importa es que falta hacer.
+  const [filtroEstado, setFiltroEstado] = useState(ABIERTOS);
+  const [filtroTexto, setFiltroTexto] = useState("");
+
   useEffect(() => {
     if (!authLoading && !isAdmin) navigate("/");
   }, [authLoading, isAdmin, navigate]);
@@ -232,11 +242,39 @@ const AdminDashboard = () => {
         : formulario.image || formulario.fotoUrl || "";
 
       const datos = aFirestore(formulario, imagen);
+      const codigo = formulario.codigo?.trim();
+      const original = formulario.codigoOriginal;
+      const cambioElCodigo = editando && codigo !== original;
 
-      if (editando) {
-        await actualizarProducto(formulario.codigo, datos);
+      if (cambioElCodigo) {
+        // El codigo es el id del documento: cambiarlo mueve el producto y
+        // deja atras los pedidos y los links que apuntaban al viejo.
+        const cuantos = pedidos.filter((p) =>
+          p.items?.some((i) => i.codigo === original)
+        ).length;
+
+        const aviso = [
+          `Vas a mover el producto de "${original}" a "${codigo}".`,
+          "",
+          "El codigo es el identificador en la base, asi que:",
+          "- cualquier link al producto con el codigo viejo deja de andar",
+          cuantos > 0
+            ? `- ${cuantos} pedido${cuantos === 1 ? "" : "s"} ya hecho${cuantos === 1 ? "" : "s"} guarda el codigo viejo`
+            : "- ningun pedido hecho lo referencia",
+          "",
+          "¿Seguis?",
+        ].join("\n");
+
+        if (!window.confirm(aviso)) {
+          setGuardando(false);
+          return;
+        }
+
+        await renombrarProducto(original, codigo, datos);
+      } else if (editando) {
+        await actualizarProducto(codigo, datos);
       } else {
-        await crearProducto(datos, formulario.codigo || null);
+        await crearProducto(datos, codigo || null);
       }
 
       invalidarCatalogo();
@@ -244,7 +282,11 @@ const AdminDashboard = () => {
       cerrarModal();
     } catch (error) {
       console.error("Error guardando el producto:", error);
-      setErrorModal("No se pudo guardar. Revisá la conexión y probá de nuevo.");
+      setErrorModal(
+        error.code === "codigo-ocupado"
+          ? "Ya existe un producto con ese código. Elegí otro."
+          : "No se pudo guardar. Revisá la conexión y probá de nuevo."
+      );
     } finally {
       setGuardando(false);
     }
@@ -380,6 +422,12 @@ const AdminDashboard = () => {
     }
   };
 
+  const pedidosFiltrados = useMemo(
+    () => filtrarPedidos(pedidos, { estado: filtroEstado, texto: filtroTexto }),
+    [pedidos, filtroEstado, filtroTexto]
+  );
+  const cuentaPedidos = useMemo(() => contarPorEstado(pedidos), [pedidos]);
+
   const sinLeer = mensajes.filter((m) => !m.leido).length;
   // Pedidos que todavia piden algo: nuevo, contactado o pagado.
   const abiertos = pedidos.filter(estaAbierto).length;
@@ -419,6 +467,18 @@ const AdminDashboard = () => {
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
             />
+            {/* Exporta los activos con los precios que la tienda ofrece de
+                verdad, no los campos crudos. */}
+            <button
+              type="button"
+              className="boton boton-secundario"
+              onClick={() => descargarCsv(productos)}
+              disabled={productos.length === 0}
+              title="Descargar los productos activos en CSV"
+            >
+              <Download size={18} />
+              Descargar CSV
+            </button>
             <button
               type="button"
               className="boton boton-primario"
@@ -451,13 +511,23 @@ const AdminDashboard = () => {
       )}
 
       {pestana === "pedidos" && (
-        <div className="admin-products">
-          <TablaPedidos
-            pedidos={pedidos}
-            onEstado={cambiarEstadoPedido}
-            onNota={guardarNotaPedido}
+        <>
+          <FiltrosPedidos
+            estado={filtroEstado}
+            onEstado={setFiltroEstado}
+            texto={filtroTexto}
+            onTexto={setFiltroTexto}
+            cuenta={cuentaPedidos}
+            visibles={pedidosFiltrados.length}
           />
-        </div>
+          <div className="admin-products">
+            <TablaPedidos
+              pedidos={pedidosFiltrados}
+              onEstado={cambiarEstadoPedido}
+              onNota={guardarNotaPedido}
+            />
+          </div>
+        </>
       )}
 
       {pestana === "mensajes" && (

@@ -34,6 +34,14 @@ import BarraSeleccion from "./BarraSeleccion";
 import FiltrosPedidos from "./FiltrosPedidos";
 import { filtrarPedidos, contarPorEstado, ABIERTOS } from "./filtrarPedidos";
 import { descargarCsv } from "./exportarProductos";
+import FiltrosProductosAdmin from "./FiltrosProductosAdmin";
+import {
+  filtrarProductos,
+  contarEstadosProducto,
+  categoriasPresentes,
+  marcasPresentes,
+  FILTROS_VACIOS,
+} from "./filtrarProductos";
 import "./AdminDashboard.css";
 
 const PESTANAS = [
@@ -156,7 +164,7 @@ const AdminDashboard = () => {
   const [pedidos, setPedidos] = useState([]);
   const [mensajes, setMensajes] = useState([]);
   const [cargando, setCargando] = useState(true);
-  const [busqueda, setBusqueda] = useState("");
+  const [filtros, setFiltros] = useState(FILTROS_VACIOS);
 
   const [modalAbierto, setModalAbierto] = useState(false);
   const [editando, setEditando] = useState(false);
@@ -305,12 +313,28 @@ const AdminDashboard = () => {
     }
   };
 
-  const filtrados = useMemo(() => {
-    const q = busqueda.toLowerCase();
-    return productos.filter((p) =>
-      (p.name || p.nombre || "").toLowerCase().includes(q),
-    );
-  }, [productos, busqueda]);
+  const filtrados = useMemo(
+    () => filtrarProductos(productos, filtros),
+    [productos, filtros]
+  );
+
+  const cuentaProductos = useMemo(
+    () => contarEstadosProducto(productos),
+    [productos]
+  );
+  const categorias = useMemo(() => categoriasPresentes(productos), [productos]);
+  const marcas = useMemo(() => marcasPresentes(productos), [productos]);
+
+  const cambiarFiltro = (campo, valor) =>
+    setFiltros((actual) => ({ ...actual, [campo]: valor }));
+
+  // Al cambiar un filtro, lo que estaba seleccionado puede dejar de estar a
+  // la vista. Limpiar la seleccion evita aplicar una accion en lote a
+  // productos que el dueno ya no ve.
+  const cambiarFiltroYLimpiar = (campo, valor) => {
+    setSeleccion(new Set());
+    cambiarFiltro(campo, valor);
+  };
 
   const alternar = (codigo) =>
     setSeleccion((actual) => {
@@ -460,13 +484,6 @@ const AdminDashboard = () => {
       {pestana === "productos" && (
         <>
           <div className="admin-actions-bar">
-            <input
-              type="search"
-              placeholder="Buscar por nombre..."
-              aria-label="Buscar productos en el panel"
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-            />
             {/* Exporta los activos con los precios que la tienda ofrece de
                 verdad, no los campos crudos. */}
             <button
@@ -488,6 +505,19 @@ const AdminDashboard = () => {
               Agregar producto
             </button>
           </div>
+
+          <FiltrosProductosAdmin
+            filtros={filtros}
+            onFiltro={cambiarFiltroYLimpiar}
+            onLimpiar={() => {
+              setSeleccion(new Set());
+              setFiltros(FILTROS_VACIOS);
+            }}
+            cuenta={cuentaProductos}
+            categorias={categorias}
+            marcas={marcas}
+            visibles={filtrados.length}
+          />
 
           <div className="admin-products">
             <TablaProductos

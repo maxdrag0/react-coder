@@ -47,3 +47,16 @@ export const eliminarMensaje = async (id) => {
     throw error;
   }
 };
+
+/**
+ * Campos libres del mensaje (hoy: `nota`). Las reglas dejan que el admin
+ * actualice sin enumerar campos, asi que no hace falta tocarlas.
+ */
+export const actualizarMensaje = async (id, campos) => {
+  try {
+    await updateDoc(doc(db, "mensajes", id), campos);
+  } catch (error) {
+    console.error("Error al actualizar el mensaje:", error);
+    throw error;
+  }
+};

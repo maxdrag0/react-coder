@@ -340,3 +340,77 @@
 @media (max-width: 899px) {
   .barra-seleccion { bottom: calc(var(--alto-nav-abajo) + var(--e-2)); }
 }
+
+/* --- Pedidos --- */
+
+.admin-orden-id {
+  font-size: var(--t-xs);
+  color: var(--text-suave);
+  word-break: break-all;
+}
+
+.admin-cliente {
+  display: grid;
+  gap: 2px;
+  font-size: var(--t-xs);
+}
+
+.admin-cliente strong { font-size: var(--t-sm); color: var(--text); }
+.admin-cliente span { color: var(--text-suave); }
+
+/* El dueno contacta por WhatsApp, asi que el telefono ES el link. */
+.admin-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--exito);
+  font-weight: 600;
+}
+
+.admin-whatsapp:hover { text-decoration: underline; }
+
+/* Los pedidos de antes de que el telefono fuera obligatorio no lo tienen,
+   y por eso no se pueden atender: conviene que se note. */
+.admin-sin-telefono {
+  color: var(--danger);
+  font-style: normal;
+}
+
+.admin-estado-select {
+  width: 100%;
+  min-width: 8rem;
+  min-height: 36px;
+  padding: var(--e-2);
+  border: 1px solid var(--gold-linea);
+  border-radius: var(--r-control);
+  background: var(--surface-alto);
+  color: var(--text);
+  font-size: var(--t-xs);
+  font-family: var(--fuente);
+}
+
+.admin-nota {
+  width: 100%;
+  min-width: 10rem;
+  padding: var(--e-2);
+  border: 1px solid var(--gold-linea);
+  border-radius: var(--r-control);
+  background: var(--surface-alto);
+  color: var(--text);
+  font-size: var(--t-xs);
+  font-family: var(--fuente);
+  resize: vertical;
+}
+
+.admin-nota:focus,
+.admin-estado-select:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+/* Un pedido nuevo tiene que saltar a la vista entre veinte filas. */
+.admin-pedido-nuevo td:first-child {
+  box-shadow: inset 3px 0 0 var(--gold);
+}
+
+.admin-pedido-cancelado { opacity: 0.55; }

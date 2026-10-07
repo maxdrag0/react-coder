@@ -10,15 +10,20 @@ import {
   actualizarEstados,
   eliminarProductos,
 } from "../../services/firebase/productosFirebase";
-import { obtenerTodasLasCompras } from "../../services/firebase/comprasFirebase";
+import {
+  obtenerTodasLasCompras,
+  actualizarCompra,
+} from "../../services/firebase/comprasFirebase";
 import {
   obtenerMensajes,
   marcarMensajeComoLeido,
   eliminarMensaje,
+  actualizarMensaje,
 } from "../../services/firebase/contactoFirebase";
 import { uploadFile } from "../../services/firebase/storageFirebase";
 import { invalidarCatalogo } from "../../services/firebase/cacheCatalogo";
 import { ACTIVO } from "../../constants/estadoProducto";
+import { estaAbierto } from "../../constants/estadoPedido";
 import ProductoModal from "./ProductoModal";
 import TablaProductos from "./TablaProductos";
 import TablaPedidos from "./TablaPedidos";
@@ -260,6 +265,41 @@ const AdminDashboard = () => {
     }
   };
 
+  /*
+    Las tres de abajo actualizan el estado local primero y escriben despues.
+
+    Recargar todo tras cada cambio tardaria y, peor, le volaria al dueno lo
+    que esta escribiendo en otra nota: cada fila guarda su texto en estado
+    local. Si la escritura falla se recarga, que es la unica forma de volver
+    a la verdad.
+  */
+  const cambiarEstadoPedido = async (id, estado) => {
+    setPedidos((actual) => actual.map((p) => (p.id === id ? { ...p, estado } : p)));
+    try {
+      await actualizarCompra(id, { estado });
+    } catch {
+      await cargar();
+    }
+  };
+
+  const guardarNotaPedido = async (id, nota) => {
+    setPedidos((actual) => actual.map((p) => (p.id === id ? { ...p, nota } : p)));
+    try {
+      await actualizarCompra(id, { nota });
+    } catch {
+      await cargar();
+    }
+  };
+
+  const guardarNotaMensaje = async (id, nota) => {
+    setMensajes((actual) => actual.map((m) => (m.id === id ? { ...m, nota } : m)));
+    try {
+      await actualizarMensaje(id, { nota });
+    } catch {
+      await cargar();
+    }
+  };
+
   const alternarLeido = async (id, leido) => {
     try {
       await marcarMensajeComoLeido(id, !leido);
@@ -280,6 +320,8 @@ const AdminDashboard = () => {
   };
 
   const sinLeer = mensajes.filter((m) => !m.leido).length;
+  // Pedidos que todavia piden algo: nuevo, contactado o pagado.
+  const abiertos = pedidos.filter(estaAbierto).length;
 
   if (authLoading || cargando) {
     return <div className="loader-container">Cargando panel...</div>;
@@ -300,6 +342,7 @@ const AdminDashboard = () => {
             >
               {p.etiqueta}
               {p.clave === "mensajes" && sinLeer > 0 && ` (${sinLeer})`}
+              {p.clave === "pedidos" && abiertos > 0 && ` (${abiertos})`}
             </button>
           ))}
         </div>
@@ -348,7 +391,11 @@ const AdminDashboard = () => {
 
       {pestana === "pedidos" && (
         <div className="admin-products">
-          <TablaPedidos pedidos={pedidos} />
+          <TablaPedidos
+            pedidos={pedidos}
+            onEstado={cambiarEstadoPedido}
+            onNota={guardarNotaPedido}
+          />
         </div>
       )}
 
@@ -357,6 +404,7 @@ const AdminDashboard = () => {
           <TablaMensajes
             mensajes={mensajes}
             onAlternarLeido={alternarLeido}
+            onNota={guardarNotaMensaje}
             onEliminar={borrarMensaje}
           />
         </div>

@@ -28,3 +28,15 @@
 
 .home-cargando { gap: var(--e-3); }
 .home-cargando p { color: var(--text-suave); margin: 0; }
+
+/* Portada sin nada que mostrar: pasa si todo el catálogo está oculto. Un
+   cartel y una salida, en vez de una grilla vacía bajo "Más vendidos". */
+.home-vacio {
+  display: grid;
+  gap: var(--e-4);
+  justify-items: start;
+  padding-block: var(--e-6);
+  color: var(--text-suave);
+}
+
+.home-vacio p { margin: 0; }

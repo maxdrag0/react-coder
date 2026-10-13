@@ -40,13 +40,50 @@ Sigue estos pasos para correr el proyecto localmente:
 | Comando | Qué hace |
 |---|---|
 | `npm run dev` | Levanta el frontend |
-| `npm test` | Tests unitarios + de reglas de seguridad (134 en total) |
+| `npm run dev:api` | Frontend + las funciones de `api/` (hace falta para el checkout) |
+| `npm test` | Tests unitarios + de reglas de seguridad |
 | `npm run test:unit` | Solo los unitarios (rápido, sin emulador) |
 | `npm run test:rules` | Reglas de Firestore y Storage contra el emulador |
 | `npm run set-admin -- <email>` | Da permisos de admin a un usuario |
 | `npm run seed` | Carga el catálogo inicial en Firestore (una sola vez) |
 
 Los tests de reglas necesitan Java instalado (lo usa el emulador de Firebase).
+
+## La API de órdenes
+
+El total de un pedido lo calcula el servidor, no el navegador: `api/orden.js`
+recibe códigos y cantidades, lee el catálogo con el Admin SDK y escribe la
+orden. Las reglas de Firestore tienen `compras.create` en `false`, así que el
+cliente no puede escribir pedidos.
+
+Para el checkout en local hace falta `vercel dev`, que sirve el front y la
+función juntos:
+
+```bash
+npm i -g vercel      # una sola vez
+npm run dev:api
+```
+
+`npm run dev` (Vite solo) sigue sirviendo para todo lo que no sea el checkout:
+sin la función, el envío del pedido responde el `index.html` y falla.
+
+Las tres variables del service account van en `.env.local`, que ya está
+ignorado por el patrón `*.local`:
+
+```
+FIREBASE_PROJECT_ID=...
+FIREBASE_CLIENT_EMAIL=...
+FIREBASE_PRIVATE_KEY=...
+```
+
+### Dónde vive la tienda
+
+En Vercel. El deploy a GitHub Pages se fue: `gh-pages -d dist` pusheaba una
+rama con solo el `dist/` compilado, y Vercel —que construye todas las ramas—
+fallaba ahí con `vite build: command not found` y mandaba un mail por cada
+push. `vercel.json` además tiene esa rama excluida por si alguien la vuelve a
+pushear a mano. Para recuperar el deploy a Pages alcanza con volver a agregar
+los scripts `predeploy` y `deploy` (están en el historial de git).
 
 ## Seguridad
 

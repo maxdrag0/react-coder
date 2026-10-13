@@ -35,12 +35,26 @@ describe("rutas profundas en los dos hostings", () => {
     expect(vercel.rewrites.some((r) => r.destination === "/index.html")).toBe(true);
   });
 
-  it("GitHub Pages tiene su 404.html, que es como se resuelve allá", () => {
-    // Pages no tiene rewrites: sirve 404.html cuando no encuentra la ruta, y
-    // si ese archivo es el index el router arranca igual.
-    expect(existsSync("scripts/copiar-404.mjs")).toBe(true);
+  it("no se vuelve a publicar en GitHub Pages desde npm", () => {
+    /*
+      `gh-pages -d dist` pusheaba una rama con solo el dist/ compilado, sin
+      package.json. Vercel construye todas las ramas, así que fallaba ahí con
+      `vite build: command not found` y mandaba un mail por cada push.
+
+      El script se fue; `scripts/copiar-404.mjs` queda para poder volver a
+      armarlo si algún día hace falta Pages de nuevo.
+    */
     const pkg = JSON.parse(leer("package.json"));
-    expect(pkg.scripts.predeploy).toContain("copiar-404");
+    expect(pkg.scripts.deploy).toBeUndefined();
+    expect(pkg.scripts.predeploy).toBeUndefined();
+    expect(existsSync("scripts/copiar-404.mjs")).toBe(true);
+  });
+
+  it("vercel.json deja la rama gh-pages fuera del deploy", () => {
+    // Defensa por si alguien la vuelve a pushear a mano: la rama existe en el
+    // remoto y un push ahí no tiene por qué disparar un build que falla.
+    const vercel = JSON.parse(leer("vercel.json"));
+    expect(vercel.git.deploymentEnabled["gh-pages"]).toBe(false);
   });
 });
 

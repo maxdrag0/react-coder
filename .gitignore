@@ -24,6 +24,9 @@ dist-ssr
 *.sw?
 
 .env
+# Vercel: enlace local al proyecto
+.vercel
+
 # Firebase: cache de deploy y artefactos del emulador
 .firebase/
 firebase-debug.log

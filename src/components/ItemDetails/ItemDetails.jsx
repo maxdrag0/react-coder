@@ -38,6 +38,11 @@ function ItemDetails({ item }) {
   const [count, setCount] = useState(1);
   const [modalAbierto, setModalAbierto] = useState(false);
 
+  // Lo que se acaba de agregar, congelado para el cartel de confirmacion.
+  // Leer `count` ahi mostraba siempre 1, porque setCount(1) corre en el mismo
+  // handler y React agrupa las actualizaciones antes de pintar el modal.
+  const [agregado, setAgregado] = useState(null);
+
   // Sin límite por stock: hasta definir si el stock se cuenta por unidad,
   // display o bulto, limitar la compra daría un número equivocado.
   const sumar = () => setCount(count + 1);
@@ -48,6 +53,11 @@ function ItemDetails({ item }) {
 
   const agregar = () => {
     addToCart(item, count, unidad, modelo);
+    setAgregado({
+      cantidad: count,
+      unidad: unidades.find((u) => u.clave === unidad)?.etiqueta ?? "",
+      modelo: modelo?.etiqueta ?? null,
+    });
     setModalAbierto(true);
     setCount(1);
   };
@@ -186,9 +196,10 @@ function ItemDetails({ item }) {
           <>
             <strong>{nombre}</strong>
             <br />
-            {modelo && <>{modelo.etiqueta} · </>}
-            {count} {count === 1 ? "unidad de compra" : "unidades de compra"} ·{" "}
-            {unidades.find((u) => u.clave === unidad)?.etiqueta}
+            {agregado?.modelo && <>{agregado.modelo} · </>}
+            {agregado?.cantidad}{" "}
+            {agregado?.cantidad === 1 ? "unidad de compra" : "unidades de compra"}
+            {agregado?.unidad && <> · {agregado.unidad}</>}
           </>
         }
       />

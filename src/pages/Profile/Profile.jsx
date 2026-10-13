@@ -11,7 +11,7 @@ import "./Profile.css";
 const Profile = () => {
   // ProtectedRoute garantiza que hay sesion: aca no hace falta chequearlo
   // ni redirigir, que es lo que hacia este componente durante el render.
-  const { user, isAdmin } = useAuth();
+  const { user } = useAuth();
   const { themeMode, setThemeMode } = useTheme();
   const { perfil, cargando, guardar } = usePerfil();
   const navigate = useNavigate();
@@ -36,7 +36,10 @@ const Profile = () => {
       await guardar({ telefono: soloDigitos(telefono) });
       setEstado({ error: "", listo: true });
     } catch {
-      setEstado({ error: "No pudimos guardarlo. Probá de nuevo.", listo: false });
+      setEstado({
+        error: "No pudimos guardarlo. Probá de nuevo.",
+        listo: false,
+      });
     } finally {
       setGuardando(false);
     }
@@ -57,7 +60,9 @@ const Profile = () => {
         <div className="profile-info">
           <div className="info-group">
             <span className="info-label">Nombre:</span>
-            <span className="info-value">{user.displayName || "Sin nombre"}</span>
+            <span className="info-value">
+              {user.displayName || "Sin nombre"}
+            </span>
           </div>
           <div className="info-group">
             <span className="info-label">Email:</span>
@@ -89,8 +94,12 @@ const Profile = () => {
                 {guardando ? "Guardando..." : "Guardar"}
               </button>
             </div>
-            {estado.error && <small className="campo-error">{estado.error}</small>}
-            {estado.listo && <small className="campo-ok">Teléfono guardado.</small>}
+            {estado.error && (
+              <small className="campo-error">{estado.error}</small>
+            )}
+            {estado.listo && (
+              <small className="campo-ok">Teléfono guardado.</small>
+            )}
             {!estado.error && !estado.listo && (
               <small className="campo-ayuda">
                 Es por donde te contactamos cuando hacés un pedido.
@@ -98,12 +107,6 @@ const Profile = () => {
             )}
           </form>
 
-          <div className="info-group">
-            <span className="info-label">Rol:</span>
-            <span className="info-value profile-role">
-              {isAdmin ? "Administrador" : "Comprador"}
-            </span>
-          </div>
           <div className="info-group">
             <span className="info-label">Tema:</span>
             <div className="info-value">

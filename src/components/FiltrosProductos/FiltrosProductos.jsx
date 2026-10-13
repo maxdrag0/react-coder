@@ -31,6 +31,14 @@ const FiltrosProductos = ({
 }) => {
   const [abierto, setAbierto] = useState(false);
 
+  // Elegir categoria navega y cambia el listado: es la accion final, asi que
+  // cierra el panel. Las marcas y el precio se eligen varias seguidas y no
+  // cierran; para esas esta el boton "Ver N productos".
+  const elegirCategoria = (c) => {
+    onCategoria(c);
+    setAbierto(false);
+  };
+
   const hayFiltros =
     Boolean(categoria) || marcasElegidas.length > 0 || rango[1] < precioMax;
 
@@ -67,7 +75,7 @@ const FiltrosProductos = ({
               <button
                 type="button"
                 className={`filtro-opcion ${!categoria ? "activa" : ""}`}
-                onClick={() => onCategoria(null)}
+                onClick={() => elegirCategoria(null)}
                 aria-pressed={!categoria}
               >
                 Todas
@@ -78,7 +86,7 @@ const FiltrosProductos = ({
                 <button
                   type="button"
                   className={`filtro-opcion ${categoria === c ? "activa" : ""}`}
-                  onClick={() => onCategoria(c)}
+                  onClick={() => elegirCategoria(c)}
                   aria-pressed={categoria === c}
                 >
                   {c}
@@ -143,7 +151,14 @@ const FiltrosProductos = ({
 
         <div className="filtros-pie">
           {hayFiltros && (
-            <button type="button" className="boton boton-fantasma" onClick={onLimpiar}>
+            <button
+              type="button"
+              className="boton boton-fantasma"
+              onClick={() => {
+                onLimpiar();
+                setAbierto(false);
+              }}
+            >
               Limpiar filtros
             </button>
           )}

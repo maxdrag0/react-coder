@@ -141,3 +141,22 @@
   color: var(--gold);
   font-variant-numeric: tabular-nums;
 }
+
+/* Un select y no una lista de opciones: un producto con diez colores llenaba
+   la pantalla y empujaba el precio y el boton de comprar abajo del todo. */
+.detalle-modelo {
+  display: grid;
+  gap: var(--e-2);
+  max-width: 22rem;
+}
+
+.detalle-modelo label {
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.detalle-modelo select.campo-control {
+  min-height: 44px;
+  padding: var(--e-2) var(--e-3);
+}

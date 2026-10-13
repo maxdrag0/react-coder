@@ -10,60 +10,81 @@ import "./Precio.css";
 
 /*
   El dorado va en el precio por unidad: es el único que todos los productos
-  tienen. Display y bulto son opcionales desde que se cargan por
-  presentación, así que acentuar el bulto dejaba sin acento a los productos
-  que solo se venden por unidad.
+  tienen. Display y bulto son opcionales desde que se cargan por presentación,
+  así que acentuar el bulto dejaba sin acento a los productos que solo se
+  venden por unidad.
 
   Recibe el producto entero y no precios sueltos: las presentaciones viven en
   el producto, y pasarlas de a tres números perdía las cantidades.
 
-  La cantidad se muestra solo si el producto la dice. Los del esquema viejo
-  no la tienen, y antes se deducía dividiendo precios: un display de $15.000
-  con unidad a $8.000 mostraba "×2" cuando traía 5.
+  `compacto` es el modo de las cards del catálogo: un precio grande y una sola
+  línea chica con el resto. Tres filas de etiqueta y valor pesaban demasiado
+  para una grilla y hacían que cada card terminara a una altura distinta.
+
+  La cantidad se muestra solo si el producto la dice. Los del esquema viejo no
+  la tienen, y antes se deducía dividiendo precios: un display de $15.000 con
+  unidad a $8.000 mostraba "×2" cuando traía 5.
 */
 const Precio = ({ item, compacto = false }) => {
-  /*
-    Un producto con modelos no tiene precio propio: el precio vive en cada
-    modelo. La card muestra el piso del rango, porque elegir el modelo es algo
-    que pasa dentro del producto y no en la grilla.
-
-    Sin esto la card no mostraria ningun precio, porque unidadesDisponibles
-    devuelve vacio mientras no haya un modelo elegido.
-  */
+  // Un producto con modelos no tiene precio propio: el precio vive en cada
+  // modelo, y elegirlo pasa dentro del producto y no en la grilla.
   if (tieneModelos(item)) {
     const rango = rangoUnitario(item);
     if (!rango) return null;
 
+    const desde = rango.min !== rango.max;
+
     return (
-      <dl className="precio">
-        <div className="precio-fila precio-unitario">
-          <dt>{rango.min === rango.max ? "unidad" : "desde"}</dt>
-          <dd>{formatearPrecio(rango.min)}</dd>
-        </div>
-      </dl>
+      <div className="precio">
+        <p className="precio-principal">
+          {desde && <span className="precio-desde">desde</span>}
+          {formatearPrecio(rango.min)}
+        </p>
+      </div>
     );
   }
 
-  const filas = unidadesDisponibles(item)
-    .filter((u) => !(compacto && u.clave === "display"))
-    .map((u) => ({
-      clave: u.clave,
-      etiqueta: u.etiqueta.toLowerCase(),
-      texto: formatearPrecio(precioDe(item, u.clave)),
-      trae: unidadesQueTrae(item, u.clave),
-    }));
+  const disponibles = unidadesDisponibles(item);
+  const unitario = disponibles.find((u) => u.clave === "unitario");
+  if (!unitario) return null;
 
-  if (filas.length === 0) return null;
+  const otras = disponibles.filter((u) => u.clave !== "unitario");
+
+  if (compacto) {
+    return (
+      <div className="precio">
+        <p className="precio-principal">{formatearPrecio(precioDe(item, "unitario"))}</p>
+
+        {otras.length > 0 && (
+          <p className="precio-otras">
+            {otras
+              .map((u) => {
+                const trae = unidadesQueTrae(item, u.clave);
+                const cantidad = trae ? ` ×${trae}` : "";
+                return `${u.etiqueta.toLowerCase()} ${formatearPrecio(
+                  precioDe(item, u.clave)
+                )}${cantidad}`;
+              })
+              .join(" · ")}
+          </p>
+        )}
+      </div>
+    );
+  }
 
   return (
     <dl className="precio">
-      {filas.map((f) => (
-        <div key={f.clave} className={`precio-fila precio-${f.clave}`}>
-          <dt>{f.etiqueta}</dt>
-          <dd>{f.texto}</dd>
-          {f.trae && <span className="precio-mult">×{f.trae}</span>}
-        </div>
-      ))}
+      {disponibles.map((u) => {
+        const trae = unidadesQueTrae(item, u.clave);
+
+        return (
+          <div key={u.clave} className={`precio-fila precio-${u.clave}`}>
+            <dt>{u.etiqueta.toLowerCase()}</dt>
+            <dd>{formatearPrecio(precioDe(item, u.clave))}</dd>
+            {trae && <span className="precio-mult">×{trae}</span>}
+          </div>
+        );
+      })}
     </dl>
   );
 };

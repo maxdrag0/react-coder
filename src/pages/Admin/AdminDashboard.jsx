@@ -157,13 +157,25 @@ const AdminDashboard = () => {
       ),
     }));
 
-  // id en null: se genera al guardar, a partir del nombre que se escriba.
+  /*
+    id en null: el definitivo se genera al guardar, a partir del nombre.
+
+    `temporal` es solo para la key de React mientras el modelo vive en el
+    formulario: sin un identificador estable, borrar un modelo hacia que los
+    de abajo heredaran el DOM del anterior. No se guarda en Firestore.
+  */
   const agregarModelo = () =>
     setFormulario((actual) => ({
       ...actual,
       modelos: [
         ...actual.modelos,
-        { id: null, etiqueta: "", precio: "", presentaciones: {} },
+        {
+          id: null,
+          temporal: crypto.randomUUID(),
+          etiqueta: "",
+          precio: "",
+          presentaciones: {},
+        },
       ],
     }));
 
@@ -200,13 +212,19 @@ const AdminDashboard = () => {
     Un solo handler para los tres casos del modelo: un File lo deja pendiente
     de subir, "quitar" borra la que ya tenia, y null cancela la pendiente.
   */
+  /*
+    Tres acciones explicitas, ninguna implicita:
+      "quitar"   borra la foto guardada
+      "cancelar" descarta la que se eligio y todavia no se subio
+      un File    la deja pendiente de subir
+  */
   const cambiarFotoModelo = (indice, valor) =>
     setFormulario((actual) => ({
       ...actual,
       modelos: actual.modelos.map((m, i) => {
         if (i !== indice) return m;
         if (valor === "quitar") return { ...m, foto: "", archivoNuevo: null };
-        if (valor === null) return { ...m, archivoNuevo: null };
+        if (valor === "cancelar") return { ...m, archivoNuevo: null };
         return { ...m, archivoNuevo: valor };
       }),
     }));

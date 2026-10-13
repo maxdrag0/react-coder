@@ -36,10 +36,18 @@ describe("Precio: qué filas muestra", () => {
     expect(screen.getByText("bulto")).toBeInTheDocument();
   });
 
-  it("en modo compacto esconde el display", () => {
-    render(<Precio item={viejo(270, 27000, 270000)} compacto />);
-    expect(screen.queryByText("display")).toBeNull();
-    expect(screen.getByText("bulto")).toBeInTheDocument();
+  it("en modo compacto destaca el unitario y junta el resto en una línea", () => {
+    // Es el modo de las cards: tres filas de etiqueta y valor pesaban
+    // demasiado en una grilla.
+    const { container } = render(<Precio item={viejo(270, 27000, 270000)} compacto />);
+
+    expect(container.querySelector(".precio-principal").textContent).toContain("270");
+
+    const otras = container.querySelector(".precio-otras").textContent;
+    expect(otras).toContain("27.000");
+    expect(otras).toContain("270.000");
+    // Las filas con <dt>/<dd> son del modo completo.
+    expect(container.querySelector(".precio-fila")).toBeNull();
   });
 
   it("no explota sin producto", () => {
@@ -89,17 +97,20 @@ describe("Precio: productos con modelos", () => {
     expect(screen.getByText("$8.000")).toBeInTheDocument();
   });
 
-  it("dice 'unidad' y no 'desde' si todos los modelos cuestan igual", () => {
-    render(<Precio item={conModelos([8000, 8000])} />);
-    expect(screen.getByText("unidad")).toBeInTheDocument();
+  it("no dice 'desde' si todos los modelos cuestan igual", () => {
+    // Con un solo precio posible, "desde" sobra: no hay un rango.
+    const { container } = render(<Precio item={conModelos([8000, 8000])} />);
     expect(screen.queryByText("desde")).toBeNull();
+    expect(container.querySelector(".precio-principal").textContent).toContain(
+      "8.000"
+    );
   });
 
   it("muestra algo: sin esto la card quedaba sin precio", () => {
     // unidadesDisponibles devuelve vacio mientras no haya modelo elegido, y
     // la card no renderizaba ningun precio.
     const { container } = render(<Precio item={conModelos([8000])} />);
-    expect(container.querySelector(".precio-fila")).toBeInTheDocument();
+    expect(container.querySelector(".precio-principal")).toBeInTheDocument();
   });
 
   it("no renderiza nada si ningun modelo tiene precio unitario", () => {

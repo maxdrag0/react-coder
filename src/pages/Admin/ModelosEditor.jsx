@@ -76,8 +76,8 @@ const FotoModelo = ({ indice, modelo, onFoto }) => (
         <button
           type="button"
           className="fotos-quitar"
-          onClick={() => onFoto(indice, null)}
-          aria-label="No subir esta foto"
+          onClick={() => onFoto(indice, "cancelar")}
+          aria-label={`No subir ${modelo.archivoNuevo.name}`}
         >
           <X size={14} />
         </button>
@@ -89,7 +89,7 @@ const FotoModelo = ({ indice, modelo, onFoto }) => (
           type="button"
           className="fotos-quitar"
           onClick={() => onFoto(indice, "quitar")}
-          aria-label="Quitar la foto de este modelo"
+          aria-label={`Quitar la foto del modelo ${modelo.etiqueta || indice + 1}`}
         >
           <X size={14} />
         </button>
@@ -103,7 +103,13 @@ const FotoModelo = ({ indice, modelo, onFoto }) => (
         type="file"
         accept="image/*"
         onChange={(e) => {
-          onFoto(indice, e.target.files[0] ?? null);
+          /*
+            Solo se avisa si REALMENTE se eligio un archivo. Cancelar el
+            selector deja files vacio, y tratarlo como un cambio borraba la
+            foto que se acababa de elegir.
+          */
+          const elegido = e.target.files?.[0];
+          if (elegido) onFoto(indice, elegido);
           e.target.value = "";
         }}
       />
@@ -132,7 +138,11 @@ const ModelosEditor = ({
     )}
 
     {modelos.map((m, i) => (
-      <fieldset key={m.id ?? `nuevo-${i}`} className="modelo">
+      // La key NO puede salir del indice: al borrar un modelo los de abajo
+      // cambian de indice y React empareja su DOM con el del anterior, asi
+      // que la foto aparecia en el modelo equivocado. Un modelo nuevo trae su
+      // propio id temporal desde que se agrega.
+      <fieldset key={m.id || m.temporal} className="modelo">
         <legend>Modelo {i + 1}</legend>
 
         <button

@@ -18,6 +18,16 @@ const COMPLETO = {
 
 const SIN_FOTO = { ...COMPLETO, fotoUrl: "" };
 
+const conModelos = (cuantos) => ({
+  codigo: "H02",
+  nombre: "Bengala de humo",
+  modelos: Array.from({ length: cuantos }, (_, i) => ({
+    id: `m${i}`,
+    etiqueta: `Color ${i}`,
+    presentaciones: { unitario: { precio: 8000 + i * 1000 } },
+  })),
+});
+
 const montar = (item) =>
   render(
     <MemoryRouter>
@@ -25,35 +35,110 @@ const montar = (item) =>
     </MemoryRouter>
   );
 
-describe("Item", () => {
-  it("muestra el nombre, la categoría y la duración", () => {
+describe("Item: qué muestra", () => {
+  it("muestra el nombre", () => {
     montar(COMPLETO);
     expect(screen.getByText("Torta 100 tiros")).toBeInTheDocument();
-    expect(screen.getByText(/Tortas/)).toBeInTheDocument();
-    expect(screen.getByText(/45 seg/)).toBeInTheDocument();
   });
 
-  it("muestra los tres precios", () => {
-    montar(COMPLETO);
-    expect(screen.getByText("$4.500")).toBeInTheDocument();
-    expect(screen.getByText("$45.000")).toBeInTheDocument();
-    expect(screen.getByText("$390.000")).toBeInTheDocument();
+  it("NO muestra marca, categoría ni duración", () => {
+    // Se quitaron de la card a propósito: en una grilla son datos que no
+    // deciden nada. Viven en el detalle, con la descripción.
+    montar({ ...COMPLETO, marca: "Punto Austral" });
+    expect(screen.queryByText(/Tortas/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/45 seg/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Punto Austral/)).not.toBeInTheDocument();
+  });
+
+  it("NO muestra el stock", () => {
+    // Mientras no esté definido si el stock se cuenta por unidad, display o
+    // bulto, cualquier número sería engañoso.
+    montar({ ...COMPLETO, stock: 4 });
+    expect(screen.queryByText(/stock|últimas/i)).not.toBeInTheDocument();
   });
 
   it("la card entera es un link al detalle", () => {
     montar(COMPLETO);
-    const link = screen.getByRole("link", { name: /Torta 100 tiros/ });
-    expect(link).toHaveAttribute("href", "/product/201");
+    expect(screen.getByRole("link", { name: /Torta 100 tiros/ })).toHaveAttribute(
+      "href",
+      "/product/201"
+    );
+  });
+});
+
+describe("Item: el precio", () => {
+  it("destaca el de por unidad y pone el resto en una línea chica", () => {
+    // Tres filas de etiqueta y valor pesaban demasiado en una grilla, y como
+    // el número de filas cambia por producto, cada card terminaba a una
+    // altura distinta.
+    const { container } = montar(COMPLETO);
+
+    expect(container.querySelector(".precio-principal").textContent).toContain(
+      "4.500"
+    );
+
+    const otras = container.querySelector(".precio-otras").textContent;
+    expect(otras).toContain("45.000");
+    expect(otras).toContain("390.000");
   });
 
-  it("NO renderiza una imagen con src vacío cuando no hay foto", () => {
+  it("sin display ni bulto no renderiza la línea chica", () => {
+    const { container } = montar({
+      ...COMPLETO,
+      precioDisplay: null,
+      precioBulto: null,
+    });
+    expect(container.querySelector(".precio-principal").textContent).toContain(
+      "4.500"
+    );
+    expect(container.querySelector(".precio-otras")).toBeNull();
+  });
+
+  it("acepta el esquema en inglés igual que el de castellano", () => {
+    const { container } = montar({ codigo: "9", name: "Mortero", price: 1200 });
+    expect(screen.getByText("Mortero")).toBeInTheDocument();
+    expect(container.querySelector(".precio-principal").textContent).toContain(
+      "1.200"
+    );
+  });
+
+  it("con modelos de precios distintos dice 'desde'", () => {
+    montar(conModelos(3));
+    expect(screen.getByText("desde")).toBeInTheDocument();
+  });
+});
+
+describe("Item: los sellos sobre la foto", () => {
+  it("avisa cuántos modelos tiene, que es la razón para entrar", () => {
+    montar(conModelos(2));
+    expect(screen.getByText("2 modelos")).toBeInTheDocument();
+  });
+
+  it("con un solo modelo no avisa nada: no hay nada que elegir", () => {
+    montar(conModelos(1));
+    expect(screen.queryByText(/modelos/)).not.toBeInTheDocument();
+  });
+
+  it("marca el producto sin stock", () => {
+    montar({ ...COMPLETO, estado: "sin_stock" });
+    expect(screen.getByText("Sin stock")).toBeInTheDocument();
+  });
+
+  it("un producto activo no lleva sello de stock", () => {
+    montar({ ...COMPLETO, estado: "activo" });
+    expect(screen.queryByText("Sin stock")).not.toBeInTheDocument();
+  });
+});
+
+describe("Item: sin foto", () => {
+  it("NO renderiza una imagen con src vacío", () => {
     const { container } = montar(SIN_FOTO);
     container.querySelectorAll("img").forEach((img) => {
       expect(img.getAttribute("src")).not.toBe("");
     });
   });
 
-  it("muestra el placeholder de marca cuando no hay foto", () => {
+  it("muestra el placeholder de marca", () => {
     const { container } = montar(SIN_FOTO);
     expect(container.querySelector(".media-vacio")).toBeInTheDocument();
   });
@@ -62,14 +147,10 @@ describe("Item", () => {
     montar(SIN_FOTO);
     expect(screen.queryByText(/no image/i)).not.toBeInTheDocument();
   });
+});
 
-  it("muestra solo el precio unitario si no hay display ni bulto", () => {
-    montar({ ...COMPLETO, precioDisplay: null, precioBulto: null });
-    expect(screen.getByText("$4.500")).toBeInTheDocument();
-    expect(screen.queryByText(/bulto/i)).not.toBeInTheDocument();
-  });
-
-  it("deja que el texto largo se corte en vez de desbordar", () => {
+describe("Item: texto largo", () => {
+  it("deja que el nombre se corte en vez de desbordar", () => {
     const { container } = montar({
       ...COMPLETO,
       nombre: "Petardo El Villerito Nacional Extra Largo De Prueba Para Desborde",
@@ -77,22 +158,9 @@ describe("Item", () => {
     expect(container.querySelector(".item-titulo")).toBeInTheDocument();
   });
 
-  it("tolera un producto sin duración", () => {
+  it("tolera un producto sin duración, sin imprimir null", () => {
     montar({ ...COMPLETO, duracion: null });
     expect(screen.getByText("Torta 100 tiros")).toBeInTheDocument();
     expect(screen.queryByText(/null|undefined/)).not.toBeInTheDocument();
-  });
-
-  it("acepta el esquema en inglés igual que el de castellano", () => {
-    montar({ codigo: "9", name: "Mortero", price: 1200, stock: 4 });
-    expect(screen.getByText("Mortero")).toBeInTheDocument();
-    expect(screen.getByText("$1.200")).toBeInTheDocument();
-  });
-
-  it("NO muestra el stock", () => {
-    // Se quitó a propósito: mientras no esté definido si el stock se cuenta
-    // por unidad, display o bulto, cualquier número sería engañoso.
-    montar({ ...COMPLETO, stock: 4 });
-    expect(screen.queryByText(/stock|últimas/i)).not.toBeInTheDocument();
   });
 });

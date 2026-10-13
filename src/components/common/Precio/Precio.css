@@ -37,3 +37,32 @@
   font-weight: 600;
   color: var(--gold);
 }
+
+/* --- Modo compacto: las cards del catálogo --- */
+
+/* Un precio grande y una línea chica con el resto. Tres filas de etiqueta y
+   valor pesaban demasiado en una grilla, y como el número de filas cambia por
+   producto, cada card terminaba a una altura distinta. */
+.precio-principal {
+  display: flex;
+  align-items: baseline;
+  gap: var(--e-2);
+  margin: 0;
+  font-size: var(--t-lg);
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1.1;
+}
+
+.precio-desde {
+  font-size: var(--t-xs);
+  font-weight: 500;
+  color: var(--text-tenue);
+}
+
+.precio-otras {
+  margin: 0;
+  font-size: var(--t-xs);
+  color: var(--text-suave);
+  overflow-wrap: anywhere;
+}

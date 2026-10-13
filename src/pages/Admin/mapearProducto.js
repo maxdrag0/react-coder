@@ -80,6 +80,9 @@ const modelosAlFormulario = (p) =>
       etiqueta: m.etiqueta,
       precio: pres.unitario?.precio ?? "",
       presentaciones: presentacionesAlFormulario(pres),
+      // Para la key de React, igual que los modelos nuevos: asi sale
+      // siempre del mismo lugar sin importar de donde vino el modelo.
+      temporal: m.id,
       foto: m.foto ?? "",
       archivoNuevo: null,
     };

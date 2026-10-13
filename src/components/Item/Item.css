@@ -2,14 +2,17 @@
   display: flex;
   flex-direction: column;
   background: var(--surface);
+  border: 1px solid var(--gold-linea);
   border-radius: var(--r-card);
-  box-shadow: var(--elev-1);
   overflow: hidden;
   /* Sin min-width:0 el texto largo fuerza scroll horizontal en toda la
      página. Es la falla responsive más visible de una grilla de cards. */
   min-width: 0;
   /* Todas las cards de una fila miden lo mismo: el grid las estira. */
   height: 100%;
+  transition:
+    border-color var(--mov-base),
+    transform var(--mov-base);
 }
 
 .item-link {
@@ -22,9 +25,10 @@
 
 .item-media {
   position: relative;
-  aspect-ratio: 4 / 3;
+  /* Más cuadrada que antes: la foto ES el producto, y en pirotecnia lo que
+     se compra se reconoce por la imagen. */
+  aspect-ratio: 1 / 1;
   background: var(--surface-alto);
-  border-radius: var(--r-media);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -33,19 +37,22 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform var(--mov-base);
 }
 
 .item-cuerpo {
   display: flex;
   flex-direction: column;
-  gap: var(--e-2);
+  gap: var(--e-3);
   padding: var(--e-4);
   min-width: 0;
   flex: 1;
 }
 
 .item-titulo {
-  font-size: var(--t-md);
+  font-size: var(--t-sm);
+  font-weight: 500;
+  line-height: 1.35;
   color: var(--text);
   /* Dos líneas siempre, aunque el nombre entre en una: así los precios de
      todas las cards de la fila arrancan a la misma altura. */
@@ -55,28 +62,37 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   overflow-wrap: anywhere;
-  min-height: calc(2 * 1.15em);
+  min-height: calc(2 * 1.35em);
   transition: color var(--mov-rapido);
 }
 
-.item-meta {
-  font-size: var(--t-sm);
-  color: var(--text-suave);
-  margin: 0;
-  min-height: calc(1 * 1.6em);
+/* El precio se va al piso de la card: con nombres de largos distintos, si no,
+   cada card lo muestra a una altura distinta. */
+.item-cuerpo .precio { margin-top: auto; }
+
+/* --- Movimiento --- */
+
+/* Un levante mínimo y un acercamiento de la foto. Es lo único que se mueve, y
+   responde a la acción de la persona: nada se anima solo. */
+.item:hover {
+  border-color: var(--gold-suave);
+  transform: translateY(-2px);
 }
 
-/* El bloque de precios se va al piso de la card: con nombres de largos
-   distintos, si no, cada card los muestra a una altura distinta. */
-.item-cuerpo .precio {
-  margin-top: auto;
-  padding-top: var(--e-2);
-}
+.item:hover .item-media img { transform: scale(1.04); }
 
-/* El único movimiento es un cambio de color: nada de elevarse ni escalar. */
 .item-link:hover .item-titulo,
 .item-link:focus-visible .item-titulo {
   color: var(--gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item,
+  .item-media img {
+    transition: none;
+  }
+  .item:hover { transform: none; }
+  .item:hover .item-media img { transform: none; }
 }
 
 .item:has(.item-link:focus-visible) {
@@ -86,17 +102,28 @@
 
 .item-link:focus-visible { outline: none; }
 
-/* Marca de no disponible sobre la foto. El producto se sigue viendo a
-   propósito: la idea es que el cliente pregunte, no que crea que no existe. */
-.item-agotado {
+/* --- Sellos sobre la foto --- */
+
+/* "Sin stock" arriba a la izquierda. El producto se sigue viendo a propósito:
+   la idea es que el cliente pregunte, no que crea que no existe. */
+.item-sello {
   position: absolute;
   top: var(--e-2);
   left: var(--e-2);
   padding: 2px var(--e-2);
   border-radius: var(--r-pill);
-  background: var(--ground);
+  background: color-mix(in srgb, var(--ground) 86%, transparent);
   color: var(--text-suave);
   font-size: var(--t-xs);
   font-weight: 600;
   border: 1px solid var(--gold-linea);
+  backdrop-filter: blur(4px);
+}
+
+/* El de modelos va a la derecha para no pisar al de sin stock: un producto
+   puede tener los dos. */
+.item-sello-modelos {
+  left: auto;
+  right: var(--e-2);
+  color: var(--gold);
 }

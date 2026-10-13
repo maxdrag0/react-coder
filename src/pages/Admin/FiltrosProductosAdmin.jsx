@@ -8,8 +8,8 @@ const CHIPS = [{ clave: TODOS, etiqueta: "Todos" }, ...ESTADOS];
  * Filtros de la lista de productos del panel.
  *
  * Las listas de categoría y marca salen del catálogo y no de las constantes:
- * ofrecer las 16 categorías cuando se usan 9 son 7 opciones que no devuelven
- * nada.
+ * ofrecer las 16 categorías cuando se usan menos son opciones que no
+ * devuelven nada.
  */
 const FiltrosProductosAdmin = ({
   filtros,
@@ -38,8 +38,8 @@ const FiltrosProductosAdmin = ({
           </button>
         ))}
 
-        {/* 323 productos no tienen foto: es la tarea de contenido más grande
-            que queda, y este botón es cómo se recorre. */}
+        {/* Un producto sin foto no se vende: este botón da la lista exacta
+            de los que falta fotografiar. */}
         <button
           type="button"
           className={`pedidos-chip ${filtros.sinFoto ? "activo" : ""}`}

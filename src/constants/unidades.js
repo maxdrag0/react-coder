@@ -1,4 +1,4 @@
-import { modelosDe, tieneModelos, modeloPorId } from "./modelos";
+import { modelosDe, tieneModelos, modeloPorId } from "./modelos.js";
 
 /*
   Las tres formas en que se compra pirotecnia, y cuántas unidades trae cada
@@ -8,7 +8,7 @@ import { modelosDe, tieneModelos, modeloPorId } from "./modelos";
   el producto se vende así. Eso es lo que "activa" o "desactiva" el display y
   el bulto, y además guarda cuántas unidades entran.
 
-  Los 323 productos cargados usan el esquema viejo
+  Los productos cargados a granel usan el esquema viejo
   (precioUnitario/precioDisplay/precioBulto), que NO dice cuántas unidades
   trae un display. Antes eso se deducía dividiendo precios, y estaba mal:
   un display de $15.000 con unidad a $8.000 daba "2 unidades" cuando traía 5.
@@ -35,10 +35,11 @@ const esCantidad = (v) => typeof v === "number" && Number.isInteger(v) && v > 1;
 
 /*
   Del esquema viejo se descarta la presentación cuyo precio es igual al
-  unitario: 171 productos tienen `precioDisplay` repetido y 45 el bulto. Son
-  valores por defecto de la carga, no formas de comprar. Ofrecerlos mostraba
-  dos opciones idénticas en el selector, y quien elegía "Display" pagaba una
-  unidad mientras el pedido decía Display, así que se despachaba un display.
+  unitario. La carga a granel dejó el precio del display y del bulto repetido
+  del unitario en buena parte del catálogo: son valores por defecto, no formas
+  de comprar. Ofrecerlos mostraba dos opciones idénticas en el selector, y
+  quien elegía "Display" pagaba una unidad mientras el pedido decía Display,
+  así que se despachaba un display.
 */
 const desdeEsquemaViejo = (item) => {
   const unitario = esPrecio(item.precioUnitario)

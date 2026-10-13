@@ -51,9 +51,9 @@ const textoOpcional = (v) => v?.trim() || null;
 
 /*
   Se prellena con presentacionesDe y no con los campos crudos, así el
-  formulario muestra lo que la tienda REALMENTE ofrece. Importa: 171 productos
-  tienen precioDisplay igual al unitario y la tienda los ignora, así que esos
-  aparecen destildados y se ve que hay que arreglarlos.
+  formulario muestra lo que la tienda REALMENTE ofrece. Importa: un producto
+  con el precio de display repetido del unitario lo tiene ignorado por la
+  tienda, así que aparece destildado y se ve que hay que arreglarlo.
 */
 const presentacionesAlFormulario = (pres) => {
   const form = {};

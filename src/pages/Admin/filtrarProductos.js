@@ -79,8 +79,8 @@ export const contarEstadosProducto = (productos) => {
 
 /*
   Las listas de los selectores salen del catalogo y no de las constantes:
-  ofrecer las 16 categorias cuando se usan 9 son 7 opciones que no devuelven
-  nada.
+  ofrecer las 16 categorias cuando se usan menos son opciones que no
+  devuelven nada.
 */
 export const categoriasPresentes = (productos) =>
   [...new Set(productos.map(categoriaDe).filter(Boolean))].sort((a, b) =>

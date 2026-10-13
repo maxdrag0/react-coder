@@ -62,7 +62,7 @@ const FotosEditor = ({ fotos, archivos, onQuitarFoto, onArchivos, onQuitarArchiv
 
     <small className="campo-ayuda">
       La primera es la que se ve en el catálogo. JPG o PNG, hasta 5 MB cada
-      una; conviene que pesen poco porque el plan gratuito da 1 GB de descarga
+      una; conviene que pesen poco, porque el plan gratuito da 1 GB de descarga
       por día para todo el catálogo.
     </small>
   </div>

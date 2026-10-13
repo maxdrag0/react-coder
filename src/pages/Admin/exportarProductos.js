@@ -15,9 +15,9 @@ import { modelosDe } from "@/constants/modelos";
   fueran "$ 8.000" Excel los leeria como texto y no se podrian sumar.
 
   Los precios salen de presentacionesDe y no de los campos crudos, asi la
-  planilla dice lo que la tienda realmente ofrece. Importa: 171 productos
-  tienen precioDisplay igual al unitario y la tienda lo ignora, asi que
-  exportarlo afirmaria que se vende de una forma en que no se vende.
+  planilla dice lo que la tienda realmente ofrece: un display con el precio
+  repetido del unitario esta ignorado por la tienda, y exportarlo afirmaria
+  que se vende de una forma en que no se vende.
 */
 
 const COLUMNAS = [

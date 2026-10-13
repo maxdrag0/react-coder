@@ -1,4 +1,4 @@
-import { modelosDe, modeloPorId } from "./modelos";
+import { modelosDe, modeloPorId } from "./modelos.js";
 
 /*
   Fotos de un producto.
@@ -7,9 +7,9 @@ import { modelosDe, modeloPorId } from "./modelos";
   (`foto`). Es lo que piden las bengalas: una foto por color, y además varias
   fotos generales del producto.
 
-  Los 323 productos cargados tienen una sola foto en `fotoUrl` (y el panel
-  escribia `image` en paralelo con el mismo valor), asi que eso se sigue
-  leyendo y no hay migracion.
+  Los productos del esquema viejo tienen una sola foto en `fotoUrl` (y el
+  panel escribia `image` en paralelo con el mismo valor), asi que eso se
+  sigue leyendo y no hay migracion.
 */
 
 const esUrl = (v) => typeof v === "string" && v.trim() !== "";

@@ -2,11 +2,11 @@
  * Caché del catálogo completo.
  *
  * El buscador y los filtros corren en el cliente, así que necesitan todos los
- * productos. Traerlos en cada visita son 321 lecturas de Firestore por
- * persona, y el plan gratuito da 50.000 por día: unas 150 visitas.
+ * productos. Traerlos en cada visita cuesta una lectura de Firestore por
+ * producto y por persona, y el plan gratuito da 50.000 por día.
  *
- * Con caché son 321 lecturas por sesión y cero en cada navegación posterior.
- * Alguien que mira veinte productos pasa de 6.420 lecturas a 321.
+ * Con caché es una vuelta por sesión y cero en cada navegación posterior:
+ * quien mira veinte productos pasa de veinte barridos del catálogo a uno.
  */
 
 const CLAVE = "catalogo";

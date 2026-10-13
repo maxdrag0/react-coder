@@ -17,9 +17,9 @@ import "./Precio.css";
   Recibe el producto entero y no precios sueltos: las presentaciones viven en
   el producto, y pasarlas de a tres números perdía las cantidades.
 
-  La cantidad se muestra solo si el producto la dice. Los 323 productos del
-  esquema viejo no la tienen, y antes se deducía dividiendo precios: un
-  display de $15.000 con unidad a $8.000 mostraba "×2" cuando traía 5.
+  La cantidad se muestra solo si el producto la dice. Los del esquema viejo
+  no la tienen, y antes se deducía dividiendo precios: un display de $15.000
+  con unidad a $8.000 mostraba "×2" cuando traía 5.
 */
 const Precio = ({ item, compacto = false }) => {
   /*

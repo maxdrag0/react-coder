@@ -6,13 +6,15 @@ import CarritoCard from "../../components/CarritoCard/CarritoCard";
 import { useNavigate, Link } from "react-router-dom";
 import Modal from "../../components/common/Modal/Modal";
 import "./Carrito.css";
-import { services } from "../../services";
+import { enviarOrden } from "@/services/api/ordenes";
+import Reconciliar from "./Reconciliar";
 import { usePerfil } from "@/hooks/usePerfil";
 import { errorDeTelefono, soloDigitos } from "@/utils/telefono";
 import { formatearTotal } from "@/utils/formatearPrecio";
 
 function Carrito() {
-  const { removeList, cartList, total } = useContext(CartContext);
+  const { removeList, cartList, total, actualizarPrecio, deleteItem } =
+    useContext(CartContext);
   const { user } = useAuth();
   const { perfil, cargando: cargandoPerfil, guardar: guardarPerfil } = usePerfil();
 
@@ -25,7 +27,71 @@ function Carrito() {
   const [showModal, setShowModal] = useState(false);
   const [orderId, setOrderId] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [problemas, setProblemas] = useState([]);
+  const [errorEnvio, setErrorEnvio] = useState("");
   const navigate = useNavigate();
+
+  // El renglón que el servidor identifica por código + modelo + unidad es el
+  // mismo que el carrito identifica por su clave.
+  const claveDe = (p) =>
+    cartList.find(
+      (i) => i.codigo === p.codigo && (i.modelo ?? null) === (p.modelo ?? null)
+    )?.clave;
+
+  /*
+    Aplica lo que el servidor dijo: los precios se corrigen y los renglones
+    que ya no se pueden comprar se van. Después el cliente confirma.
+  */
+  const reconciliar = (lista) => {
+    for (const p of lista) {
+      const clave = claveDe(p);
+      if (!clave) continue;
+      if (p.tipo === "precio_cambio") actualizarPrecio(clave, p.ahora);
+      else deleteItem(clave);
+    }
+  };
+
+  /*
+    Manda el pedido. Nunca el total: el servidor lo calcula leyendo el
+    catálogo, que es lo que impide que un carrito manipulado se cobre solo.
+  */
+  const mandar = async () => {
+    setIsProcessing(true);
+    setErrorEnvio("");
+    setProblemas([]);
+
+    try {
+      const items = cartList.map((i) => ({
+        codigo: i.codigo,
+        unidad: i.unidad,
+        modelo: i.modelo ?? null,
+        cantidad: i.cantidad,
+        // El precio que el cliente TIENE A LA VISTA. No entra en el total: el
+        // servidor lo usa para poder decir qué cambió.
+        precioVisto: i.precioElegido,
+      }));
+
+      const { id } = await enviarOrden({
+        items,
+        telefono: perfil?.telefono ? undefined : telefono,
+      });
+
+      setOrderId(id);
+      setShowModal(true);
+    } catch (error) {
+      if (error.code === "carrito-desactualizado") {
+        reconciliar(error.problemas);
+        setProblemas(error.problemas);
+      } else if (error.code === "sin_telefono") {
+        setErrorTelefono("Necesitamos tu teléfono para coordinar el pedido.");
+      } else {
+        console.error("Error al enviar el pedido:", error);
+        setErrorEnvio(error.message);
+      }
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   const handleProcesarCompra = async () => {
     if (!user) {
@@ -33,45 +99,15 @@ function Carrito() {
       return;
     }
 
-    let telefonoFinal = perfil?.telefono ?? "";
-
-    if (!telefonoFinal) {
+    if (!perfil?.telefono) {
       const malo = errorDeTelefono(telefono);
       if (malo) return setErrorTelefono(malo);
-      telefonoFinal = soloDigitos(telefono);
+      // Queda guardado para que no lo tenga que escribir la próxima vez.
+      await guardarPerfil({ telefono: soloDigitos(telefono) });
     }
 
-    setIsProcessing(true);
     setErrorTelefono("");
-
-    const orden = {
-      buyer: {
-        uid: user.uid,
-        name: user.displayName || "Usuario",
-        email: user.email,
-        // Copia y no referencia: si el cliente cambia su telefono mas
-        // adelante, el pedido viejo tiene que seguir mostrando el que dio.
-        telefono: telefonoFinal,
-      },
-      items: cartList,
-      total: total,
-      date: new Date().toISOString(),
-    };
-    try {
-      // Queda guardado para que no lo tenga que escribir la proxima vez.
-      if (!perfil?.telefono) await guardarPerfil({ telefono: telefonoFinal });
-
-      const id = await services.firebase.crearCompra(orden);
-
-      setOrderId(id);
-
-      setShowModal(true);
-    } catch (error) {
-      console.error("Error al procesar:", error);
-      alert("Error al guardar la compra");
-    } finally {
-      setIsProcessing(false);
-    }
+    await mandar();
   };
 
   const handleCerrarYFinalizar = () => {
@@ -101,6 +137,23 @@ function Carrito() {
           </div>
 
           <aside className="carrito-resumen">
+            {problemas.length > 0 && (
+              <Reconciliar
+                problemas={problemas}
+                onConfirmar={() => {
+                  setProblemas([]);
+                  mandar();
+                }}
+                onCancelar={() => setProblemas([])}
+              />
+            )}
+
+            {errorEnvio && (
+              <p className="campo-error carrito-error" role="alert">
+                {errorEnvio}
+              </p>
+            )}
+
             <div className="carrito-total">
               <span>Total</span>
               <strong>{formatearTotal(total)}</strong>

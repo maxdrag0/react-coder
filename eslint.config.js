@@ -32,6 +32,7 @@ export default defineConfig([
     // `__dirname` y compania se reportan como no definidos.
     files: [
       '*.config.js',
+      'api/**/*.js',
       'scripts/**/*.{js,mjs}',
       'tests/**/*.{js,jsx}',
     ],

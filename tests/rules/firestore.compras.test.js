@@ -1,6 +1,6 @@
 import { describe, it, beforeAll, afterAll, afterEach } from "vitest";
 import { assertFails, assertSucceeds } from "@firebase/rules-unit-testing";
-import { collection, doc, getDoc, getDocs, setDoc, addDoc, deleteDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, setDoc, addDoc } from "firebase/firestore";
 import { montarEntorno, limpiar } from "./helpers.js";
 
 let env;

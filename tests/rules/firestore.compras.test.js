@@ -65,112 +65,50 @@ describe("compras - lectura", () => {
   });
 });
 
-describe("compras - creación", () => {
-  it("permite crear un pedido propio con forma válida", async () => {
+describe("compras - creación: cerrada al cliente", () => {
+  /*
+    Las ordenes las crea api/orden.js con el Admin SDK, que saltea las reglas.
+    El cliente NO puede crearlas, y eso es lo que impide que mande un pedido
+    con el total que quiera: verificar el total desde las reglas es imposible,
+    porque exigiria un get() por producto del carrito y Firestore topea en 10
+    accesos a documentos por evaluacion.
+
+    Antes habia diez casos validando la forma del documento (date obligatorio,
+    total numerico, maximo de items, email del token). Se fueron con el
+    create: con la puerta cerrada todos pasaban por la misma razon y ninguno
+    probaba ya la regla que decia probar.
+  */
+  it("NIEGA que un cliente cree un pedido, incluso con la forma correcta", async () => {
     const ana = env.authenticatedContext("ana", { email: "ana@mail.com" });
-    await assertSucceeds(addDoc(collection(ana.firestore(), "compras"), orden("ana")));
+    await assertFails(addDoc(collection(ana.firestore(), "compras"), orden("ana")));
   });
 
-  it("NIEGA crear un pedido a nombre de otro uid", async () => {
+  it("NIEGA que un cliente cree un pedido con un id elegido por el", async () => {
+    // addDoc genera el id; setDoc lo elige. Los dos tienen que estar cerrados,
+    // porque el servidor usa el id de idempotencia y un cliente podria querer
+    // pisar un pedido existente.
     const ana = env.authenticatedContext("ana", { email: "ana@mail.com" });
-    await assertFails(addDoc(collection(ana.firestore(), "compras"), orden("beto")));
+    await assertFails(
+      setDoc(doc(ana.firestore(), "compras/elegido-por-el-cliente"), orden("ana"))
+    );
   });
 
-  it("niega crear un pedido anónimo", async () => {
+  it("NIEGA la creacion anonima", async () => {
     const anon = env.unauthenticatedContext();
     await assertFails(addDoc(collection(anon.firestore(), "compras"), orden("ana")));
   });
 
-  it("niega un pedido con items vacío", async () => {
-    const ana = env.authenticatedContext("ana", { email: "ana@mail.com" });
-    await assertFails(
-      addDoc(collection(ana.firestore(), "compras"), orden("ana", { items: [] }))
-    );
-  });
-
-  it("niega un pedido con total negativo", async () => {
-    const ana = env.authenticatedContext("ana", { email: "ana@mail.com" });
-    await assertFails(
-      addDoc(collection(ana.firestore(), "compras"), orden("ana", { total: -500 }))
-    );
-  });
-
-  it("niega un pedido con total que no es número", async () => {
-    const ana = env.authenticatedContext("ana", { email: "ana@mail.com" });
-    await assertFails(
-      addDoc(collection(ana.firestore(), "compras"), orden("ana", { total: "9000" }))
-    );
-  });
-
-  it("niega un pedido con más de 50 items", async () => {
-    const ana = env.authenticatedContext("ana", { email: "ana@mail.com" });
-    const muchos = Array.from({ length: 51 }, (_, i) => ({
-      codigo: `P${i}`, cantidad: 1, precioUnitario: 100,
-    }));
-    await assertFails(
-      addDoc(collection(ana.firestore(), "compras"), orden("ana", { items: muchos }))
-    );
+  it("NIEGA que un admin cree un pedido desde el cliente", async () => {
+    // El panel no crea pedidos: los crea el servidor. Si el admin pudiera,
+    // habria dos caminos de creacion y uno sin validar.
+    const admin = env.authenticatedContext("max", {
+      email: "max@mail.com",
+      admin: true,
+    });
+    await assertFails(addDoc(collection(admin.firestore(), "compras"), orden("max")));
   });
 });
 
-describe("compras - modificación", () => {
-  it("NIEGA que un cliente borre su propio pedido", async () => {
-    await sembrarCompra("c1", "ana");
-    const ana = env.authenticatedContext("ana", { email: "ana@mail.com" });
-    await assertFails(deleteDoc(doc(ana.firestore(), "compras/c1")));
-  });
-
-  it("permite que un admin borre un pedido", async () => {
-    await sembrarCompra("c1", "ana");
-    const admin = env.authenticatedContext("max", { admin: true });
-    await assertSucceeds(deleteDoc(doc(admin.firestore(), "compras/c1")));
-  });
-});
-
-// --- Hallazgos de la revision final ---
-
-describe("compras - forma del documento (Important 2 y 3)", () => {
-  it("NIEGA un pedido sin date (quedaria invisible en el panel para siempre)", async () => {
-    // obtenerTodasLasCompras ordena por date, y Firestore omite en silencio
-    // los documentos que no tienen el campo del orderBy: el cliente ve
-    // "compra exitosa" y Max nunca ve el pedido.
-    const sinDate = orden("ana");
-    delete sinDate.date;
-    const ana = env.authenticatedContext("ana", { email: "ana@mail.com" });
-    await assertFails(addDoc(collection(ana.firestore(), "compras"), sinDate));
-  });
-
-  it("NIEGA un pedido con campos no declarados en el esquema", async () => {
-    const ana = env.authenticatedContext("ana", { email: "ana@mail.com" });
-    await assertFails(
-      addDoc(collection(ana.firestore(), "compras"), orden("ana", { basura: "x".repeat(500 * 1024) }))
-    );
-  });
-
-  it("NIEGA falsificar el email del comprador", async () => {
-    // El subproyecto C va a mandar el mail del pedido a buyer.email.
-    const ana = env.authenticatedContext("ana", { email: "ana@mail.com" });
-    await assertFails(
-      addDoc(collection(ana.firestore(), "compras"), {
-        ...orden("ana"),
-        buyer: { uid: "ana", name: "Ana", email: "victima@otrodominio.com" },
-      })
-    );
-  });
-
-  it("permite el pedido cuando buyer.email coincide con el del token", async () => {
-    const ana = env.authenticatedContext("ana", { email: "ana@mail.com" });
-    await assertSucceeds(addDoc(collection(ana.firestore(), "compras"), orden("ana")));
-  });
-
-  it("NIEGA el pedido si el token no trae email", async () => {
-    // Solo usamos email/password y Google, que siempre traen email. Este test
-    // documenta el limite: si se agrega un proveedor sin email (telefono,
-    // anonimo), el checkout se rompe y hay que revisar esta regla.
-    const sinEmail = env.authenticatedContext("ana");
-    await assertFails(addDoc(collection(sinEmail.firestore(), "compras"), orden("ana")));
-  });
-});
 
 describe("compras - aislamiento por otras formas de consulta (Important 9)", () => {
   it("NIEGA la consulta de grupo de coleccion", async () => {

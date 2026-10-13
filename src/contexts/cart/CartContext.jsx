@@ -97,6 +97,16 @@ const CartContextProvider = ({ children }) => {
     );
   };
 
+  /*
+    Cambia el precio de un renglón sin tocar nada más. La usa la pantalla de
+    reconciliación: cuando el servidor avisa que un precio cambió, el renglón
+    se queda en el carrito con el precio nuevo.
+  */
+  const actualizarPrecio = (clave, precio) =>
+    setCartList((actual) =>
+      actual.map((i) => (i.clave === clave ? { ...i, precioElegido: precio } : i))
+    );
+
   const removeList = () => setCartList([]);
 
   const deleteItem = (clave) =>
@@ -110,6 +120,7 @@ const CartContextProvider = ({ children }) => {
         cantidadItems,
         addToCart,
         updateQuantity,
+        actualizarPrecio,
         removeList,
         deleteItem,
       }}

@@ -1,0 +1,79 @@
+.confirmar-fondo {
+  position: fixed;
+  inset: 0;
+  /* Arriba del modal de producto (100): se puede pedir confirmación desde
+     adentro de un modal. */
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--e-4);
+  background: rgba(14, 23, 38, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.confirmar {
+  display: grid;
+  gap: var(--e-3);
+  justify-items: start;
+  width: 100%;
+  max-width: 26rem;
+  padding: var(--e-5);
+  background: var(--surface);
+  border: 1px solid var(--gold-linea);
+  border-radius: var(--r-card);
+  box-shadow: var(--elev-2);
+}
+
+.confirmar-icono {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-pill);
+  background: var(--surface-alto);
+  color: var(--text-suave);
+}
+
+.confirmar-icono.peligro {
+  background: var(--danger-fondo);
+  color: var(--danger);
+}
+
+.confirmar h2 {
+  margin: 0;
+  font-size: var(--t-lg);
+}
+
+.confirmar-mensaje {
+  margin: 0;
+  color: var(--text-suave);
+  font-size: var(--t-sm);
+}
+
+/* Las consecuencias, una por línea. En un window.confirm iban todas apiladas
+   con saltos de línea y no se leían. */
+.confirmar-detalles {
+  margin: 0;
+  padding-left: var(--e-4);
+  display: grid;
+  gap: var(--e-1);
+  font-size: var(--t-sm);
+  color: var(--text-suave);
+}
+
+.confirmar-botones {
+  display: flex;
+  gap: var(--e-3);
+  width: 100%;
+  margin-top: var(--e-2);
+}
+
+.confirmar-botones .boton { flex: 1; }
+
+@media (min-width: 480px) {
+  .confirmar-botones {
+    justify-content: flex-end;
+  }
+  .confirmar-botones .boton { flex: 0 0 auto; }
+}

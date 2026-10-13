@@ -35,6 +35,8 @@ import TablaPedidos from "./TablaPedidos";
 import TablaMensajes from "./TablaMensajes";
 import BarraSeleccion from "./BarraSeleccion";
 import FiltrosPedidos from "./FiltrosPedidos";
+import Confirmar from "../../components/common/Confirmar/Confirmar";
+import { useConfirmacion } from "../../hooks/useConfirmacion";
 import { filtrarPedidos, contarPorEstado, ABIERTOS } from "./filtrarPedidos";
 import { descargarCsv } from "./exportarProductos";
 import FiltrosProductosAdmin from "./FiltrosProductosAdmin";
@@ -75,6 +77,11 @@ const AdminDashboard = () => {
   const [enLote, setEnLote] = useState(false);
 
   // "Abiertos" por defecto: al entrar, lo que importa es que falta hacer.
+  // Confirmaciones propias: el dialogo del navegador bloquea el hilo, no se
+  // puede estilar, en celular aparece pegado arriba con la URL del sitio, y
+  // algunos navegadores lo suprimen si se repite.
+  const confirmacion = useConfirmacion();
+
   const [filtroEstado, setFiltroEstado] = useState(ABIERTOS);
   const [filtroTexto, setFiltroTexto] = useState("");
 
@@ -199,19 +206,20 @@ const AdminDashboard = () => {
           p.items?.some((i) => i.codigo === original)
         ).length;
 
-        const aviso = [
-          `Vas a mover el producto de "${original}" a "${codigo}".`,
-          "",
-          "El codigo es el identificador en la base, asi que:",
-          "- cualquier link al producto con el codigo viejo deja de andar",
-          cuantos > 0
-            ? `- ${cuantos} pedido${cuantos === 1 ? "" : "s"} ya hecho${cuantos === 1 ? "" : "s"} guarda el codigo viejo`
-            : "- ningun pedido hecho lo referencia",
-          "",
-          "¿Seguis?",
-        ].join("\n");
+        const acepta = await confirmacion.pedir({
+          titulo: "Cambiar el código del producto",
+          mensaje: `Se va a mover de "${original}" a "${codigo}". El código es el identificador en la base, así que mover el producto deja atrás lo que apuntaba al viejo.`,
+          detalles: [
+            "Cualquier link al producto con el código viejo deja de funcionar.",
+            cuantos > 0
+              ? `${cuantos} pedido${cuantos === 1 ? "" : "s"} ya hecho${cuantos === 1 ? "" : "s"} guarda el código viejo.`
+              : "Ningún pedido hecho lo referencia.",
+          ],
+          textoConfirmar: "Mover el producto",
+          peligro: true,
+        });
 
-        if (!window.confirm(aviso)) {
+        if (!acepta) {
           setGuardando(false);
           return;
         }
@@ -239,8 +247,23 @@ const AdminDashboard = () => {
   };
 
   const borrarUno = async (codigo) => {
-    if (!window.confirm("¿Eliminar este producto? No se puede deshacer."))
-      return;
+    const nombre =
+      productos.find((p) => p.codigo === codigo)?.nombre ??
+      productos.find((p) => p.codigo === codigo)?.name ??
+      codigo;
+
+    const acepta = await confirmacion.pedir({
+      titulo: "Eliminar el producto",
+      // El nombre va en el mensaje: en una tabla de 300 filas conviene saber
+      // cual se esta por borrar antes de confirmar.
+      mensaje: `"${nombre}" se borra de la base y no se puede recuperar.`,
+      detalles: [
+        "Si solo querés que deje de venderse, usá Ocultar: se puede volver atrás.",
+      ],
+      textoConfirmar: "Eliminar",
+      peligro: true,
+    });
+    if (!acepta) return;
     try {
       await eliminarProducto(codigo);
       invalidarCatalogo();
@@ -305,11 +328,17 @@ const AdminDashboard = () => {
 
   const borrarSeleccion = async () => {
     const cuantos = seleccion.size;
-    const mensaje =
-      cuantos === 1
-        ? "¿Eliminar 1 producto? No se puede deshacer."
-        : `¿Eliminar ${cuantos} productos? No se puede deshacer.`;
-    if (!window.confirm(mensaje)) return;
+
+    const acepta = await confirmacion.pedir({
+      titulo: cuantos === 1 ? "Eliminar 1 producto" : `Eliminar ${cuantos} productos`,
+      mensaje: "Se borran de la base y no se pueden recuperar.",
+      detalles: [
+        "Si solo querés que dejen de venderse, usá Ocultar: se puede volver atrás.",
+      ],
+      textoConfirmar: cuantos === 1 ? "Eliminar" : `Eliminar ${cuantos}`,
+      peligro: true,
+    });
+    if (!acepta) return;
 
     setEnLote(true);
     try {
@@ -375,7 +404,13 @@ const AdminDashboard = () => {
   };
 
   const borrarMensaje = async (id) => {
-    if (!window.confirm("¿Eliminar este mensaje?")) return;
+    const acepta = await confirmacion.pedir({
+      titulo: "Eliminar el mensaje",
+      mensaje: "No se puede recuperar.",
+      textoConfirmar: "Eliminar",
+      peligro: true,
+    });
+    if (!acepta) return;
     try {
       await eliminarMensaje(id);
       await cargar();
@@ -508,6 +543,13 @@ const AdminDashboard = () => {
           />
         </div>
       )}
+
+      <Confirmar
+        abierto={Boolean(confirmacion.pedido)}
+        {...(confirmacion.pedido ?? {})}
+        onConfirmar={confirmacion.confirmar}
+        onCancelar={confirmacion.cancelar}
+      />
 
       {modalAbierto && (
         <ProductoModal

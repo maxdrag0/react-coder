@@ -21,7 +21,7 @@ import {
   eliminarMensaje,
   actualizarMensaje,
 } from "../../services/firebase/contactoFirebase";
-import { uploadFile } from "../../services/firebase/storageFirebase";
+import { uploadFile, uploadFiles } from "../../services/firebase/storageFirebase";
 import { invalidarCatalogo } from "../../services/firebase/cacheCatalogo";
 import { estaAbierto } from "../../constants/estadoPedido";
 import {
@@ -69,7 +69,6 @@ const AdminDashboard = () => {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [editando, setEditando] = useState(false);
   const [formulario, setFormulario] = useState(PRODUCTO_VACIO);
-  const [archivo, setArchivo] = useState(null);
   const [guardando, setGuardando] = useState(false);
   const [errorModal, setErrorModal] = useState("");
 
@@ -113,7 +112,6 @@ const AdminDashboard = () => {
 
   const cerrarModal = useCallback(() => {
     setModalAbierto(false);
-    setArchivo(null);
     setErrorModal("");
   }, []);
 
@@ -128,7 +126,6 @@ const AdminDashboard = () => {
   const abrirModal = (producto = null) => {
     setEditando(Boolean(producto));
     setFormulario(producto ? aFormulario(producto) : PRODUCTO_VACIO);
-    setArchivo(null);
     setErrorModal("");
     setModalAbierto(true);
   };
@@ -176,6 +173,44 @@ const AdminDashboard = () => {
       modelos: actual.modelos.filter((_, i) => i !== indice),
     }));
 
+  /*
+    Las fotos elegidas NO se suben al elegirlas: se acumulan en el formulario
+    y se suben al guardar. Subirlas antes dejaria basura en Storage cada vez
+    que alguien abre el modal, cambia de idea y cancela.
+  */
+  const agregarArchivos = (nuevos) =>
+    setFormulario((actual) => ({
+      ...actual,
+      archivosNuevos: [...(actual.archivosNuevos ?? []), ...nuevos],
+    }));
+
+  const quitarArchivo = (indice) =>
+    setFormulario((actual) => ({
+      ...actual,
+      archivosNuevos: actual.archivosNuevos.filter((_, i) => i !== indice),
+    }));
+
+  const quitarFoto = (indice) =>
+    setFormulario((actual) => ({
+      ...actual,
+      fotos: actual.fotos.filter((_, i) => i !== indice),
+    }));
+
+  /*
+    Un solo handler para los tres casos del modelo: un File lo deja pendiente
+    de subir, "quitar" borra la que ya tenia, y null cancela la pendiente.
+  */
+  const cambiarFotoModelo = (indice, valor) =>
+    setFormulario((actual) => ({
+      ...actual,
+      modelos: actual.modelos.map((m, i) => {
+        if (i !== indice) return m;
+        if (valor === "quitar") return { ...m, foto: "", archivoNuevo: null };
+        if (valor === null) return { ...m, archivoNuevo: null };
+        return { ...m, archivoNuevo: valor };
+      }),
+    }));
+
   const cambiarPresentacion = (clave, campo, valor) =>
     setFormulario((actual) => ({
       ...actual,
@@ -190,11 +225,23 @@ const AdminDashboard = () => {
     setGuardando(true);
     setErrorModal("");
     try {
-      const imagen = archivo
-        ? await uploadFile(archivo)
-        : formulario.image || formulario.fotoUrl || "";
+      /*
+        Se sube primero y se escribe despues: si una subida falla, el producto
+        no se guarda a medias con fotos que no existen.
+      */
+      const fotos = [...(formulario.fotos ?? [])];
+      if (formulario.archivosNuevos?.length) {
+        fotos.push(...(await uploadFiles(formulario.archivosNuevos)));
+      }
 
-      const datos = aFirestore(formulario, imagen);
+      const modelos = [];
+      for (const m of formulario.modelos ?? []) {
+        modelos.push(
+          m.archivoNuevo ? { ...m, foto: await uploadFile(m.archivoNuevo) } : m
+        );
+      }
+
+      const datos = aFirestore({ ...formulario, fotos, modelos });
       const codigo = formulario.codigo?.trim();
       const original = formulario.codigoOriginal;
       const cambioElCodigo = editando && codigo !== original;
@@ -560,8 +607,10 @@ const AdminDashboard = () => {
           onModeloPresentacion={cambiarModeloPresentacion}
           onAgregarModelo={agregarModelo}
           onBorrarModelo={borrarModelo}
-          onArchivo={setArchivo}
-          archivo={archivo}
+          onQuitarFoto={quitarFoto}
+          onArchivos={agregarArchivos}
+          onQuitarArchivo={quitarArchivo}
+          onModeloFoto={cambiarFotoModelo}
           esEdicion={editando}
           guardando={guardando}
           error={errorModal}

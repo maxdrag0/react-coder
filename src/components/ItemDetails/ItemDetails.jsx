@@ -63,7 +63,6 @@ function ItemDetails({ item }) {
   };
 
   const nombre = item.nombre || item.name;
-  const foto = item.fotoUrl || item.image;
   const categoria = item.categoria || item.category;
   const descripcion = item.descripcion || item.description;
 
@@ -78,7 +77,7 @@ function ItemDetails({ item }) {
   return (
     <article className="detalle">
       <div className="detalle-media">
-        <Media foto={foto} video={item.videoUrl} titulo={nombre} modo="completo" />
+        <Media item={item} modeloId={modeloId} titulo={nombre} modo="completo" />
       </div>
 
       <div className="detalle-info">

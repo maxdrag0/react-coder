@@ -73,7 +73,14 @@ export const modelosDe = (item) => {
     if (!tieneAlgunPrecio(m.presentaciones)) continue;
 
     vistos.add(id);
-    limpios.push({ id, etiqueta, presentaciones: m.presentaciones });
+    limpios.push({
+      id,
+      etiqueta,
+      presentaciones: m.presentaciones,
+      // Cada modelo puede tener su propia foto: es lo que pide una bengala
+      // que viene en seis colores.
+      foto: typeof m.foto === "string" && m.foto.trim() !== "" ? m.foto : null,
+    });
   }
 
   return limpios;

@@ -71,3 +71,30 @@ export const deleteFile = async (fileUrl) => {
     // Si el archivo ya no existe, el objetivo igual esta cumplido.
   }
 };
+
+/**
+ * Sube varios archivos y devuelve sus URLs en el mismo orden.
+ *
+ * Secuencial y no en paralelo a proposito: si una subida falla, el mensaje
+ * puede decir CUAL archivo fue, y las que ya subieron se devuelven igual en
+ * lugar de perderse. Con Promise.all un fallo tira todo.
+ *
+ * @param {File[]} files
+ * @returns {Promise<string[]>}
+ */
+export const uploadFiles = async (files, path = "products") => {
+  const urls = [];
+
+  for (const file of files) {
+    try {
+      const url = await uploadFile(file, path);
+      if (url) urls.push(url);
+    } catch (error) {
+      const e = new Error(`${file.name}: ${error.message}`);
+      e.subidas = urls;
+      throw e;
+    }
+  }
+
+  return urls;
+};

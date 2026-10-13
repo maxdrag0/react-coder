@@ -1,6 +1,7 @@
 import { ACTIVO } from "@/constants/estadoProducto";
 import { UNIDADES, presentacionesDe } from "@/constants/unidades";
 import { modelosDe, idLibre } from "@/constants/modelos";
+import { fotosDe } from "@/constants/fotos";
 
 /*
   Traduce entre el producto de Firestore y el formulario del panel.
@@ -33,7 +34,10 @@ export const PRODUCTO_VACIO = {
   marca: "",
   duracion: "",
   description: "",
-  image: "",
+  fotos: [],
+  // Archivos elegidos en el formulario que todavia no se subieron. Se suben
+  // al guardar y recien ahi se convierten en urls dentro de `fotos`.
+  archivosNuevos: [],
   videoUrl: "",
   estado: ACTIVO,
 };
@@ -76,6 +80,8 @@ const modelosAlFormulario = (p) =>
       etiqueta: m.etiqueta,
       precio: pres.unitario?.precio ?? "",
       presentaciones: presentacionesAlFormulario(pres),
+      foto: m.foto ?? "",
+      archivoNuevo: null,
     };
   });
 
@@ -92,6 +98,8 @@ export const aFormulario = (p) => ({
   name: p.name ?? p.nombre ?? "",
   price: p.price ?? p.precioUnitario ?? "",
   presentaciones: presentacionesAlFormulario(presentacionesDe(p)),
+  fotos: fotosDe(p),
+  archivosNuevos: [],
   conModelos: modelosDe(p).length > 0,
   modelos: modelosAlFormulario(p),
   category: p.category ?? p.categoria ?? "",
@@ -152,13 +160,19 @@ const modelosDeFormulario = (form) => {
       id,
       etiqueta,
       presentaciones: presentacionesDeFormulario(m.presentaciones, precio),
+      // null y no omitido: igual que las presentaciones, el merge profundo de
+      // Firestore conservaria la foto vieja si la clave no viajara.
+      foto: (m.foto ?? "").trim() || null,
     });
   }
 
   return salida;
 };
 
-export const aFirestore = (form, imagen) => {
+/**
+ * @param {object} form el formulario, con las fotos ya resueltas a urls
+ */
+export const aFirestore = (form) => {
   const presentaciones = presentacionesDeFormulario(
     form.presentaciones,
     Number(form.price)
@@ -189,7 +203,13 @@ export const aFirestore = (form, imagen) => {
     duracion: numeroOpcional(form.duracion),
     estado: form.estado ?? ACTIVO,
     videoUrl: textoOpcional(form.videoUrl),
-    image: imagen,
-    fotoUrl: imagen,
+    fotos: form.fotos ?? [],
+    /*
+      La primera foto se sigue escribiendo en los campos viejos: son los que
+      lee cualquier cosa que todavia no conozca `fotos` (los scripts, el
+      archivo semilla). En null si no hay ninguna.
+    */
+    image: form.fotos?.[0] ?? null,
+    fotoUrl: form.fotos?.[0] ?? null,
   };
 };

@@ -4,6 +4,7 @@ import { ESTADOS, estadoDe } from "../../constants/estadoProducto";
 import { idDeYoutube } from "../../utils/videoEmbed";
 import { UNIDADES } from "../../constants/unidades";
 import ModelosEditor from "./ModelosEditor";
+import FotosEditor from "./FotosEditor";
 import "./ProductoModal.css";
 
 const CATEGORIAS = Object.values(CATEGORIES).sort((a, b) => a.localeCompare(b));
@@ -100,8 +101,10 @@ const ProductoModal = ({
   onModeloPresentacion,
   onAgregarModelo,
   onBorrarModelo,
-  onArchivo,
-  archivo,
+  onQuitarFoto,
+  onArchivos,
+  onQuitarArchivo,
+  onModeloFoto,
   esEdicion,
   guardando,
   error,
@@ -221,6 +224,7 @@ const ProductoModal = ({
                 onPresentacion={onModeloPresentacion}
                 onAgregar={onAgregarModelo}
                 onBorrar={onBorrarModelo}
+                onFoto={onModeloFoto}
               />
             ) : (
               <>
@@ -322,21 +326,14 @@ const ProductoModal = ({
             </div>
           </Seccion>
 
-          <Seccion titulo="Imagen y video">
-            <Campo
-              id="p-archivo"
-              etiqueta="Foto"
-              ayuda="JPG o PNG, hasta 5 MB."
-              ancho
-            >
-              <input
-                id="p-archivo"
-                className="campo-control"
-                type="file"
-                accept="image/*"
-                onChange={(e) => onArchivo(e.target.files[0])}
-              />
-            </Campo>
+          <Seccion titulo="Fotos y video">
+            <FotosEditor
+              fotos={producto.fotos ?? []}
+              archivos={producto.archivosNuevos ?? []}
+              onQuitarFoto={onQuitarFoto}
+              onArchivos={onArchivos}
+              onQuitarArchivo={onQuitarArchivo}
+            />
 
             {/* El video va por YouTube y no subido: el plan gratuito da 1 GB
                 de descarga por día compartido con todo el catálogo. */}
@@ -361,12 +358,6 @@ const ProductoModal = ({
               />
             </Campo>
 
-            {producto.image && !archivo && (
-              <div className="campo campo-ancho">
-                <span className="campo-etiqueta">Foto actual</span>
-                <img src={producto.image} alt="" className="modal-miniatura" />
-              </div>
-            )}
           </Seccion>
         </form>
 

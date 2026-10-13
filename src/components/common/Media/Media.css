@@ -28,3 +28,56 @@
   color: var(--text);
   backdrop-filter: blur(4px);
 }
+
+/* --- Galería del detalle --- */
+
+/* El contenedor (.detalle-media) tiene proporcion fija y overflow hidden, asi
+   que la galeria se arma adentro: la foto grande ocupa lo que queda y las
+   miniaturas van abajo con alto propio. */
+.media-galeria {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  height: 100%;
+  gap: var(--e-2);
+}
+
+.media-galeria-grande {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  min-height: 0;
+}
+
+.media-tiras {
+  display: flex;
+  gap: var(--e-2);
+  padding: 0 var(--e-2) var(--e-2);
+  overflow-x: auto;
+}
+
+.media-tira {
+  flex: 0 0 auto;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: var(--r-control);
+  overflow: hidden;
+  background: none;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity var(--mov-rapido), border-color var(--mov-rapido);
+}
+
+.media-tira:hover { opacity: 1; }
+
+.media-tira.activa {
+  opacity: 1;
+  border-color: var(--gold);
+}
+
+.media-tira img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

@@ -1,4 +1,4 @@
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, ImagePlus, X } from "lucide-react";
 import { UNIDADES } from "../../constants/unidades";
 
 const OPCIONALES = UNIDADES.filter((u) => u.clave !== "unitario");
@@ -61,7 +61,68 @@ const PresentacionModelo = ({ idModelo, clave, etiqueta, valores, onCampo }) => 
  * El nombre del modelo es obligatorio: sin él no se puede elegir en la
  * tienda, y el identificador interno se genera a partir de él al guardar.
  */
-const ModelosEditor = ({ modelos, onModelo, onPresentacion, onAgregar, onBorrar }) => (
+/**
+ * La foto del modelo. Es UNA sola: lo que distingue a un modelo del otro es
+ * justamente la foto (el color de la bengala), y una galeria por modelo
+ * multiplicaria el formulario sin agregar nada.
+ */
+const FotoModelo = ({ indice, modelo, onFoto }) => (
+  <div className="campo modelo-foto">
+    <span className="campo-etiqueta">Foto de este modelo</span>
+
+    {modelo.archivoNuevo ? (
+      <div className="modelo-foto-actual">
+        <span className="fotos-nombre">{modelo.archivoNuevo.name}</span>
+        <button
+          type="button"
+          className="fotos-quitar"
+          onClick={() => onFoto(indice, null)}
+          aria-label="No subir esta foto"
+        >
+          <X size={14} />
+        </button>
+      </div>
+    ) : modelo.foto ? (
+      <div className="modelo-foto-actual">
+        <img src={modelo.foto} alt="" className="modal-miniatura" />
+        <button
+          type="button"
+          className="fotos-quitar"
+          onClick={() => onFoto(indice, "quitar")}
+          aria-label="Quitar la foto de este modelo"
+        >
+          <X size={14} />
+        </button>
+      </div>
+    ) : null}
+
+    <label className="fotos-elegir">
+      <ImagePlus size={16} />
+      {modelo.foto || modelo.archivoNuevo ? "Cambiar" : "Elegir foto"}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          onFoto(indice, e.target.files[0] ?? null);
+          e.target.value = "";
+        }}
+      />
+    </label>
+
+    <small className="campo-ayuda">
+      Si no le pones una, se muestran las fotos del producto.
+    </small>
+  </div>
+);
+
+const ModelosEditor = ({
+  modelos,
+  onModelo,
+  onPresentacion,
+  onAgregar,
+  onBorrar,
+  onFoto,
+}) => (
   <div className="campo campo-ancho modelos">
     {modelos.length === 0 && (
       <p className="modelos-vacio">
@@ -115,6 +176,8 @@ const ModelosEditor = ({ modelos, onModelo, onPresentacion, onAgregar, onBorrar 
             />
           </div>
         </div>
+
+        <FotoModelo indice={i} modelo={m} onFoto={onFoto} />
 
         {OPCIONALES.map((u) => (
           <PresentacionModelo

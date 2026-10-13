@@ -41,7 +41,7 @@ describe("aFirestore: borrar una presentación", () => {
       },
     });
 
-    const datos = aFirestore(sinBulto, "");
+    const datos = aFirestore(sinBulto);
 
     expect("bulto" in datos.presentaciones).toBe(true);
     expect(datos.presentaciones.bulto).toBeNull();
@@ -50,7 +50,7 @@ describe("aFirestore: borrar una presentación", () => {
   it("también manda null la clave que nunca se tocó", () => {
     // Un producto nuevo sin display ni bulto: si las claves no viajan, un
     // producto que antes los tenia se los queda para siempre.
-    const datos = aFirestore(form(), "");
+    const datos = aFirestore(form());
     expect(datos.presentaciones.display).toBeNull();
     expect(datos.presentaciones.bulto).toBeNull();
   });
@@ -59,27 +59,27 @@ describe("aFirestore: borrar una presentación", () => {
     const sinBulto = form({
       presentaciones: { bulto: { activa: false, precio: "", unidades: "" } },
     });
-    expect(aFirestore(sinBulto, "").precioBulto).toBeNull();
+    expect(aFirestore(sinBulto).precioBulto).toBeNull();
   });
 
   it("una presentación tildada pero sin precio cuenta como no vendida", () => {
     const vacia = form({
       presentaciones: { display: { activa: true, precio: "", unidades: "" } },
     });
-    expect(aFirestore(vacia, "").presentaciones.display).toBeNull();
+    expect(aFirestore(vacia).presentaciones.display).toBeNull();
   });
 });
 
 describe("aFirestore: lo que sí se guarda", () => {
   it("guarda precio y cantidad de cada presentación activa", () => {
-    const datos = aFirestore(conDisplayYBulto, "");
+    const datos = aFirestore(conDisplayYBulto);
     expect(datos.presentaciones.unitario).toEqual({ precio: 8000 });
     expect(datos.presentaciones.display).toEqual({ precio: 15000, unidades: 5 });
     expect(datos.presentaciones.bulto).toEqual({ precio: 140000, unidades: 50 });
   });
 
   it("escribe los dos esquemas, para que la tienda lea lo mismo", () => {
-    const datos = aFirestore(conDisplayYBulto, "");
+    const datos = aFirestore(conDisplayYBulto);
     expect(datos.name).toBe("Torta 100 tiros");
     expect(datos.nombre).toBe("Torta 100 tiros");
     expect(datos.precioUnitario).toBe(8000);
@@ -90,7 +90,7 @@ describe("aFirestore: lo que sí se guarda", () => {
     const sinCantidad = form({
       presentaciones: { display: { activa: true, precio: "15000", unidades: "" } },
     });
-    expect(aFirestore(sinCantidad, "").presentaciones.display.unidades).toBeNull();
+    expect(aFirestore(sinCantidad).presentaciones.display.unidades).toBeNull();
   });
 });
 
@@ -109,7 +109,7 @@ describe("aFirestore: modelos", () => {
   });
 
   it("genera el id a partir del nombre del modelo", () => {
-    expect(aFirestore(conModelos, "").modelos.map((m) => m.id)).toEqual([
+    expect(aFirestore(conModelos).modelos.map((m) => m.id)).toEqual([
       "3-pulgadas",
       "5-pulgadas",
     ]);
@@ -124,7 +124,7 @@ describe("aFirestore: modelos", () => {
         { id: "tres", etiqueta: "3 pulgadas (chico)", precio: "8000", presentaciones: {} },
       ],
     });
-    expect(aFirestore(renombrado, "").modelos[0].id).toBe("tres");
+    expect(aFirestore(renombrado).modelos[0].id).toBe("tres");
   });
 
   it("descarta un modelo sin nombre o sin precio", () => {
@@ -136,11 +136,11 @@ describe("aFirestore: modelos", () => {
         { id: null, etiqueta: "Verde", precio: "500", presentaciones: {} },
       ],
     });
-    expect(aFirestore(sucio, "").modelos.map((m) => m.etiqueta)).toEqual(["Verde"]);
+    expect(aFirestore(sucio).modelos.map((m) => m.etiqueta)).toEqual(["Verde"]);
   });
 
   it("con modelos, los precios del producto van en null", () => {
-    const datos = aFirestore(conModelos, "");
+    const datos = aFirestore(conModelos);
     expect(datos.precioUnitario).toBeNull();
     expect(datos.precioDisplay).toBeNull();
     expect(datos.price).toBeNull();
@@ -150,7 +150,7 @@ describe("aFirestore: modelos", () => {
     // Si el array no viajara vacio, un producto que tuvo modelos los
     // seguiria teniendo y la tienda pediria elegir uno.
     const sinModelos = form({ conModelos: false, modelos: [{ id: "x", etiqueta: "X", precio: "1" }] });
-    expect(aFirestore(sinModelos, "").modelos).toEqual([]);
+    expect(aFirestore(sinModelos).modelos).toEqual([]);
   });
 });
 
@@ -194,5 +194,76 @@ describe("aFormulario: leer un producto existente", () => {
     const f = aFormulario(conMod);
     expect(f.conModelos).toBe(true);
     expect(f.modelos[0]).toMatchObject({ id: "a", etiqueta: "Rojo", precio: 100 });
+  });
+});
+
+describe("aFirestore: fotos", () => {
+  const A = "https://ejemplo.test/a.jpg";
+  const B = "https://ejemplo.test/b.jpg";
+
+  it("guarda la lista completa", () => {
+    expect(aFirestore(form({ fotos: [A, B] })).fotos).toEqual([A, B]);
+  });
+
+  it("escribe la primera en los campos viejos", () => {
+    // Son los que lee cualquier cosa que todavia no conozca `fotos`: los
+    // scripts y el archivo semilla.
+    const datos = aFirestore(form({ fotos: [A, B] }));
+    expect(datos.fotoUrl).toBe(A);
+    expect(datos.image).toBe(A);
+  });
+
+  it("sin fotos deja los campos viejos en null, no en undefined", () => {
+    // undefined hace que Firestore rechace la escritura entera.
+    const datos = aFirestore(form({ fotos: [] }));
+    expect(datos.fotos).toEqual([]);
+    expect(datos.fotoUrl).toBeNull();
+    expect(datos.image).toBeNull();
+  });
+
+  it("guarda la foto de cada modelo", () => {
+    const conFotos = form({
+      conModelos: true,
+      modelos: [
+        { id: "rojo", etiqueta: "Rojo", precio: "100", foto: A, presentaciones: {} },
+        { id: "verde", etiqueta: "Verde", precio: "100", foto: "", presentaciones: {} },
+      ],
+    });
+    const modelos = aFirestore(conFotos).modelos;
+    expect(modelos[0].foto).toBe(A);
+    // null y no omitida: el merge profundo de Firestore conservaria la vieja.
+    expect(modelos[1].foto).toBeNull();
+  });
+});
+
+describe("aFormulario: fotos", () => {
+  it("lee la lista nueva", () => {
+    const f = aFormulario({ codigo: "A1", fotos: ["https://x.test/1.jpg"] });
+    expect(f.fotos).toEqual(["https://x.test/1.jpg"]);
+  });
+
+  it("lee la foto única del esquema viejo", () => {
+    // Los 323 productos del catalogo estan asi.
+    const f = aFormulario({ codigo: "A1", fotoUrl: "https://x.test/vieja.jpg" });
+    expect(f.fotos).toEqual(["https://x.test/vieja.jpg"]);
+  });
+
+  it("arranca sin archivos pendientes de subir", () => {
+    expect(aFormulario({ codigo: "A1" }).archivosNuevos).toEqual([]);
+  });
+
+  it("lee la foto de cada modelo", () => {
+    const conMod = {
+      codigo: "M1",
+      modelos: [
+        {
+          id: "a",
+          etiqueta: "Rojo",
+          foto: "https://x.test/rojo.jpg",
+          presentaciones: { unitario: { precio: 100 } },
+        },
+      ],
+    };
+    expect(aFormulario(conMod).modelos[0].foto).toBe("https://x.test/rojo.jpg");
   });
 });

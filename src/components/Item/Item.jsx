@@ -7,7 +7,6 @@ import "./Item.css";
 function Item({ item }) {
   // El catálogo convive con los dos esquemas hasta que E los unifique.
   const nombre = item.nombre || item.name;
-  const foto = item.fotoUrl || item.image;
   const categoria = item.categoria || item.category;
 
   const meta = [item.marca, categoria, item.duracion ? `${item.duracion} seg` : null]
@@ -18,7 +17,7 @@ function Item({ item }) {
     <article className="item">
       <Link to={`/product/${item.codigo}`} className="item-link">
         <div className="item-media">
-          <Media foto={foto} video={item.videoUrl} titulo={nombre} />
+          <Media item={item} titulo={nombre} />
           {!sePuedeComprar(item) && (
             <span className="item-agotado">Sin stock</span>
           )}

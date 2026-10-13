@@ -231,9 +231,12 @@
   color: var(--text-suave);
 }
 
+/* pre-wrap respeta los saltos del mensaje pero NO parte una palabra larga:
+   una URL pegada en el formulario de contacto desbordaba la tabla. */
 .admin-celda-mensaje {
   max-width: 22rem;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .msg-unread { background: var(--surface-alto); }
@@ -314,7 +317,7 @@
 
   .admin-table td {
     display: grid;
-    grid-template-columns: 7rem 1fr;
+    grid-template-columns: 7rem minmax(0, 1fr);
     gap: var(--e-3);
     align-items: baseline;
     padding: 0;
@@ -349,10 +352,12 @@
   word-break: break-all;
 }
 
+/* El email no tiene espacios y es largo: sin esto ensanchaba la columna. */
 .admin-cliente {
   display: grid;
   gap: 2px;
   font-size: var(--t-xs);
+  overflow-wrap: anywhere;
 }
 
 .admin-cliente strong { font-size: var(--t-sm); color: var(--text); }

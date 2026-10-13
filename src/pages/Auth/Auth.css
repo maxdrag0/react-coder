@@ -48,7 +48,7 @@
    degradado de marca le da peso. */
 @media (min-width: 900px) {
   .auth {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     justify-items: stretch;
     padding: 0;
   }

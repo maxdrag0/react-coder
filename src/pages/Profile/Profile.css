@@ -55,7 +55,7 @@
 .logout-btn:hover { background: var(--danger); color: var(--ground); }
 
 @media (min-width: 640px) {
-  .info-group { grid-template-columns: 9rem 1fr; align-items: baseline; }
+  .info-group { grid-template-columns: 9rem minmax(0, 1fr); align-items: baseline; }
 }
 
 /* El unico campo editable del perfil. Se apila en celular porque el input

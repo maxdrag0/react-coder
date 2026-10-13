@@ -46,7 +46,7 @@
 
 @media (min-width: 900px) {
   .carrito-grid {
-    grid-template-columns: 1fr 22rem;
+    grid-template-columns: minmax(0, 1fr) 22rem;
     gap: var(--e-6);
     align-items: start;
   }

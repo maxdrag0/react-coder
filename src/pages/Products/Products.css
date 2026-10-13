@@ -55,7 +55,7 @@
 @media (min-width: 900px) {
   /* Columna de filtros a la izquierda, como en cualquier catálogo. */
   .productos-cuerpo {
-    grid-template-columns: 15rem 1fr;
+    grid-template-columns: 15rem minmax(0, 1fr);
     gap: var(--e-6);
     align-items: start;
   }

@@ -182,7 +182,7 @@
 }
 
 @media (min-width: 700px) {
-  .modal-campos { grid-template-columns: 1fr 1fr; }
+  .modal-campos { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .campo-ancho { grid-column: 1 / -1; }
 }
 
@@ -237,7 +237,7 @@
 }
 
 @media (min-width: 520px) {
-  .modal-presentacion-datos { grid-template-columns: 1fr 1fr; }
+  .modal-presentacion-datos { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 }
 
 /* --- Modelos --- */
@@ -293,5 +293,5 @@
 }
 
 @media (min-width: 520px) {
-  .modelo-datos { grid-template-columns: 1fr 1fr; }
+  .modelo-datos { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 }

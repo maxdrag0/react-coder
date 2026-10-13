@@ -76,6 +76,15 @@ button, a[role="button"], [role="tab"] {
   min-width: 44px;
 }
 
+/*
+  Una palabra sin espacios no parte sola y ensancha a su contenedor: un codigo
+  de producto largo, o una URL que alguien pego en un mensaje de contacto.
+  Esto la parte antes de que empuje la pagina.
+*/
+body {
+  overflow-wrap: break-word;
+}
+
 .contenedor {
   width: 100%;
   max-width: var(--ancho-max);

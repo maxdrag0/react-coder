@@ -21,6 +21,15 @@ async function correr(script, args = [], env = {}) {
 const RUTA_INEXISTENTE = join("tests", "unit", "__no-existe__.json");
 const RUTA_CORRUPTA = join("tests", "unit", "__credencial-corrupta.json");
 
+/*
+  Estos tres lanzan un proceso de node de verdad, que es lo que los hace
+  valiosos: prueban el script como lo corre una persona, incluido el orden de
+  los imports. Pero arrancar node en Windows tarda, y con el suite completo
+  corriendo en paralelo se pasaban de los 15s por defecto y fallaban por carga
+  y no por el codigo. El timeout es generoso a proposito.
+*/
+const ESPERA = 60_000;
+
 describe("scripts/set-admin.mjs - rutas de error", () => {
   it("explica el uso cuando no se pasa email, incluso sin credencial", async () => {
     const r = await correr("scripts/set-admin.mjs", [], {
@@ -29,7 +38,7 @@ describe("scripts/set-admin.mjs - rutas de error", () => {
     expect(r.code).toBe(1);
     expect(r.stderr).toMatch(/Uso:/);
     expect(r.stderr).toMatch(/set-admin/);
-  });
+  }, ESPERA);
 
   it("explica cómo obtener la credencial cuando falta, si el email sí vino", async () => {
     const r = await correr("scripts/set-admin.mjs", ["ana@mail.com"], {
@@ -38,7 +47,7 @@ describe("scripts/set-admin.mjs - rutas de error", () => {
     expect(r.code).toBe(1);
     expect(r.stderr).toMatch(/No se encontró la credencial/);
     expect(r.stderr).toMatch(/Cuentas de servicio/);
-  });
+  }, ESPERA);
 
   it("da un mensaje legible si la credencial existe pero está corrupta", async () => {
     writeFileSync(RUTA_CORRUPTA, "esto no es json");
@@ -53,5 +62,5 @@ describe("scripts/set-admin.mjs - rutas de error", () => {
     } finally {
       rmSync(RUTA_CORRUPTA, { force: true });
     }
-  });
+  }, ESPERA);
 });

@@ -79,10 +79,12 @@ describe("Home: destacados", () => {
 
   it("manda al catálogo en vez de paginar, que ya tiene todo cargado", () => {
     montar(Array.from({ length: 40 }, (_, i) => producto(i)));
-    expect(screen.getByRole("link", { name: /catálogo/i })).toHaveAttribute(
-      "href",
-      "/products"
-    );
+    // La portada tiene varios links al catalogo (el hero, el pie de la
+    // grilla): se apunta al de abajo de los productos, que es el que
+    // reemplazo al \"Cargar mas\".
+    expect(
+      screen.getByRole("link", { name: "Ver todo el catálogo" })
+    ).toHaveAttribute("href", "/products");
   });
 
   it("no muestra la grilla vacía con un cartel de más vendidos si no hay nada", () => {

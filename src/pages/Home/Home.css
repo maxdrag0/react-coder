@@ -40,3 +40,83 @@
 }
 
 .home-vacio p { margin: 0; }
+
+/* --- Portada nueva --- */
+
+.home { display: grid; gap: var(--e-6); }
+
+.home-acciones {
+  display: flex;
+  gap: var(--e-3);
+  flex-wrap: wrap;
+  margin-top: var(--e-2);
+}
+
+/* Las tres razones para comprar acá. Van arriba de los productos porque
+   quien entra por primera vez todavía no sabe qué es esta tienda. */
+.home-ventajas {
+  display: grid;
+  gap: var(--e-4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.home-ventajas li {
+  display: grid;
+  gap: var(--e-2);
+  padding: var(--e-4);
+  background: var(--surface);
+  border: 1px solid var(--gold-linea);
+  border-radius: var(--r-card);
+}
+
+.home-ventajas svg { color: var(--gold); }
+
+.home-ventajas h2 {
+  margin: 0;
+  font-size: var(--t-base);
+  font-weight: 600;
+}
+
+.home-ventajas p {
+  margin: 0;
+  font-size: var(--t-sm);
+  color: var(--text-suave);
+}
+
+/* El bloque de shows es el único con fondo dorado tenue: es la venta de
+   mayor valor y la que no se descubre sola mirando el catálogo. */
+.home-shows {
+  padding: var(--e-6) var(--e-4);
+  border: 1px solid var(--gold-linea);
+  border-radius: var(--r-card);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--gold) 10%, var(--surface)),
+    var(--surface)
+  );
+}
+
+.home-shows-texto {
+  display: grid;
+  gap: var(--e-3);
+  justify-items: start;
+  max-width: 52ch;
+}
+
+.home-shows h2 {
+  margin: 0;
+  font-size: var(--t-xl);
+  font-stretch: var(--ancho-display);
+}
+
+.home-shows p {
+  margin: 0;
+  color: var(--text-suave);
+}
+
+@media (min-width: 700px) {
+  .home-ventajas { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .home-shows { padding: var(--e-7) var(--e-6); }
+}

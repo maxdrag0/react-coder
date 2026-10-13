@@ -13,6 +13,7 @@ import Profile from "./pages/Profile/Profile";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
 import BottomNav from "@/components/BottomNav/BottomNav";
+import Footer from "@/components/Footer/Footer";
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
           <Route path="/*" element={<NotFound />} />
         </Routes>
       </main>
+      <Footer />
       <BottomNav />
     </>
   );

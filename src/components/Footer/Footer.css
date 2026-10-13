@@ -1,0 +1,95 @@
+.pie {
+  margin-top: var(--e-8);
+  border-top: 1px solid var(--gold-linea);
+  background: var(--surface);
+  /* La barra inferior de celular es fixed: sin este aire tapa el pie, que es
+     justamente lo último de la página. */
+  padding-bottom: calc(var(--alto-nav-abajo) + var(--e-4));
+}
+
+.pie-inner {
+  display: grid;
+  gap: var(--e-5);
+  padding-block: var(--e-6);
+}
+
+.pie-marca {
+  display: grid;
+  gap: var(--e-2);
+  justify-items: start;
+}
+
+.pie-estrella { color: var(--gold); }
+
+.pie-nombre {
+  margin: 0;
+  font-size: var(--t-lg);
+  font-weight: 700;
+  font-stretch: var(--ancho-display);
+  color: var(--text);
+}
+
+.pie-bajada,
+.pie-texto {
+  margin: 0;
+  font-size: var(--t-sm);
+  color: var(--text-suave);
+  max-width: 32ch;
+}
+
+.pie-grupo {
+  display: grid;
+  gap: var(--e-3);
+  align-content: start;
+}
+
+.pie-grupo h2 {
+  margin: 0;
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.pie-grupo ul {
+  display: grid;
+  gap: var(--e-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pie-grupo a {
+  font-size: var(--t-sm);
+  color: var(--text-suave);
+}
+
+.pie-grupo a:hover { color: var(--gold); }
+
+.pie-boton { justify-self: start; }
+
+.pie-legal {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--e-3);
+  flex-wrap: wrap;
+  padding-block: var(--e-4);
+  border-top: 1px solid var(--gold-linea);
+}
+
+.pie-legal p {
+  margin: 0;
+  font-size: var(--t-xs);
+  color: var(--text-tenue);
+}
+
+@media (min-width: 700px) {
+  .pie-inner {
+    grid-template-columns: 1.4fr repeat(3, minmax(0, 1fr));
+    gap: var(--e-6);
+  }
+}
+
+@media (min-width: 900px) {
+  /* En escritorio no hay barra inferior. */
+  .pie { padding-bottom: 0; }
+}

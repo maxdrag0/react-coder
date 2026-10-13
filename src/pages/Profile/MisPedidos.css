@@ -1,0 +1,104 @@
+.mis-pedidos {
+  display: grid;
+  gap: var(--e-4);
+  margin-top: var(--e-5);
+  padding-top: var(--e-5);
+  border-top: 1px solid var(--gold-linea);
+}
+
+.mis-pedidos h3 {
+  margin: 0;
+  font-size: var(--t-lg);
+}
+
+.mis-pedidos-cargando {
+  display: grid;
+  place-items: center;
+  padding-block: var(--e-5);
+  color: var(--text-suave);
+}
+
+.mis-pedidos-vacio {
+  display: grid;
+  gap: var(--e-3);
+  justify-items: start;
+  color: var(--text-suave);
+}
+
+.mis-pedidos-vacio p { margin: 0; }
+
+.mis-pedidos-lista {
+  display: grid;
+  gap: var(--e-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mi-pedido {
+  display: grid;
+  gap: var(--e-3);
+  padding: var(--e-4);
+  background: var(--surface-alto);
+  border: 1px solid var(--gold-linea);
+  border-radius: var(--r-card);
+}
+
+.mi-pedido-cabecera,
+.mi-pedido-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-3);
+  flex-wrap: wrap;
+}
+
+.mi-pedido-fecha {
+  font-size: var(--t-sm);
+  color: var(--text);
+  font-weight: 500;
+}
+
+.mi-pedido-estado {
+  padding: 2px var(--e-3);
+  border-radius: var(--r-pill);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  background: var(--gold-linea);
+  color: var(--gold);
+}
+
+/* Entregado en verde y cancelado apagado: el resto queda en dorado, que es
+   "en curso". */
+.mi-pedido-estado.estado-entregado {
+  background: var(--exito-fondo);
+  color: var(--exito);
+}
+
+.mi-pedido-estado.estado-cancelado {
+  background: var(--surface);
+  color: var(--text-tenue);
+}
+
+.mi-pedido-items {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding-left: var(--e-4);
+  font-size: var(--t-sm);
+  color: var(--text-suave);
+}
+
+.mi-pedido-total {
+  font-size: var(--t-md);
+  font-weight: 600;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* El numero de orden es largo y sin espacios: sin esto ensancha la tarjeta. */
+.mi-pedido-id {
+  font-size: var(--t-xs);
+  color: var(--text-tenue);
+  overflow-wrap: anywhere;
+}

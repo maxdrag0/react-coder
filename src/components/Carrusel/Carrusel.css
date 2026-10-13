@@ -1,0 +1,95 @@
+.carrusel {
+  position: relative;
+  border-radius: var(--r-card);
+  overflow: hidden;
+  background: var(--surface-alto);
+  /* Más ancho que alto, y más alto en celular para que el texto entre. */
+  aspect-ratio: 16 / 10;
+}
+
+.carrusel-imagen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* El texto va sobre un degradado y no sobre la foto pelada: una imagen
+   clara dejaría el título ilegible. */
+.carrusel-texto {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: grid;
+  gap: var(--e-3);
+  justify-items: start;
+  padding: var(--e-5) var(--e-4) var(--e-4);
+  background: linear-gradient(
+    to top,
+    rgba(14, 23, 38, 0.92),
+    rgba(14, 23, 38, 0.65) 60%,
+    transparent
+  );
+  color: #f2f0eb;
+}
+
+.carrusel-texto h2 {
+  margin: 0;
+  font-size: var(--t-xl);
+  font-stretch: var(--ancho-display);
+}
+
+.carrusel-texto p {
+  margin: 0;
+  max-width: 44ch;
+  font-size: var(--t-sm);
+  color: #d8d4cc;
+}
+
+.carrusel-flecha {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, #0e1726 65%, transparent);
+  color: #f2f0eb;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+
+.carrusel-flecha.izquierda { left: var(--e-3); }
+.carrusel-flecha.derecha { right: var(--e-3); }
+
+.carrusel-puntos {
+  position: absolute;
+  top: var(--e-3);
+  right: var(--e-3);
+  display: flex;
+  gap: var(--e-2);
+}
+
+.carrusel-punto {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, #f2f0eb 45%, transparent);
+  cursor: pointer;
+}
+
+.carrusel-punto.activo { background: var(--gold); }
+
+@media (min-width: 700px) {
+  .carrusel { aspect-ratio: 21 / 8; }
+
+  .carrusel-texto {
+    padding: var(--e-7) var(--e-6) var(--e-5);
+  }
+
+  .carrusel-texto h2 { font-size: var(--t-2xl); }
+  .carrusel-texto p { font-size: var(--t-base); }
+}

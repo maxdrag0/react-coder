@@ -6,6 +6,7 @@ import { errorDeTelefono, soloDigitos } from "@/utils/telefono";
 import { logoutUser } from "@/services/firebase/authFirebase";
 import { useTheme } from "@/contexts/ThemeContext";
 import VerificacionPendiente from "@/components/auth/VerificacionPendiente/VerificacionPendiente";
+import MisPedidos from "./MisPedidos";
 import "./Profile.css";
 
 const Profile = () => {
@@ -123,6 +124,8 @@ const Profile = () => {
             </div>
           </div>
         </div>
+
+        <MisPedidos />
 
         <button className="logout-btn" onClick={salir}>
           Cerrar Sesión

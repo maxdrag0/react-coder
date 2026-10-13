@@ -101,9 +101,8 @@ body {
 
 /* La barra inferior es fixed, así que no empuja nada: sin este aire tapa el
    final de cada página. */
-@media (max-width: 899px) {
-  .page-container { padding-bottom: calc(var(--alto-nav-abajo) + var(--e-4)); }
-}
+/* El aire para la barra inferior lo pone el pie, que es lo ultimo de la
+   pagina. Ponerlo tambien aca metia un hueco entre el contenido y el pie. */
 
 .solo-lectores {
   position: absolute;

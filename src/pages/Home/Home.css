@@ -69,43 +69,55 @@
 
 /* Las tres razones para comprar acá. Van arriba de los productos porque
    quien entra por primera vez todavía no sabe qué es esta tienda. */
-.home-ventajas {
+/*
+  Dos afirmaciones sobre el fondo de la página, no tarjetas.
+
+  Eran tres rectángulos idénticos —superficie, borde, radio, ícono arriba—
+  que es el kit que aparece igual en cualquier landing. Sin caja, el peso lo
+  lleva la tipografía y la sección deja de competir con el catálogo, que es lo
+  único de esta página que sí tiene que verse en tarjetas.
+
+  Una regla arriba y una línea vertical entre las dos: el trazo separa, que es
+  todo lo que hacía falta.
+*/
+.home-como {
   display: grid;
-  gap: var(--e-4);
-  list-style: none;
-  margin: 0;
-  padding: 0;
+  gap: var(--e-5);
+  padding-top: var(--e-5);
+  border-top: 1px solid var(--linea);
 }
 
-.home-ventajas li {
-  display: grid;
-  gap: var(--e-2);
-  padding: var(--e-4);
-  background: var(--surface);
-  border: 1px solid var(--gold-linea);
-  border-radius: var(--r-card);
-}
-
-.home-ventajas svg {
-  color: var(--gold);
-}
-
-.home-ventajas h2 {
-  margin: 0;
+.home-como h2 {
+  margin: 0 0 var(--e-2);
   font-size: var(--t-base);
   font-weight: 600;
 }
 
-.home-ventajas p {
+.home-como p {
   margin: 0;
+  max-width: 44ch;
   font-size: var(--t-sm);
   color: var(--text-suave);
+}
+
+@media (min-width: 720px) {
+  .home-como {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--e-7);
+  }
+
+  /* La línea va en el segundo y no como borde del primero: así no aparece
+     colgando cuando las dos se apilan en celular. */
+  .home-como > div + div {
+    padding-left: var(--e-7);
+    border-left: 1px solid var(--linea);
+  }
 }
 
 /* El bloque de shows es el único con fondo dorado tenue: es la venta de
    mayor valor y la que no se descubre sola mirando el catálogo. */
 .home-shows {
-  padding: var(--e-6) var(--e-4);
+  padding: var(--e-6) var(--e-5);
   border: 1px solid var(--gold-linea);
   border-radius: var(--r-card);
   background: linear-gradient(

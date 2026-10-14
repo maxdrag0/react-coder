@@ -4,13 +4,27 @@ const verifyIdToken = vi.fn();
 const getAll = vi.fn();
 const set = vi.fn();
 const getPerfil = vi.fn();
+const update = vi.fn();
+const commit = vi.fn();
+
+vi.mock("firebase-admin/firestore", () => ({
+  FieldValue: { increment: (n) => ({ __incremento: n }) },
+}));
 
 vi.mock("../../api/_lib/firebaseAdmin.js", () => ({
   auth: { verifyIdToken: (...a) => verifyIdToken(...a) },
   db: {
     getAll: (...a) => getAll(...a),
+    batch: () => ({
+      update: (...a) => update(...a),
+      commit: (...a) => commit(...a),
+    }),
     collection: () => ({
-      doc: () => ({ set: (...a) => set(...a), get: (...a) => getPerfil(...a) }),
+      doc: (id) => ({
+        id,
+        set: (...a) => set(...a),
+        get: (...a) => getPerfil(...a),
+      }),
     }),
   },
 }));
@@ -65,6 +79,8 @@ beforeEach(() => {
   });
   getAll.mockReset().mockResolvedValue([docDe(PRODUCTO)]);
   set.mockReset().mockResolvedValue(undefined);
+  update.mockReset();
+  commit.mockReset().mockResolvedValue(undefined);
   getPerfil.mockReset().mockResolvedValue({
     exists: true,
     data: () => ({ telefono: "1123456789" }),
@@ -285,5 +301,112 @@ describe("api/orden: un codigo repetido se pide una sola vez", () => {
     expect(res.codigo).toBe(201);
     expect(set.mock.calls[0][0].items).toHaveLength(2);
     expect(set.mock.calls[0][0].total).toBe(98000);
+  });
+});
+
+describe("api/orden: el contador de mas vendidos", () => {
+  /*
+    "Mas vendidos" ordenaba por un campo que nadie escribia: valia 0 en los 29
+    productos, asi que la portada mostraba los primeros doce en orden
+    arbitrario con un titulo que afirmaba otra cosa.
+
+    Se cuenta UN pedido por producto y no las unidades: un mayorista que
+    compra diez bultos de lo mismo no tiene que decidir la portada para
+    siempre, y "12 unidades" contra "1 bulto de 12" son la misma venta
+    contada de dos maneras.
+  */
+  it("suma uno al producto del pedido", async () => {
+    await handler(pedido(), respuesta());
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "A12" }),
+      { compras: { __incremento: 1 } },
+    );
+    expect(commit).toHaveBeenCalled();
+  });
+
+  it("suma UNO aunque se pidan doce", async () => {
+    await handler(
+      pedido({
+        items: [
+          {
+            codigo: "A12",
+            unidad: "unitario",
+            modelo: null,
+            cantidad: 12,
+            precioVisto: 8000,
+          },
+        ],
+      }),
+      respuesta(),
+    );
+    expect(update).toHaveBeenCalledWith(expect.anything(), {
+      compras: { __incremento: 1 },
+    });
+  });
+
+  it("suma UNO por producto, no por renglon", async () => {
+    // El mismo producto en dos presentaciones es una sola venta de ese
+    // producto.
+    getAll.mockResolvedValue([
+      docDe({
+        ...PRODUCTO,
+        presentaciones: {
+          unitario: { precio: 8000 },
+          bulto: { precio: 90000, unidades: 12 },
+        },
+      }),
+    ]);
+    await handler(
+      pedido({
+        items: [
+          {
+            codigo: "A12",
+            unidad: "unitario",
+            modelo: null,
+            cantidad: 1,
+            precioVisto: 8000,
+          },
+          {
+            codigo: "A12",
+            unidad: "bulto",
+            modelo: null,
+            cantidad: 1,
+            precioVisto: 90000,
+          },
+        ],
+      }),
+      respuesta(),
+    );
+    expect(update).toHaveBeenCalledTimes(1);
+  });
+
+  it("NO cuenta cuando el pedido se rechaza", async () => {
+    await handler(
+      pedido({
+        items: [
+          {
+            codigo: "A12",
+            unidad: "unitario",
+            modelo: null,
+            cantidad: 1,
+            precioVisto: 1,
+          },
+        ],
+      }),
+      respuesta(),
+    );
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it("si el contador falla, el pedido SIGUE entrando", async () => {
+    /*
+      El pedido ya esta escrito y el dueno lo ve en el panel. Devolver un 500
+      por un contador de portada le haria creer al cliente que no se mando, y
+      volveria a mandarlo.
+    */
+    commit.mockRejectedValue(new Error("Firestore caido"));
+    const res = respuesta();
+    await handler(pedido(), res);
+    expect(res.codigo).toBe(201);
   });
 });

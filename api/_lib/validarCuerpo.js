@@ -24,13 +24,15 @@ const esNumero = (v, min) =>
 export const validarCuerpo = (cuerpo) => {
   const mal = (error) => ({ ok: false, error });
 
-  if (!cuerpo || typeof cuerpo !== "object") return mal("El cuerpo no es un objeto.");
+  if (!cuerpo || typeof cuerpo !== "object")
+    return mal("El cuerpo no es un objeto.");
 
   if (!esTexto(cuerpo.idempotencia, 64)) {
     return mal("Falta el identificador del intento de compra.");
   }
 
-  if (!Array.isArray(cuerpo.items)) return mal("`items` tiene que ser una lista.");
+  if (!Array.isArray(cuerpo.items))
+    return mal("`items` tiene que ser una lista.");
   if (cuerpo.items.length === 0) return mal("El carrito esta vacio.");
   if (cuerpo.items.length > MAX_ITEMS) {
     return mal(`El carrito no puede tener mas de ${MAX_ITEMS} renglones.`);
@@ -46,13 +48,16 @@ export const validarCuerpo = (cuerpo) => {
     if (!esTexto(it.codigo, 100)) return mal(`${donde}: codigo invalido.`);
     if (!CLAVES.has(it.unidad)) return mal(`${donde}: unidad invalida.`);
     if (!esEntero(it.cantidad, 1, MAX_CANTIDAD)) {
-      return mal(`${donde}: la cantidad tiene que ser un entero de 1 a ${MAX_CANTIDAD}.`);
+      return mal(
+        `${donde}: la cantidad tiene que ser un entero de 1 a ${MAX_CANTIDAD}.`,
+      );
     }
     if (!esNumero(it.precioVisto, 0)) {
       return mal(`${donde}: el precio visto tiene que ser un numero.`);
     }
 
-    const modelo = it.modelo === undefined || it.modelo === null ? null : it.modelo;
+    const modelo =
+      it.modelo === undefined || it.modelo === null ? null : it.modelo;
     if (modelo !== null && !esTexto(modelo, 100)) {
       return mal(`${donde}: modelo invalido.`);
     }
@@ -75,7 +80,11 @@ export const validarCuerpo = (cuerpo) => {
     });
   }
 
-  const telefono = typeof cuerpo.telefono === "string" ? cuerpo.telefono : undefined;
+  const telefono =
+    typeof cuerpo.telefono === "string" ? cuerpo.telefono : undefined;
 
-  return { ok: true, datos: { idempotencia: cuerpo.idempotencia, items, telefono } };
+  return {
+    ok: true,
+    datos: { idempotencia: cuerpo.idempotencia, items, telefono },
+  };
 };

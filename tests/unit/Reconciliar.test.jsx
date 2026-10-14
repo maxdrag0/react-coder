@@ -24,7 +24,7 @@ describe("Reconciliar", () => {
         problemas={[PROBLEMAS[0]]}
         onConfirmar={vi.fn()}
         onCancelar={vi.fn()}
-      />
+      />,
     );
     expect(screen.getByText(/Torta 100 tiros/)).toBeInTheDocument();
     expect(screen.getByText(/\$7\.000/)).toBeInTheDocument();
@@ -37,7 +37,7 @@ describe("Reconciliar", () => {
         problemas={[PROBLEMAS[1]]}
         onConfirmar={vi.fn()}
         onCancelar={vi.fn()}
-      />
+      />,
     );
     expect(screen.getByText(/ya no est[aá] disponible/i)).toBeInTheDocument();
   });
@@ -46,7 +46,11 @@ describe("Reconciliar", () => {
     // Un tipo sin texto mostraría un renglón vacío, que se lee como un error
     // de la tienda y no como una explicación.
     const { container } = render(
-      <Reconciliar problemas={PROBLEMAS} onConfirmar={vi.fn()} onCancelar={vi.fn()} />
+      <Reconciliar
+        problemas={PROBLEMAS}
+        onConfirmar={vi.fn()}
+        onCancelar={vi.fn()}
+      />,
     );
     const renglones = container.querySelectorAll(".reconciliar-item");
     expect(renglones).toHaveLength(4);
@@ -61,7 +65,7 @@ describe("Reconciliar", () => {
         problemas={PROBLEMAS}
         onConfirmar={onConfirmar}
         onCancelar={vi.fn()}
-      />
+      />,
     );
 
     await usuario.click(screen.getByRole("button", { name: /seguir/i }));
@@ -76,7 +80,7 @@ describe("Reconciliar", () => {
         problemas={PROBLEMAS}
         onConfirmar={vi.fn()}
         onCancelar={onCancelar}
-      />
+      />,
     );
 
     await usuario.click(screen.getByRole("button", { name: /revisar/i }));

@@ -69,7 +69,7 @@ describe("cacheCatalogo", () => {
   it("ignora un caché que no es un arreglo", () => {
     sessionStorage.setItem(
       "catalogo:__todas__",
-      JSON.stringify({ items: { truco: true }, guardadoEn: Date.now() })
+      JSON.stringify({ items: { truco: true }, guardadoEn: Date.now() }),
     );
     expect(leerCatalogo(null)).toBeNull();
   });

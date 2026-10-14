@@ -35,10 +35,16 @@ beforeEach(() => {
 
 describe("registerWithEmail", () => {
   it("crea la cuenta, setea el displayName, el perfil y manda la verificación", async () => {
-    const r = await registerWithEmail("ana@mail.com", "contrasenia8", "Ana Pérez");
+    const r = await registerWithEmail(
+      "ana@mail.com",
+      "contrasenia8",
+      "Ana Pérez",
+    );
 
     expect(r.user).toEqual(USUARIO);
-    expect(updateProfileMock).toHaveBeenCalledWith(USUARIO, { displayName: "Ana Pérez" });
+    expect(updateProfileMock).toHaveBeenCalledWith(USUARIO, {
+      displayName: "Ana Pérez",
+    });
     expect(setDocMock).toHaveBeenCalled();
     expect(sendEmailVerificationMock).toHaveBeenCalledWith(USUARIO);
     expect(r.avisos).toEqual([]);
@@ -70,7 +76,9 @@ describe("registerWithEmail", () => {
   });
 
   it("NO tira si falla updateProfile", async () => {
-    updateProfileMock.mockImplementation(() => Promise.reject(new Error("offline")));
+    updateProfileMock.mockImplementation(() =>
+      Promise.reject(new Error("offline")),
+    );
 
     const r = await registerWithEmail("ana@mail.com", "contrasenia8", "Ana");
 
@@ -85,7 +93,7 @@ describe("registerWithEmail", () => {
     createUserMock.mockImplementation(() => Promise.reject(e));
 
     await expect(
-      registerWithEmail("ana@mail.com", "contrasenia8", "Ana")
+      registerWithEmail("ana@mail.com", "contrasenia8", "Ana"),
     ).rejects.toHaveProperty("code", "auth/email-already-in-use");
 
     expect(setDocMock).not.toHaveBeenCalled();

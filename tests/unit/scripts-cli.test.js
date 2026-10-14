@@ -14,7 +14,11 @@ async function correr(script, args = [], env = {}) {
     });
     return { code: 0, ...r };
   } catch (e) {
-    return { code: e.code ?? 1, stdout: e.stdout ?? "", stderr: e.stderr ?? "" };
+    return {
+      code: e.code ?? 1,
+      stdout: e.stdout ?? "",
+      stderr: e.stderr ?? "",
+    };
   }
 }
 
@@ -31,36 +35,50 @@ const RUTA_CORRUPTA = join("tests", "unit", "__credencial-corrupta.json");
 const ESPERA = 60_000;
 
 describe("scripts/set-admin.mjs - rutas de error", () => {
-  it("explica el uso cuando no se pasa email, incluso sin credencial", async () => {
-    const r = await correr("scripts/set-admin.mjs", [], {
-      FIREBASE_SERVICE_ACCOUNT_PATH: RUTA_INEXISTENTE,
-    });
-    expect(r.code).toBe(1);
-    expect(r.stderr).toMatch(/Uso:/);
-    expect(r.stderr).toMatch(/set-admin/);
-  }, ESPERA);
-
-  it("explica cómo obtener la credencial cuando falta, si el email sí vino", async () => {
-    const r = await correr("scripts/set-admin.mjs", ["ana@mail.com"], {
-      FIREBASE_SERVICE_ACCOUNT_PATH: RUTA_INEXISTENTE,
-    });
-    expect(r.code).toBe(1);
-    expect(r.stderr).toMatch(/No se encontró la credencial/);
-    expect(r.stderr).toMatch(/Cuentas de servicio/);
-  }, ESPERA);
-
-  it("da un mensaje legible si la credencial existe pero está corrupta", async () => {
-    writeFileSync(RUTA_CORRUPTA, "esto no es json");
-    try {
-      const r = await correr("scripts/set-admin.mjs", ["ana@mail.com"], {
-        FIREBASE_SERVICE_ACCOUNT_PATH: RUTA_CORRUPTA,
+  it(
+    "explica el uso cuando no se pasa email, incluso sin credencial",
+    async () => {
+      const r = await correr("scripts/set-admin.mjs", [], {
+        FIREBASE_SERVICE_ACCOUNT_PATH: RUTA_INEXISTENTE,
       });
       expect(r.code).toBe(1);
-      // Lo que NO debe pasar: volcar un stack trace de firebase-admin.
-      expect(r.stderr).not.toMatch(/at new ServiceAccount|credential-internal/);
-      expect(r.stderr).toMatch(/credencial/i);
-    } finally {
-      rmSync(RUTA_CORRUPTA, { force: true });
-    }
-  }, ESPERA);
+      expect(r.stderr).toMatch(/Uso:/);
+      expect(r.stderr).toMatch(/set-admin/);
+    },
+    ESPERA,
+  );
+
+  it(
+    "explica cómo obtener la credencial cuando falta, si el email sí vino",
+    async () => {
+      const r = await correr("scripts/set-admin.mjs", ["ana@mail.com"], {
+        FIREBASE_SERVICE_ACCOUNT_PATH: RUTA_INEXISTENTE,
+      });
+      expect(r.code).toBe(1);
+      expect(r.stderr).toMatch(/No se encontró la credencial/);
+      expect(r.stderr).toMatch(/Cuentas de servicio/);
+    },
+    ESPERA,
+  );
+
+  it(
+    "da un mensaje legible si la credencial existe pero está corrupta",
+    async () => {
+      writeFileSync(RUTA_CORRUPTA, "esto no es json");
+      try {
+        const r = await correr("scripts/set-admin.mjs", ["ana@mail.com"], {
+          FIREBASE_SERVICE_ACCOUNT_PATH: RUTA_CORRUPTA,
+        });
+        expect(r.code).toBe(1);
+        // Lo que NO debe pasar: volcar un stack trace de firebase-admin.
+        expect(r.stderr).not.toMatch(
+          /at new ServiceAccount|credential-internal/,
+        );
+        expect(r.stderr).toMatch(/credencial/i);
+      } finally {
+        rmSync(RUTA_CORRUPTA, { force: true });
+      }
+    },
+    ESPERA,
+  );
 });

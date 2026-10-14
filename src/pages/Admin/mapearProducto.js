@@ -98,16 +98,16 @@ export const aFormulario = (p) => ({
   ...p,
   // Se guarda el original para poder detectar el cambio al guardar.
   codigoOriginal: p.codigo,
-  name: p.name ?? p.nombre ?? "",
+  name: p.nombre ?? p.name ?? "",
   price: p.price ?? p.precioUnitario ?? "",
   presentaciones: presentacionesAlFormulario(presentacionesDe(p)),
   fotos: fotosDe(p),
   archivosNuevos: [],
   conModelos: modelosDe(p).length > 0,
   modelos: modelosAlFormulario(p),
-  category: p.category ?? p.categoria ?? "",
-  description: p.description ?? p.descripcion ?? "",
-  image: p.image ?? p.fotoUrl ?? "",
+  category: p.categoria ?? p.category ?? "",
+  description: p.descripcion ?? p.description ?? "",
+  image: p.fotoUrl ?? p.image ?? "",
   videoUrl: p.videoUrl ?? "",
   marca: p.marca ?? "",
   subcategoria: p.subcategoria ?? "",
@@ -178,13 +178,12 @@ const modelosDeFormulario = (form) => {
 export const aFirestore = (form) => {
   const presentaciones = presentacionesDeFormulario(
     form.presentaciones,
-    Number(form.price)
+    Number(form.price),
   );
   const modelos = form.conModelos ? modelosDeFormulario(form) : [];
   const conModelos = modelos.length > 0;
 
   return {
-    name: form.name,
     nombre: form.name,
     presentaciones,
     modelos,
@@ -197,9 +196,7 @@ export const aFirestore = (form) => {
     precioUnitario: conModelos ? null : Number(form.price),
     precioDisplay: conModelos ? null : (presentaciones.display?.precio ?? null),
     precioBulto: conModelos ? null : (presentaciones.bulto?.precio ?? null),
-    category: form.category,
     categoria: form.category,
-    description: form.description ?? "",
     descripcion: form.description ?? "",
     marca: textoOpcional(form.marca),
     subcategoria: textoOpcional(form.subcategoria),
@@ -208,11 +205,10 @@ export const aFirestore = (form) => {
     videoUrl: textoOpcional(form.videoUrl),
     fotos: form.fotos ?? [],
     /*
-      La primera foto se sigue escribiendo en los campos viejos: son los que
-      lee cualquier cosa que todavia no conozca `fotos` (los scripts, el
-      archivo semilla). En null si no hay ninguna.
+      La primera foto se sigue escribiendo suelta en `fotoUrl`: es la que lee
+      cualquier cosa que todavia no conozca `fotos` (los scripts, el archivo
+      semilla). En null si no hay ninguna.
     */
-    image: form.fotos?.[0] ?? null,
     fotoUrl: form.fotos?.[0] ?? null,
   };
 };

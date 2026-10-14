@@ -45,7 +45,13 @@ const pedido = (extra = {}) => ({
   body: {
     idempotencia: "uuid-1",
     items: [
-      { codigo: "A12", unidad: "unitario", modelo: null, cantidad: 1, precioVisto: 8000 },
+      {
+        codigo: "A12",
+        unidad: "unitario",
+        modelo: null,
+        cantidad: 1,
+        precioVisto: 8000,
+      },
     ],
     ...extra,
   },
@@ -139,7 +145,10 @@ describe("api/orden: telefono", () => {
   it("guarda en el perfil el telefono que llego en el cuerpo", async () => {
     getPerfil.mockResolvedValue({ exists: true, data: () => ({}) });
     await handler(pedido({ telefono: "11 2345-6789" }), respuesta());
-    expect(set.mock.calls[0]).toEqual([{ telefono: "1123456789" }, { merge: true }]);
+    expect(set.mock.calls[0]).toEqual([
+      { telefono: "1123456789" },
+      { merge: true },
+    ]);
   });
 
   it("422 con un telefono del cuerpo que no sirve", async () => {
@@ -156,10 +165,16 @@ describe("api/orden: validacion contra el catalogo", () => {
     await handler(
       pedido({
         items: [
-          { codigo: "A12", unidad: "unitario", modelo: null, cantidad: 1, precioVisto: 1 },
+          {
+            codigo: "A12",
+            unidad: "unitario",
+            modelo: null,
+            cantidad: 1,
+            precioVisto: 1,
+          },
         ],
       }),
-      res
+      res,
     );
     expect(res.codigo).toBe(409);
     expect(res.cuerpo.problemas[0].tipo).toBe("precio_cambio");
@@ -216,7 +231,9 @@ describe("api/orden: la orden que escribe", () => {
 
 describe("api/orden: errores inesperados", () => {
   it("500 generico, sin filtrar el detalle", async () => {
-    getAll.mockRejectedValue(new Error("Firestore: PERMISSION_DENIED en products"));
+    getAll.mockRejectedValue(
+      new Error("Firestore: PERMISSION_DENIED en products"),
+    );
     const res = respuesta();
     await handler(pedido(), res);
     expect(res.codigo).toBe(500);
@@ -236,8 +253,20 @@ describe("api/orden: un codigo repetido se pide una sola vez", () => {
   const enDosUnidades = () =>
     pedido({
       items: [
-        { codigo: "A12", unidad: "unitario", modelo: null, cantidad: 1, precioVisto: 8000 },
-        { codigo: "A12", unidad: "bulto", modelo: null, cantidad: 1, precioVisto: 90000 },
+        {
+          codigo: "A12",
+          unidad: "unitario",
+          modelo: null,
+          cantidad: 1,
+          precioVisto: 8000,
+        },
+        {
+          codigo: "A12",
+          unidad: "bulto",
+          modelo: null,
+          cantidad: 1,
+          precioVisto: 90000,
+        },
       ],
     });
 

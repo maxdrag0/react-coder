@@ -32,7 +32,7 @@ const montar = (item) =>
   render(
     <MemoryRouter>
       <Item item={item} />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 
 describe("Item: qué muestra", () => {
@@ -59,10 +59,9 @@ describe("Item: qué muestra", () => {
 
   it("la card entera es un link al detalle", () => {
     montar(COMPLETO);
-    expect(screen.getByRole("link", { name: /Torta 100 tiros/ })).toHaveAttribute(
-      "href",
-      "/product/201"
-    );
+    expect(
+      screen.getByRole("link", { name: /Torta 100 tiros/ }),
+    ).toHaveAttribute("href", "/product/201");
   });
 });
 
@@ -74,7 +73,7 @@ describe("Item: el precio", () => {
     const { container } = montar(COMPLETO);
 
     expect(container.querySelector(".precio-principal").textContent).toContain(
-      "4.500"
+      "4.500",
     );
 
     const otras = container.querySelector(".precio-otras").textContent;
@@ -89,16 +88,20 @@ describe("Item: el precio", () => {
       precioBulto: null,
     });
     expect(container.querySelector(".precio-principal").textContent).toContain(
-      "4.500"
+      "4.500",
     );
     expect(container.querySelector(".precio-otras")).toBeNull();
   });
 
-  it("acepta el esquema en inglés igual que el de castellano", () => {
-    const { container } = montar({ codigo: "9", name: "Mortero", price: 1200 });
+  it("acepta el `price` del esquema viejo, que todavia no se migro", () => {
+    const { container } = montar({
+      codigo: "9",
+      nombre: "Mortero",
+      price: 1200,
+    });
     expect(screen.getByText("Mortero")).toBeInTheDocument();
     expect(container.querySelector(".precio-principal").textContent).toContain(
-      "1.200"
+      "1.200",
     );
   });
 
@@ -153,7 +156,8 @@ describe("Item: texto largo", () => {
   it("deja que el nombre se corte en vez de desbordar", () => {
     const { container } = montar({
       ...COMPLETO,
-      nombre: "Petardo El Villerito Nacional Extra Largo De Prueba Para Desborde",
+      nombre:
+        "Petardo El Villerito Nacional Extra Largo De Prueba Para Desborde",
     });
     expect(container.querySelector(".item-titulo")).toBeInTheDocument();
   });

@@ -34,7 +34,7 @@ describe("firebase-admin", () => {
       adentro, el bundle del navegador seria la llave maestra de la base.
     */
     const culpables = archivosDe("src").filter((f) =>
-      readFileSync(f, "utf8").includes("firebase-admin")
+      readFileSync(f, "utf8").includes("firebase-admin"),
     );
     expect(culpables).toEqual([]);
   });

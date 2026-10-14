@@ -5,9 +5,24 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 
 const CATALOGO = [
-  { codigo: "1", nombre: "Cohete Alfa", marca: "Punto Austral", precioUnitario: 100 },
-  { codigo: "2", nombre: "Cohete Beta", marca: "Punto Austral", precioUnitario: 200 },
-  { codigo: "3", nombre: "Torta Gamma", marca: "Cienfuegos", precioUnitario: 300 },
+  {
+    codigo: "1",
+    nombre: "Cohete Alfa",
+    marca: "Punto Austral",
+    precioUnitario: 100,
+  },
+  {
+    codigo: "2",
+    nombre: "Cohete Beta",
+    marca: "Punto Austral",
+    precioUnitario: 200,
+  },
+  {
+    codigo: "3",
+    nombre: "Torta Gamma",
+    marca: "Cienfuegos",
+    precioUnitario: 300,
+  },
   { codigo: "4", nombre: "Petardo Delta", precioUnitario: 400 },
 ];
 
@@ -27,7 +42,7 @@ function montar() {
       <Routes>
         <Route path="/products" element={<Products />} />
       </Routes>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -63,8 +78,10 @@ describe("Products: conteo por marca en los filtros", () => {
     const usuario = userEvent.setup();
     montar();
     await usuario.type(
-      screen.getByRole("searchbox", { name: "Buscar productos en el catálogo" }),
-      "Cohete"
+      screen.getByRole("searchbox", {
+        name: "Buscar productos en el catálogo",
+      }),
+      "Cohete",
     );
 
     expect(cuentaDe("Punto Austral")).toBe("2");
@@ -75,13 +92,17 @@ describe("Products: conteo por marca en los filtros", () => {
     const usuario = userEvent.setup();
     montar();
     await usuario.type(
-      screen.getByRole("searchbox", { name: "Buscar productos en el catálogo" }),
-      "Cohete"
+      screen.getByRole("searchbox", {
+        name: "Buscar productos en el catálogo",
+      }),
+      "Cohete",
     );
 
-    expect(casillaDe("Cienfuegos").closest("label")).toHaveClass("filtro-check-vacia");
+    expect(casillaDe("Cienfuegos").closest("label")).toHaveClass(
+      "filtro-check-vacia",
+    );
     expect(casillaDe("Punto Austral").closest("label")).not.toHaveClass(
-      "filtro-check-vacia"
+      "filtro-check-vacia",
     );
   });
 });

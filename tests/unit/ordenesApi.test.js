@@ -8,7 +8,13 @@ vi.mock("@/utils/firebase", () => ({
 const { enviarOrden } = await import("@/services/api/ordenes");
 
 const ITEMS = [
-  { codigo: "A12", unidad: "unitario", modelo: null, cantidad: 1, precioVisto: 8000 },
+  {
+    codigo: "A12",
+    unidad: "unitario",
+    modelo: null,
+    cantidad: 1,
+    precioVisto: 8000,
+  },
 ];
 
 // La idempotencia la elige quien manda el pedido, no enviarOrden.

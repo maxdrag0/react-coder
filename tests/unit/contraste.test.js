@@ -36,45 +36,53 @@ const CLARO = '[data-theme="light"] {';
 
 describe("contraste de los tokens — tema oscuro", () => {
   it("el texto principal sobre el fondo supera 4.5:1", () => {
-    expect(contraste(token(OSCURO, "--text"), token(OSCURO, "--ground")))
-      .toBeGreaterThanOrEqual(4.5);
+    expect(
+      contraste(token(OSCURO, "--text"), token(OSCURO, "--ground")),
+    ).toBeGreaterThanOrEqual(4.5);
   });
 
   it("el texto secundario sobre el fondo supera 4.5:1", () => {
-    expect(contraste(token(OSCURO, "--text-suave"), token(OSCURO, "--ground")))
-      .toBeGreaterThanOrEqual(4.5);
+    expect(
+      contraste(token(OSCURO, "--text-suave"), token(OSCURO, "--ground")),
+    ).toBeGreaterThanOrEqual(4.5);
   });
 
   it("el dorado sobre el fondo supera 4.5:1 (es donde va el precio)", () => {
-    expect(contraste(token(OSCURO, "--gold"), token(OSCURO, "--ground")))
-      .toBeGreaterThanOrEqual(4.5);
+    expect(
+      contraste(token(OSCURO, "--gold"), token(OSCURO, "--ground")),
+    ).toBeGreaterThanOrEqual(4.5);
   });
 
   it("el texto principal sobre la superficie de card supera 4.5:1", () => {
-    expect(contraste(token(OSCURO, "--text"), token(OSCURO, "--surface")))
-      .toBeGreaterThanOrEqual(4.5);
+    expect(
+      contraste(token(OSCURO, "--text"), token(OSCURO, "--surface")),
+    ).toBeGreaterThanOrEqual(4.5);
   });
 
   it("el dorado sobre la superficie de card supera 4.5:1", () => {
-    expect(contraste(token(OSCURO, "--gold"), token(OSCURO, "--surface")))
-      .toBeGreaterThanOrEqual(4.5);
+    expect(
+      contraste(token(OSCURO, "--gold"), token(OSCURO, "--surface")),
+    ).toBeGreaterThanOrEqual(4.5);
   });
 
   it("el rojo de peligro sobre el fondo supera 4.5:1", () => {
-    expect(contraste(token(OSCURO, "--danger"), token(OSCURO, "--ground")))
-      .toBeGreaterThanOrEqual(4.5);
+    expect(
+      contraste(token(OSCURO, "--danger"), token(OSCURO, "--ground")),
+    ).toBeGreaterThanOrEqual(4.5);
   });
 });
 
 describe("contraste de los tokens — tema claro", () => {
   it("el texto principal sobre el fondo supera 4.5:1", () => {
-    expect(contraste(token(CLARO, "--text"), token(CLARO, "--ground")))
-      .toBeGreaterThanOrEqual(4.5);
+    expect(
+      contraste(token(CLARO, "--text"), token(CLARO, "--ground")),
+    ).toBeGreaterThanOrEqual(4.5);
   });
 
   it("el texto secundario sobre el fondo supera 4.5:1", () => {
-    expect(contraste(token(CLARO, "--text-suave"), token(CLARO, "--ground")))
-      .toBeGreaterThanOrEqual(4.5);
+    expect(
+      contraste(token(CLARO, "--text-suave"), token(CLARO, "--ground")),
+    ).toBeGreaterThanOrEqual(4.5);
   });
 
   it("EL DORADO SOBRE BLANCO supera 4.5:1", () => {
@@ -82,13 +90,15 @@ describe("contraste de los tokens — tema claro", () => {
     // olvida oscurecerlo en el tema claro, el precio —el dato más importante
     // de la card— se vuelve ilegible y nadie se da cuenta porque en oscuro
     // se ve perfecto.
-    expect(contraste(token(CLARO, "--gold"), token(CLARO, "--surface")))
-      .toBeGreaterThanOrEqual(4.5);
+    expect(
+      contraste(token(CLARO, "--gold"), token(CLARO, "--surface")),
+    ).toBeGreaterThanOrEqual(4.5);
   });
 
   it("el rojo de peligro sobre el fondo supera 4.5:1", () => {
-    expect(contraste(token(CLARO, "--danger"), token(CLARO, "--ground")))
-      .toBeGreaterThanOrEqual(4.5);
+    expect(
+      contraste(token(CLARO, "--danger"), token(CLARO, "--ground")),
+    ).toBeGreaterThanOrEqual(4.5);
   });
 });
 
@@ -100,16 +110,18 @@ describe("el dorado de marca sin corregir NO pasaría en claro", () => {
 
 describe("texto sobre el dorado — el botón primario", () => {
   it("es legible en tema oscuro", () => {
-    expect(contraste(token(OSCURO, "--sobre-gold"), token(OSCURO, "--gold")))
-      .toBeGreaterThanOrEqual(4.5);
+    expect(
+      contraste(token(OSCURO, "--sobre-gold"), token(OSCURO, "--gold")),
+    ).toBeGreaterThanOrEqual(4.5);
   });
 
   it("es legible en tema claro", () => {
     // En claro el dorado se oscurece para ser legible como texto, así que el
     // texto ENCIMA del dorado tiene que invertirse. Fijarlo en un literal
     // dejaba el botón primario ilegible justo en el tema que menos se prueba.
-    expect(contraste(token(CLARO, "--sobre-gold"), token(CLARO, "--gold")))
-      .toBeGreaterThanOrEqual(4.5);
+    expect(
+      contraste(token(CLARO, "--sobre-gold"), token(CLARO, "--gold")),
+    ).toBeGreaterThanOrEqual(4.5);
   });
 });
 
@@ -118,15 +130,22 @@ describe("texto sobre el dorado — el botón primario", () => {
 // etiquetas de la ficha y los placeholders de los campos.
 describe("contraste sobre las superficies, no solo sobre el fondo", () => {
   const SUPERFICIES = ["--surface", "--surface-alto"];
-  const TEXTOS = ["--text", "--text-suave", "--text-tenue", "--gold", "--danger"];
+  const TEXTOS = [
+    "--text",
+    "--text-suave",
+    "--text-tenue",
+    "--gold",
+    "--danger",
+  ];
 
   for (const tema of [OSCURO, CLARO]) {
     const nombre = tema === OSCURO ? "oscuro" : "claro";
     for (const fondo of SUPERFICIES) {
       for (const texto of TEXTOS) {
         it(`${texto} sobre ${fondo} en tema ${nombre}`, () => {
-          expect(contraste(token(tema, texto), token(tema, fondo)))
-            .toBeGreaterThanOrEqual(4.5);
+          expect(
+            contraste(token(tema, texto), token(tema, fondo)),
+          ).toBeGreaterThanOrEqual(4.5);
         });
       }
     }

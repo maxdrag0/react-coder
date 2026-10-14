@@ -20,22 +20,28 @@ import { enLotes } from "../../utils/enLotes";
 const idSeguro = (codigo) => String(codigo).replace(/\//g, "-");
 const refDe = (codigo) => doc(db, "products", idSeguro(codigo));
 
-export const obtenerProductos = async (categoria, lastVisible = null, pageSize = 8) => {
+export const obtenerProductos = async (
+  categoria,
+  lastVisible = null,
+  pageSize = 8,
+) => {
   try {
     const productsRef = collection(db, "products");
     let queryConstraints = [];
 
     if (categoria) {
-      queryConstraints.push(where("category", "in", [categoria, categoria.toUpperCase()]));
+      queryConstraints.push(
+        where("category", "in", [categoria, categoria.toUpperCase()]),
+      );
     }
-    
+
     // Default order by ID or any other field to ensure consistent pagination
     queryConstraints.push(orderBy("__name__"));
-    
+
     if (lastVisible) {
       queryConstraints.push(startAfter(lastVisible));
     }
-    
+
     queryConstraints.push(limit(pageSize));
 
     const q = query(productsRef, ...queryConstraints);
@@ -111,7 +117,9 @@ export const eliminarProducto = async (id) => {
 export const actualizarEstados = async (codigos, estado) => {
   for (const lote of enLotes(codigos)) {
     const batch = writeBatch(db);
-    lote.forEach((codigo) => batch.set(refDe(codigo), { estado }, { merge: true }));
+    lote.forEach((codigo) =>
+      batch.set(refDe(codigo), { estado }, { merge: true }),
+    );
     await batch.commit();
   }
 };

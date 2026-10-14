@@ -6,7 +6,8 @@ import { MemoryRouter, Routes, Route } from "react-router-dom";
 const useAuthMock = vi.fn();
 vi.mock("@/contexts/auth/useAuth", () => ({ useAuth: () => useAuthMock() }));
 
-const { default: ProtectedRoute } = await import("@/components/ProtectedRoute/ProtectedRoute");
+const { default: ProtectedRoute } =
+  await import("@/components/ProtectedRoute/ProtectedRoute");
 
 function montar({ ruta = "/admin", auth }) {
   useAuthMock.mockReturnValue(auth);
@@ -22,7 +23,7 @@ function montar({ ruta = "/admin", auth }) {
           <Route path="/admin" element={<p>panel de admin</p>} />
         </Route>
       </Routes>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -36,7 +37,10 @@ describe("ProtectedRoute", () => {
   });
 
   it("manda al login a un visitante no autenticado", () => {
-    montar({ ruta: "/profile", auth: { user: null, isAdmin: false, loading: false } });
+    montar({
+      ruta: "/profile",
+      auth: { user: null, isAdmin: false, loading: false },
+    });
     expect(screen.getByText("pantalla de login")).toBeInTheDocument();
   });
 

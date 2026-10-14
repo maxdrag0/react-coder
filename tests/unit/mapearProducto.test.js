@@ -74,13 +74,20 @@ describe("aFirestore: lo que sí se guarda", () => {
   it("guarda precio y cantidad de cada presentación activa", () => {
     const datos = aFirestore(conDisplayYBulto);
     expect(datos.presentaciones.unitario).toEqual({ precio: 8000 });
-    expect(datos.presentaciones.display).toEqual({ precio: 15000, unidades: 5 });
-    expect(datos.presentaciones.bulto).toEqual({ precio: 140000, unidades: 50 });
+    expect(datos.presentaciones.display).toEqual({
+      precio: 15000,
+      unidades: 5,
+    });
+    expect(datos.presentaciones.bulto).toEqual({
+      precio: 140000,
+      unidades: 50,
+    });
   });
 
-  it("escribe los dos esquemas, para que la tienda lea lo mismo", () => {
+  it("escribe el nombre canonico y los precios del esquema viejo", () => {
+    // Los precios sueltos siguen: son otro par legado, de antes de las
+    // presentaciones, y todavia no se migraron.
     const datos = aFirestore(conDisplayYBulto);
-    expect(datos.name).toBe("Torta 100 tiros");
     expect(datos.nombre).toBe("Torta 100 tiros");
     expect(datos.precioUnitario).toBe(8000);
     expect(datos.precioDisplay).toBe(15000);
@@ -88,7 +95,9 @@ describe("aFirestore: lo que sí se guarda", () => {
 
   it("la cantidad vacía queda en null, no en cero", () => {
     const sinCantidad = form({
-      presentaciones: { display: { activa: true, precio: "15000", unidades: "" } },
+      presentaciones: {
+        display: { activa: true, precio: "15000", unidades: "" },
+      },
     });
     expect(aFirestore(sinCantidad).presentaciones.display.unidades).toBeNull();
   });
@@ -102,7 +111,9 @@ describe("aFirestore: modelos", () => {
         id: null,
         etiqueta: "3 pulgadas",
         precio: "8000",
-        presentaciones: { display: { activa: true, precio: "15000", unidades: "5" } },
+        presentaciones: {
+          display: { activa: true, precio: "15000", unidades: "5" },
+        },
       },
       { id: null, etiqueta: "5 pulgadas", precio: "20000", presentaciones: {} },
     ],
@@ -121,7 +132,12 @@ describe("aFirestore: modelos", () => {
     const renombrado = form({
       conModelos: true,
       modelos: [
-        { id: "tres", etiqueta: "3 pulgadas (chico)", precio: "8000", presentaciones: {} },
+        {
+          id: "tres",
+          etiqueta: "3 pulgadas (chico)",
+          precio: "8000",
+          presentaciones: {},
+        },
       ],
     });
     expect(aFirestore(renombrado).modelos[0].id).toBe("tres");
@@ -149,7 +165,10 @@ describe("aFirestore: modelos", () => {
   it("destildar 'por modelo' vacía la lista, no la deja escondida", () => {
     // Si el array no viajara vacio, un producto que tuvo modelos los
     // seguiria teniendo y la tienda pediria elegir uno.
-    const sinModelos = form({ conModelos: false, modelos: [{ id: "x", etiqueta: "X", precio: "1" }] });
+    const sinModelos = form({
+      conModelos: false,
+      modelos: [{ id: "x", etiqueta: "X", precio: "1" }],
+    });
     expect(aFirestore(sinModelos).modelos).toEqual([]);
   });
 });
@@ -188,12 +207,20 @@ describe("aFormulario: leer un producto existente", () => {
     const conMod = {
       codigo: "M1",
       modelos: [
-        { id: "a", etiqueta: "Rojo", presentaciones: { unitario: { precio: 100 } } },
+        {
+          id: "a",
+          etiqueta: "Rojo",
+          presentaciones: { unitario: { precio: 100 } },
+        },
       ],
     };
     const f = aFormulario(conMod);
     expect(f.conModelos).toBe(true);
-    expect(f.modelos[0]).toMatchObject({ id: "a", etiqueta: "Rojo", precio: 100 });
+    expect(f.modelos[0]).toMatchObject({
+      id: "a",
+      etiqueta: "Rojo",
+      precio: 100,
+    });
   });
 });
 
@@ -205,28 +232,39 @@ describe("aFirestore: fotos", () => {
     expect(aFirestore(form({ fotos: [A, B] })).fotos).toEqual([A, B]);
   });
 
-  it("escribe la primera en los campos viejos", () => {
-    // Son los que lee cualquier cosa que todavia no conozca `fotos`: los
+  it("escribe la primera suelta en fotoUrl", () => {
+    // Es la que lee cualquier cosa que todavia no conozca `fotos`: los
     // scripts y el archivo semilla.
     const datos = aFirestore(form({ fotos: [A, B] }));
     expect(datos.fotoUrl).toBe(A);
-    expect(datos.image).toBe(A);
+    expect("image" in datos).toBe(false);
   });
 
-  it("sin fotos deja los campos viejos en null, no en undefined", () => {
+  it("sin fotos deja fotoUrl en null, no en undefined", () => {
     // undefined hace que Firestore rechace la escritura entera.
     const datos = aFirestore(form({ fotos: [] }));
     expect(datos.fotos).toEqual([]);
     expect(datos.fotoUrl).toBeNull();
-    expect(datos.image).toBeNull();
   });
 
   it("guarda la foto de cada modelo", () => {
     const conFotos = form({
       conModelos: true,
       modelos: [
-        { id: "rojo", etiqueta: "Rojo", precio: "100", foto: A, presentaciones: {} },
-        { id: "verde", etiqueta: "Verde", precio: "100", foto: "", presentaciones: {} },
+        {
+          id: "rojo",
+          etiqueta: "Rojo",
+          precio: "100",
+          foto: A,
+          presentaciones: {},
+        },
+        {
+          id: "verde",
+          etiqueta: "Verde",
+          precio: "100",
+          foto: "",
+          presentaciones: {},
+        },
       ],
     });
     const modelos = aFirestore(conFotos).modelos;
@@ -244,7 +282,10 @@ describe("aFormulario: fotos", () => {
 
   it("lee la foto única del esquema viejo", () => {
     // Los 323 productos del catalogo estan asi.
-    const f = aFormulario({ codigo: "A1", fotoUrl: "https://x.test/vieja.jpg" });
+    const f = aFormulario({
+      codigo: "A1",
+      fotoUrl: "https://x.test/vieja.jpg",
+    });
     expect(f.fotos).toEqual(["https://x.test/vieja.jpg"]);
   });
 
@@ -265,5 +306,48 @@ describe("aFormulario: fotos", () => {
       ],
     };
     expect(aFormulario(conMod).modelos[0].foto).toBe("https://x.test/rojo.jpg");
+  });
+});
+
+describe("aFirestore: un solo idioma", () => {
+  /*
+    El panel escribia los dos: name Y nombre, category Y categoria. Con la
+    migracion ya corrida eso la revierte de a un producto por vez, en silencio
+    y justo sobre los que mas se tocan.
+
+    Los campos de precio viejos (price, precioUnitario...) NO entran aca: son
+    otro par legado, de antes de las presentaciones, y todavia no se migraron.
+  */
+  const guardado = () =>
+    aFirestore({
+      ...form(),
+      name: "Torta 100 tiros",
+      category: "Tortas",
+      description: "Cien tiros",
+      fotos: ["https://x/f.jpg"],
+    });
+
+  it("no escribe name", () => {
+    expect("name" in guardado()).toBe(false);
+  });
+
+  it("no escribe category", () => {
+    expect("category" in guardado()).toBe(false);
+  });
+
+  it("no escribe description", () => {
+    expect("description" in guardado()).toBe(false);
+  });
+
+  it("no escribe image", () => {
+    expect("image" in guardado()).toBe(false);
+  });
+
+  it("sigue escribiendo los canonicos", () => {
+    const g = guardado();
+    expect(g.nombre).toBe("Torta 100 tiros");
+    expect(g.categoria).toBe("Tortas");
+    expect(g.descripcion).toBe("Cien tiros");
+    expect(g.fotoUrl).toBe("https://x/f.jpg");
   });
 });

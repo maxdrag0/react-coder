@@ -9,7 +9,9 @@ vi.mock("@/contexts/auth/useAuth", () => ({
 }));
 
 // El carrito y el logo no participan de la navegación que se prueba acá.
-vi.mock("@/components/NavBar/CartMenu/CartMenu", () => ({ default: () => null }));
+vi.mock("@/components/NavBar/CartMenu/CartMenu", () => ({
+  default: () => null,
+}));
 vi.mock("@/components/NavBar/Logo/Logo", () => ({ default: () => null }));
 
 const { default: NavBar } = await import("@/components/NavBar/NavBar");
@@ -27,7 +29,7 @@ function montar(ruta = "/") {
         <Route path="/contact" element={<p>pantalla de contacto</p>} />
         <Route path="/login" element={<p>pantalla de login</p>} />
       </Routes>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -62,10 +64,10 @@ describe("NavBar: el buscador no secuestra la navegación", () => {
     montar("/");
     await usuario.type(
       screen.getByRole("searchbox", { name: "Buscar productos" }),
-      "cohete"
+      "cohete",
     );
     await waitFor(() =>
-      expect(screen.getByText("pantalla de productos")).toBeInTheDocument()
+      expect(screen.getByText("pantalla de productos")).toBeInTheDocument(),
     );
   });
 });

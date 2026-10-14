@@ -30,14 +30,22 @@ function Sonda() {
       <p data-testid="total">{total}</p>
       <p data-testid="cantidad">{cantidadItems}</p>
       <p data-testid="precio-primero">{cartList[0]?.precioElegido}</p>
-      <button onClick={() => addToCart(PRODUCTO, 1, "unitario")}>+unidad</button>
+      <button onClick={() => addToCart(PRODUCTO, 1, "unitario")}>
+        +unidad
+      </button>
       <button onClick={() => addToCart(PRODUCTO, 1, "bulto")}>+bulto</button>
-      <button onClick={() => updateQuantity(cartList[0]?.clave, 5)}>poner 5</button>
-      <button onClick={() => deleteItem(cartList[0]?.clave)}>borrar primero</button>
+      <button onClick={() => updateQuantity(cartList[0]?.clave, 5)}>
+        poner 5
+      </button>
+      <button onClick={() => deleteItem(cartList[0]?.clave)}>
+        borrar primero
+      </button>
       <button onClick={() => actualizarPrecio(cartList[0]?.clave, 9000)}>
         precio 9000
       </button>
-      <button onClick={() => actualizarPrecio("no-existe", 1)}>precio fantasma</button>
+      <button onClick={() => actualizarPrecio("no-existe", 1)}>
+        precio fantasma
+      </button>
     </div>
   );
 }
@@ -48,7 +56,7 @@ const montar = () =>
   render(
     <CartProvider>
       <Sonda />
-    </CartProvider>
+    </CartProvider>,
   );
 
 describe("CartContext", () => {
@@ -174,7 +182,7 @@ describe("CartContext — persistencia", () => {
         { clave: "1__unitario", precioElegido: 100, cantidad: 2, codigo: "1" },
         { codigo: "2", cantidad: 1 },
         { clave: "3__bulto", precioElegido: 0, cantidad: 1, codigo: "3" },
-      ])
+      ]),
     );
     montar();
     expect(screen.getByTestId("renglones")).toHaveTextContent("1");

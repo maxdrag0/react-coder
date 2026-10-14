@@ -19,9 +19,9 @@ export const obtenerTodasLasCompras = async () => {
   try {
     const q = query(collection(db, "compras"), orderBy("date", "desc"));
     const querySnapshot = await getDocs(q);
-    const compras = querySnapshot.docs.map(doc => ({
+    const compras = querySnapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
     return compras;
   } catch (error) {

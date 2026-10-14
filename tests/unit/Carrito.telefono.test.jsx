@@ -60,7 +60,7 @@ function montar({ telefono = null } = {}) {
       >
         <Carrito />
       </CartContext.Provider>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -139,7 +139,9 @@ describe("Carrito: el teléfono es obligatorio para mandar el pedido", () => {
     await usuario.click(enviar());
 
     await waitFor(() =>
-      expect(guardarPerfilMock).toHaveBeenCalledWith({ telefono: "1123456789" })
+      expect(guardarPerfilMock).toHaveBeenCalledWith({
+        telefono: "1123456789",
+      }),
     );
   });
 });

@@ -6,8 +6,7 @@ import { modelosDe } from "@/constants/modelos";
 import "./Item.css";
 
 function Item({ item }) {
-  // El catálogo convive con los dos esquemas hasta que E los unifique.
-  const nombre = item.nombre || item.name;
+  const nombre = item.nombre;
   const modelos = modelosDe(item).length;
 
   return (

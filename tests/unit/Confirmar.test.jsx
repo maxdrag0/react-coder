@@ -133,7 +133,9 @@ describe("Confirmar: lo que muestra", () => {
     render(<Prueba alResponder={vi.fn()} />);
     await abrir(usuario);
 
-    expect(screen.getByRole("button", { name: "Eliminar" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Eliminar" }),
+    ).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Confirmar" })).toBeNull();
   });
 });

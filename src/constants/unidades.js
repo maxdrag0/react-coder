@@ -49,7 +49,8 @@ const desdeEsquemaViejo = (item) => {
       : null;
 
   const presentaciones = {};
-  if (unitario !== null) presentaciones.unitario = { precio: unitario, unidades: null };
+  if (unitario !== null)
+    presentaciones.unitario = { precio: unitario, unidades: null };
 
   for (const u of UNIDADES) {
     if (u.clave === "unitario") continue;
@@ -71,7 +72,8 @@ const desdeMapa = (mapa) => {
     presentaciones[u.clave] = {
       precio: p.precio,
       // La unidad no "trae" nada: ES una unidad.
-      unidades: u.clave !== "unitario" && esCantidad(p.unidades) ? p.unidades : null,
+      unidades:
+        u.clave !== "unitario" && esCantidad(p.unidades) ? p.unidades : null,
     };
   }
 
@@ -95,7 +97,9 @@ export const presentacionesDe = (item, modeloId = null) => {
     return modelo ? desdeMapa(modelo.presentaciones) : {};
   }
 
-  return item.presentaciones ? desdeMapa(item.presentaciones) : desdeEsquemaViejo(item);
+  return item.presentaciones
+    ? desdeMapa(item.presentaciones)
+    : desdeEsquemaViejo(item);
 };
 
 export const precioDe = (item, clave, modeloId = null) =>

@@ -313,7 +313,7 @@ const AdminDashboard = () => {
   const borrarUno = async (codigo) => {
     const nombre =
       productos.find((p) => p.codigo === codigo)?.nombre ??
-      productos.find((p) => p.codigo === codigo)?.name ??
+      productos.find((p) => p.codigo === codigo)?.nombre ??
       codigo;
 
     const acepta = await confirmacion.pedir({

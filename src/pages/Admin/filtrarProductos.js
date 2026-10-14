@@ -28,10 +28,10 @@ export const FILTROS_VACIOS = {
   sinFoto: false,
 };
 
-const categoriaDe = (p) => p.categoria || p.category || "";
+const categoriaDe = (p) => p.categoria || "";
 const marcaDe = (p) => p.marca || SIN_MARCA;
-const nombreDe = (p) => p.nombre || p.name || "";
-const tieneFoto = (p) => Boolean(p.fotoUrl || p.image);
+const nombreDe = (p) => p.nombre || "";
+const tieneFoto = (p) => Boolean(p.fotoUrl);
 
 const numero = (v) => {
   if (v === "" || v === null || v === undefined) return null;
@@ -45,7 +45,11 @@ export const filtrarProductos = (productos, filtros = FILTROS_VACIOS) => {
   const max = numero(filtros.precioMax);
 
   return productos.filter((p) => {
-    if (filtros.estado && filtros.estado !== TODOS && estadoDe(p) !== filtros.estado) {
+    if (
+      filtros.estado &&
+      filtros.estado !== TODOS &&
+      estadoDe(p) !== filtros.estado
+    ) {
       return false;
     }
 
@@ -84,22 +88,22 @@ export const contarEstadosProducto = (productos) => {
 */
 export const categoriasPresentes = (productos) =>
   [...new Set(productos.map(categoriaDe).filter(Boolean))].sort((a, b) =>
-    a.localeCompare(b)
+    a.localeCompare(b),
   );
 
 export const marcasPresentes = (productos) =>
   [...new Set(productos.map(marcaDe))].sort((a, b) =>
     // "Sin marca" al final: es un cajon, no una marca.
-    a === SIN_MARCA ? 1 : b === SIN_MARCA ? -1 : a.localeCompare(b)
+    a === SIN_MARCA ? 1 : b === SIN_MARCA ? -1 : a.localeCompare(b),
   );
 
 export const hayFiltros = (filtros) =>
   Boolean(
     filtros.texto ||
-      (filtros.estado && filtros.estado !== TODOS) ||
-      filtros.categoria ||
-      filtros.marca ||
-      filtros.precioMin !== "" ||
-      filtros.precioMax !== "" ||
-      filtros.sinFoto
+    (filtros.estado && filtros.estado !== TODOS) ||
+    filtros.categoria ||
+    filtros.marca ||
+    filtros.precioMin !== "" ||
+    filtros.precioMax !== "" ||
+    filtros.sinFoto,
   );

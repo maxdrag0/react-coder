@@ -43,7 +43,7 @@ describe("NavBar: el carrito y la cuenta no se ven en celular", () => {
     // usara solo .nav-solo-escritorio, perdería contra el compuesto de
     // arriba y el carrito desaparecería también en escritorio.
     expect(displayDe(escritorio, ".nav-accion.nav-solo-escritorio")).toBe(
-      "inline-flex"
+      "inline-flex",
     );
   });
 
@@ -66,7 +66,7 @@ describe("NavBar: lo que SÍ queda arriba en celular", () => {
     const jsx = readFileSync("src/components/NavBar/NavBar.jsx", "utf8");
     const cart = readFileSync(
       "src/components/NavBar/CartMenu/CartMenu.jsx",
-      "utf8"
+      "utf8",
     );
     const cuenta = jsx
       .split("\n")

@@ -1,3 +1,5 @@
+import { UNIDADES } from "./unidades.js";
+
 /*
   Cómo se nombra un renglón de pedido: en el carrito, en "mis pedidos" y en la
   tabla del panel.
@@ -17,18 +19,23 @@
 export const nombreDeItem = (item) => item?.nombre || item?.name || "";
 
 /**
- * Un renglón listo para mostrar: `2x Bengala de humo (Rojo, display)`.
+ * Un renglón listo para mostrar: `2x Bengala de humo (Rojo, Display)`.
  *
- * El modelo va primero porque es lo que distingue un renglón de otro. La
- * unidad suelta no se nombra: es el caso normal y nombrarla sería ruido en
- * todos los renglones para distinguir los pocos que no lo son.
+ * El modelo va primero porque es lo que distingue un renglón de otro.
+ *
+ * La unidad se nombra SIEMPRE, incluida la suelta. Omitirla ahorraba una
+ * palabra pero obligaba a quien prepara el pedido a saber que la ausencia
+ * significa "de a uno": leer "2x Bengala" y tener que deducir si son dos
+ * unidades o dos bultos es justo la duda que no puede existir.
+ *
+ * Se usa la etiqueta y no la clave: en la tabla decía "display" en minúscula,
+ * que es el nombre interno del campo y no cómo se vende.
  */
 export const renglonDe = (item) => {
-  const extras = [
-    item?.modeloEtiqueta,
-    item?.unidad && item.unidad !== "unitario" ? item.unidad : null,
-  ].filter(Boolean);
+  const unidad =
+    UNIDADES.find((u) => u.clave === item?.unidad)?.etiqueta ?? null;
 
+  const extras = [item?.modeloEtiqueta, unidad].filter(Boolean);
   const detalle = extras.length > 0 ? ` (${extras.join(", ")})` : "";
 
   return `${item?.cantidad}x ${nombreDeItem(item)}${detalle}`;

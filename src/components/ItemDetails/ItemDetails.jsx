@@ -165,6 +165,10 @@ function ItemDetails({ item }) {
             pasamos.
           </p>
         ) : (
+          /* El subtotal va en la misma fila que la cantidad y el botón: es el
+             número que cambia cuando tocás el contador, y leerlo abajo
+             obligaba a mirar en dos lugares para una sola decisión. Adentro
+             del bloque de compra, además, no aparece cuando no hay stock. */
           <div className="detalle-compra">
             <Counter count={count} sumar={sumar} restar={restar} />
             <button
@@ -174,13 +178,13 @@ function ItemDetails({ item }) {
             >
               Agregar al carrito
             </button>
-          </div>
-        )}
 
-        {subtotal > 0 && (
-          <p className="detalle-subtotal">
-            Subtotal <strong>{formatearPrecio(subtotal)}</strong>
-          </p>
+            {subtotal > 0 && (
+              <p className="detalle-subtotal">
+                Subtotal <strong>{formatearPrecio(subtotal)}</strong>
+              </p>
+            )}
+          </div>
         )}
 
         {/* La ficha va DESPUÉS de comprar. Entre el título y el selector

@@ -1,3 +1,9 @@
+/* El ancho del bloque de compra: el select de modelo, las opciones de
+   unidad y la fila de cantidad + boton + subtotal comparten borde derecho. */
+.detalle {
+  --ancho-compra: 30rem;
+}
+
 .detalle {
   display: grid;
   gap: var(--e-5);
@@ -12,7 +18,7 @@
 */
 .detalle-media {
   aspect-ratio: 1 / 1;
-  max-width: 420px;
+  max-width: 520px;
   background: var(--surface);
   border-radius: var(--r-card);
   overflow: hidden;
@@ -22,7 +28,11 @@
   contain y no cover: las fotos vienen del proveedor con el producto centrado
   sobre su fondo, y recortar le come las puntas a una bengala parada.
 */
-.detalle-media img { width: 100%; height: 100%; object-fit: contain; }
+.detalle-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 
 .detalle-info {
   display: grid;
@@ -62,14 +72,24 @@
   font-size: var(--t-xs);
 }
 
-.detalle-ficha dt { color: var(--text-tenue); }
-.detalle-ficha dd { color: var(--text); }
+.detalle-ficha dt {
+  color: var(--text-tenue);
+}
+.detalle-ficha dd {
+  color: var(--text);
+}
 
+/*
+  Una sola fila: cantidad, boton y subtotal. El subtotal es el numero que
+  cambia al tocar el contador, y tenerlo abajo obligaba a mirar en dos lugares
+  para una sola decision.
+*/
 .detalle-compra {
   display: flex;
   flex-wrap: wrap;
   gap: var(--e-3);
   align-items: center;
+  max-width: var(--ancho-compra);
 }
 
 .detalle-agotado {
@@ -84,23 +104,32 @@
   /* La columna de compra manda y la foto se acota: al revés (3fr 2fr) la
      foto se llevaba el 60% del ancho y la compra quedaba apretada. */
   .detalle {
-    grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 520px) minmax(0, 1fr);
     gap: var(--e-6);
     align-items: start;
   }
   /* El media es lo único que vende el producto: se queda a la vista
      mientras se lee la ficha. */
-  .detalle-media { position: sticky; top: calc(64px + var(--e-5)); }
+  .detalle-media {
+    position: sticky;
+    top: calc(64px + var(--e-5));
+  }
 }
 
 /* --- Selector de unidad de compra --- */
 
+/*
+  Las tres opciones no necesitan todo el ancho de la columna: una fila de
+  600px para "Unidad ... $8.000" deja un vacio en el medio que hace dudar de
+  si falta algo.
+*/
 .detalle-unidades {
   display: grid;
   gap: var(--e-2);
   border: none;
   padding: 0;
   min-width: 0;
+  max-width: var(--ancho-compra);
 }
 
 .detalle-unidades legend {
@@ -120,20 +149,33 @@
   border-radius: var(--r-control);
   background: var(--surface);
   cursor: pointer;
-  transition: border-color var(--mov-rapido), background-color var(--mov-rapido);
+  transition:
+    border-color var(--mov-rapido),
+    background-color var(--mov-rapido);
 }
 
-.unidad:hover { border-color: var(--blue); }
+.unidad:hover {
+  border-color: var(--blue);
+}
 
 .unidad-elegida {
   border-color: var(--gold);
   background: var(--surface-alto);
 }
 
-.unidad input { accent-color: var(--gold); width: 18px; height: 18px; }
+.unidad input {
+  accent-color: var(--gold);
+  width: 18px;
+  height: 18px;
+}
 
-.unidad-nombre { font-size: var(--t-sm); min-width: 0; }
-.unidad-nombre small { color: var(--text-tenue); }
+.unidad-nombre {
+  font-size: var(--t-sm);
+  min-width: 0;
+}
+.unidad-nombre small {
+  color: var(--text-tenue);
+}
 
 .unidad-precio {
   font-variant-numeric: tabular-nums;
@@ -142,7 +184,9 @@
   white-space: nowrap;
 }
 
-.unidad-elegida .unidad-precio { color: var(--gold); }
+.unidad-elegida .unidad-precio {
+  color: var(--gold);
+}
 
 .unidad:has(input:focus-visible) {
   outline: 2px solid var(--gold);
@@ -151,18 +195,17 @@
 
 .detalle-subtotal {
   display: flex;
-  justify-content: space-between;
   align-items: baseline;
-  gap: var(--e-3);
-  margin: 0;
-  padding-top: var(--e-3);
-  border-top: 1px solid var(--gold-linea);
+  gap: var(--e-2);
+  /* Contra el borde derecho de la columna, separado del boton. */
+  margin: 0 0 0 auto;
   color: var(--text-suave);
   font-size: var(--t-sm);
+  white-space: nowrap;
 }
 
 .detalle-subtotal strong {
-  font-size: var(--t-xl);
+  font-size: var(--t-lg);
   font-stretch: var(--ancho-display);
   color: var(--gold);
   font-variant-numeric: tabular-nums;
@@ -173,16 +216,28 @@
 .detalle-modelo {
   display: grid;
   gap: var(--e-2);
-  max-width: 22rem;
+  max-width: var(--ancho-compra);
 }
 
+/* Igual que el legend del selector de unidad: son dos pasos de lo mismo. */
 .detalle-modelo label {
   font-size: var(--t-sm);
-  font-weight: 500;
-  color: var(--text);
+  color: var(--text-suave);
 }
 
+/*
+  Mismo alto, borde, radio y fondo que una tarjeta de unidad: elegir el
+  modelo y elegir la presentacion son el mismo gesto y se ven igual.
+*/
 .detalle-modelo select.campo-control {
-  min-height: 44px;
-  padding: var(--e-2) var(--e-3);
+  min-height: 56px;
+  padding: var(--e-3) var(--e-4);
+  border: 1px solid var(--gold-linea);
+  border-radius: var(--r-control);
+  background-color: var(--surface);
+  font-size: var(--t-sm);
+}
+
+.detalle-modelo select.campo-control:hover {
+  border-color: var(--blue);
 }

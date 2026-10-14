@@ -10,7 +10,7 @@ vi.mock("@/services/api/ordenes", () => ({
   enviarOrden: (...a) => enviarOrden(...a),
 }));
 
-vi.mock("@/contexts/AuthContext", () => ({
+vi.mock("@/contexts/auth/useAuth", () => ({
   useAuth: () => ({
     user: { uid: "ana", email: "ana@mail.com", displayName: "Ana" },
     loading: false,

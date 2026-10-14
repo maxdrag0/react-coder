@@ -1,5 +1,4 @@
-import { useContext } from "react";
-import { CartContext } from "../../contexts/cart/CartContext";
+import { useCart } from "../../contexts/cart/useCart";
 import { Trash2 } from "lucide-react";
 import { Counter } from "../common/Counter/Counter";
 import MediaPlaceholder from "@/components/common/MediaPlaceholder/MediaPlaceholder";
@@ -10,7 +9,7 @@ import { nombreDeItem } from "@/constants/renglon";
 import "./CarritoCard.css";
 
 function CarritoCard({ item }) {
-  const { deleteItem, updateQuantity } = useContext(CartContext);
+  const { deleteItem, updateQuantity } = useCart();
 
   const subtotal = (item.precioElegido || 0) * item.cantidad;
   const nombre = nombreDeItem(item);

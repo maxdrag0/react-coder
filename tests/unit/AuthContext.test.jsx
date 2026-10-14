@@ -9,7 +9,10 @@ vi.mock("firebase/auth", () => ({
 }));
 vi.mock("@/utils/firebase", () => ({ auth: {} }));
 
-const { AuthProvider, useAuth } = await import("@/contexts/AuthContext");
+// El provider y el hook viven en archivos distintos: un archivo que exporta
+// un componente Y otra cosa rompe el Fast Refresh de Vite.
+const { AuthProvider } = await import("@/contexts/auth/AuthProvider");
+const { useAuth } = await import("@/contexts/auth/useAuth");
 
 function Sonda() {
   const { isAdmin, loading, user } = useAuth();
@@ -37,18 +40,24 @@ function montarCon(usuario) {
   render(
     <AuthProvider>
       <Sonda />
-    </AuthProvider>
+    </AuthProvider>,
   );
 }
 
-beforeEach(() => { onAuthStateChangedMock.mockReset(); });
-afterEach(() => { vi.clearAllMocks(); });
+beforeEach(() => {
+  onAuthStateChangedMock.mockReset();
+});
+afterEach(() => {
+  vi.clearAllMocks();
+});
 
 describe("AuthContext", () => {
   it("marca isAdmin cuando el token trae el claim admin", async () => {
     montarCon(usuarioFalso({ claims: { admin: true } }));
     await waitFor(() =>
-      expect(screen.getByTestId("resultado")).toHaveTextContent("ana@mail.com|admin")
+      expect(screen.getByTestId("resultado")).toHaveTextContent(
+        "ana@mail.com|admin",
+      ),
     );
   });
 
@@ -56,21 +65,25 @@ describe("AuthContext", () => {
     // Review Focus #2: claim recién asignado, token de hasta una hora sin él.
     montarCon(usuarioFalso({ claims: {} }));
     await waitFor(() =>
-      expect(screen.getByTestId("resultado")).toHaveTextContent("ana@mail.com|comprador")
+      expect(screen.getByTestId("resultado")).toHaveTextContent(
+        "ana@mail.com|comprador",
+      ),
     );
   });
 
   it("NO marca isAdmin cuando el claim es el string 'true' y no el booleano", async () => {
     montarCon(usuarioFalso({ claims: { admin: "true" } }));
     await waitFor(() =>
-      expect(screen.getByTestId("resultado")).toHaveTextContent("comprador")
+      expect(screen.getByTestId("resultado")).toHaveTextContent("comprador"),
     );
   });
 
   it("deja isAdmin en false si no hay usuario", async () => {
     montarCon(null);
     await waitFor(() =>
-      expect(screen.getByTestId("resultado")).toHaveTextContent("sin-usuario|comprador")
+      expect(screen.getByTestId("resultado")).toHaveTextContent(
+        "sin-usuario|comprador",
+      ),
     );
   });
 
@@ -82,7 +95,7 @@ describe("AuthContext", () => {
     };
     montarCon(roto);
     await waitFor(() =>
-      expect(screen.getByTestId("resultado")).toHaveTextContent("comprador")
+      expect(screen.getByTestId("resultado")).toHaveTextContent("comprador"),
     );
   });
 });

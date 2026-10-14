@@ -1,8 +1,7 @@
-import { useContext } from "react";
 import { NavLink } from "react-router-dom";
 import { Home, Sparkles, ShoppingCart, Mail, User } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { CartContext } from "@/contexts/cart/CartContext";
+import { useAuth } from "@/contexts/auth/useAuth";
+import { useCart } from "@/contexts/cart/useCart";
 import "./BottomNav.css";
 
 /**
@@ -12,7 +11,7 @@ import "./BottomNav.css";
  */
 const BottomNav = () => {
   const { user } = useAuth();
-  const { cantidadItems } = useContext(CartContext);
+  const { cantidadItems } = useCart();
 
   const destinos = [
     // `exacto` solo en la raíz: "/" hace prefijo con todas las rutas, así que

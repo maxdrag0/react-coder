@@ -1,10 +1,9 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach } from "vitest";
-import { useContext } from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import CartContextProvider, { } from "@/contexts/cart/CartContext";
-import { CartContext } from "@/contexts/cart/CartContext";
+import CartProvider from "@/contexts/cart/CartProvider";
+import { useCart } from "@/contexts/cart/useCart";
 
 const PRODUCTO = {
   codigo: "201",
@@ -23,7 +22,7 @@ function Sonda() {
     deleteItem,
     updateQuantity,
     actualizarPrecio,
-  } = useContext(CartContext);
+  } = useCart();
 
   return (
     <div>
@@ -47,9 +46,9 @@ beforeEach(() => localStorage.clear());
 
 const montar = () =>
   render(
-    <CartContextProvider>
+    <CartProvider>
       <Sonda />
-    </CartContextProvider>
+    </CartProvider>
   );
 
 describe("CartContext", () => {

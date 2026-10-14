@@ -2,9 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
-import CartContextProvider from "./contexts/cart/CartContext.jsx";
-import { AuthProvider } from "./contexts/AuthContext.jsx";
-import { ThemeProvider } from "./contexts/ThemeContext.jsx";
+import CartProvider from "./contexts/cart/CartProvider.jsx";
+import { AuthProvider } from "./contexts/auth/AuthProvider.jsx";
+import { ThemeProvider } from "./contexts/theme/ThemeProvider.jsx";
 import "./main.css";
 
 // Derivado del base de Vite y no escrito a mano: si los dos no coinciden, el
@@ -17,9 +17,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <BrowserRouter basename={BASENAME}>
       <ThemeProvider>
         <AuthProvider>
-          <CartContextProvider>
+          <CartProvider>
             <App />
-          </CartContextProvider>
+          </CartProvider>
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>

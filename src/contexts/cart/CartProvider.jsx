@@ -1,7 +1,6 @@
-import { createContext, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { precioDe } from "@/constants/unidades";
-
-export const CartContext = createContext();
+import { CartContext } from "./CartContext.js";
 
 const CLAVE_GUARDADO = "carrito";
 
@@ -41,7 +40,7 @@ const leerGuardado = () => {
   }
 };
 
-const CartContextProvider = ({ children }) => {
+const CartProvider = ({ children }) => {
   const [cartList, setCartList] = useState(leerGuardado);
 
   useEffect(() => {
@@ -54,7 +53,7 @@ const CartContextProvider = ({ children }) => {
 
   const total = cartList.reduce(
     (acc, item) => acc + (item.precioElegido || 0) * item.cantidad,
-    0
+    0,
   );
 
   const cantidadItems = cartList.reduce((acc, item) => acc + item.cantidad, 0);
@@ -68,7 +67,7 @@ const CartContextProvider = ({ children }) => {
 
       if (existente) {
         return actual.map((i) =>
-          i.clave === clave ? { ...i, cantidad: i.cantidad + cantidad } : i
+          i.clave === clave ? { ...i, cantidad: i.cantidad + cantidad } : i,
         );
       }
 
@@ -93,7 +92,7 @@ const CartContextProvider = ({ children }) => {
   const updateQuantity = (clave, cantidad) => {
     if (cantidad <= 0) return;
     setCartList((actual) =>
-      actual.map((i) => (i.clave === clave ? { ...i, cantidad } : i))
+      actual.map((i) => (i.clave === clave ? { ...i, cantidad } : i)),
     );
   };
 
@@ -104,7 +103,9 @@ const CartContextProvider = ({ children }) => {
   */
   const actualizarPrecio = (clave, precio) =>
     setCartList((actual) =>
-      actual.map((i) => (i.clave === clave ? { ...i, precioElegido: precio } : i))
+      actual.map((i) =>
+        i.clave === clave ? { ...i, precioElegido: precio } : i,
+      ),
     );
 
   const removeList = () => setCartList([]);
@@ -130,4 +131,4 @@ const CartContextProvider = ({ children }) => {
   );
 };
 
-export default CartContextProvider;
+export default CartProvider;

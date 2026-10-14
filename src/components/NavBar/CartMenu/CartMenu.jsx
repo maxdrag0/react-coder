@@ -1,11 +1,10 @@
 import { NavLink } from "react-router-dom";
 import { ShoppingCart } from "lucide-react";
-import { useContext } from "react";
-import { CartContext } from "../../../contexts/cart/CartContext";
+import { useCart } from "../../../contexts/cart/useCart";
 import "./CartMenu.css";
 
 function CartWidget() {
-  const { cantidadItems } = useContext(CartContext);
+  const { cantidadItems } = useCart();
 
   return (
     <NavLink to="/carrito" className="nav-accion nav-solo-escritorio" aria-label={`Carrito, ${cantidadItems} productos`}>

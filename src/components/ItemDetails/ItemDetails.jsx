@@ -1,5 +1,5 @@
-import { useState, useContext } from "react";
-import { CartContext } from "../../contexts/cart/CartContext";
+import { useState } from "react";
+import { useCart } from "../../contexts/cart/useCart";
 import { Counter } from "../common/Counter/Counter";
 import Modal from "../common/Modal/Modal";
 import Media from "@/components/common/Media/Media";
@@ -15,7 +15,7 @@ import { Link } from "react-router-dom";
 import "./ItemDetails.css";
 
 function ItemDetails({ item }) {
-  const { addToCart } = useContext(CartContext);
+  const { addToCart } = useCart();
 
   // El modelo se elige primero: de el dependen las presentaciones y los
   // precios. Si el producto tiene uno solo, se elige solo y no se muestra el

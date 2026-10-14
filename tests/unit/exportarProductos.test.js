@@ -9,7 +9,7 @@ const producto = (extra = {}) => ({
   ...extra,
 });
 
-const filas = (csv) => csv.replace(/^﻿/, "").trim().split("\n");
+const filas = (csv) => csv.replace(/^\uFEFF/, "").trim().split("\n");
 
 describe("aCsv: qué productos entran", () => {
   it("exporta los activos", () => {

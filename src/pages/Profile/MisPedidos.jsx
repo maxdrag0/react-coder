@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { PuffLoader } from "react-spinners";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/auth/useAuth";
 import { obtenerComprasDeUsuario } from "@/services/firebase/comprasFirebase";
 import { estadoDePedido, etiquetaDePedido } from "@/constants/estadoPedido";
 import { formatearPrecio } from "@/utils/formatearPrecio";

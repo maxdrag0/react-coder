@@ -35,10 +35,14 @@
   cursor: pointer;
   padding: var(--e-2) var(--e-4);
   border-radius: var(--r-control);
-  transition: background-color var(--mov-rapido), color var(--mov-rapido);
+  transition:
+    background-color var(--mov-rapido),
+    color var(--mov-rapido);
 }
 
-.admin-tab:hover { color: var(--text); }
+.admin-tab:hover {
+  color: var(--text);
+}
 
 .admin-tab.active {
   background: var(--surface);
@@ -104,12 +108,24 @@
   color: var(--text-suave);
 }
 
-.admin-table tbody tr { transition: background-color var(--mov-rapido); }
-.admin-table tbody tr:hover { background: var(--surface-alto); }
-.admin-table tbody tr:last-child td { border-bottom: none; }
+.admin-table tbody tr {
+  transition: background-color var(--mov-rapido);
+}
+.admin-table tbody tr:hover {
+  background: var(--surface-alto);
+}
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
 
-.admin-col-check { width: 1%; }
-.admin-col-check input { accent-color: var(--gold); width: 16px; height: 16px; }
+.admin-col-check {
+  width: 1%;
+}
+.admin-col-check input {
+  accent-color: var(--gold);
+  width: 16px;
+  height: 16px;
+}
 
 .admin-fila-elegida,
 .admin-fila-elegida:hover {
@@ -175,7 +191,9 @@
   transition: opacity var(--mov-rapido);
 }
 
-.btn-action:hover { opacity: 0.8; }
+.btn-action:hover {
+  opacity: 0.8;
+}
 
 .btn-action.edit {
   background: var(--gold-linea);
@@ -213,7 +231,9 @@
   font-variant-numeric: tabular-nums;
 }
 
-.barra-seleccion-cuenta strong { color: var(--text); }
+.barra-seleccion-cuenta strong {
+  color: var(--text);
+}
 
 .barra-seleccion-acciones {
   display: flex;
@@ -222,7 +242,9 @@
   flex: 1;
 }
 
-.barra-seleccion-cerrar { padding: var(--e-2); }
+.barra-seleccion-cerrar {
+  padding: var(--e-2);
+}
 
 .admin-items-pedido {
   margin: 0;
@@ -239,7 +261,9 @@
   overflow-wrap: anywhere;
 }
 
-.msg-unread { background: var(--surface-alto); }
+.msg-unread {
+  background: var(--surface-alto);
+}
 
 .msg-action-btn {
   display: inline-flex;
@@ -251,13 +275,21 @@
   transition: background-color var(--mov-rapido);
 }
 
-.msg-action-btn:hover { background: var(--gold-linea); }
+.msg-action-btn:hover {
+  background: var(--gold-linea);
+}
 
 /* Estos tres colores venían en estilos inline apuntando a --success-color,
    --text-secondary y --danger-color: tokens que no existen. */
-.msg-leido { color: var(--exito); }
-.msg-pendiente { color: var(--text-suave); }
-.msg-borrar { color: var(--danger); }
+.msg-leido {
+  color: var(--exito);
+}
+.msg-pendiente {
+  color: var(--text-suave);
+}
+.msg-borrar {
+  color: var(--danger);
+}
 
 .empty-state {
   text-align: center;
@@ -295,7 +327,9 @@
     border: none;
   }
 
-  .admin-table thead { display: none; }
+  .admin-table thead {
+    display: none;
+  }
 
   .admin-table,
   .admin-table tbody,
@@ -330,18 +364,30 @@
     color: var(--text-tenue);
   }
 
-  .admin-table td:not([data-etiqueta]) { grid-template-columns: 1fr; }
+  .admin-table td:not([data-etiqueta]) {
+    grid-template-columns: 1fr;
+  }
 
-  .admin-prod-img { width: 56px; height: 56px; }
+  .admin-prod-img {
+    width: 56px;
+    height: 56px;
+  }
 
-  .barra-seleccion { gap: var(--e-3); }
-  .barra-seleccion-acciones .boton { flex: 1; font-size: var(--t-xs); }
+  .barra-seleccion {
+    gap: var(--e-3);
+  }
+  .barra-seleccion-acciones .boton {
+    flex: 1;
+    font-size: var(--t-xs);
+  }
 }
 
 /* BottomNav llega hasta 899px, no hasta 767: entre esos dos anchos la
    barra de seleccion quedaba encima de la navegacion. */
 @media (max-width: 899px) {
-  .barra-seleccion { bottom: calc(var(--alto-nav-abajo) + var(--e-2)); }
+  .barra-seleccion {
+    bottom: calc(var(--alto-nav-abajo) + var(--e-2));
+  }
 }
 
 /* --- Pedidos --- */
@@ -360,8 +406,13 @@
   overflow-wrap: anywhere;
 }
 
-.admin-cliente strong { font-size: var(--t-sm); color: var(--text); }
-.admin-cliente span { color: var(--text-suave); }
+.admin-cliente strong {
+  font-size: var(--t-sm);
+  color: var(--text);
+}
+.admin-cliente span {
+  color: var(--text-suave);
+}
 
 /* El dueno contacta por WhatsApp, asi que el telefono ES el link. */
 .admin-whatsapp {
@@ -372,7 +423,9 @@
   font-weight: 600;
 }
 
-.admin-whatsapp:hover { text-decoration: underline; }
+.admin-whatsapp:hover {
+  text-decoration: underline;
+}
 
 /* Los pedidos de antes de que el telefono fuera obligatorio no lo tienen,
    y por eso no se pueden atender: conviene que se note. */
@@ -418,7 +471,9 @@
   box-shadow: inset 3px 0 0 var(--gold);
 }
 
-.admin-pedido-cancelado { opacity: 0.55; }
+.admin-pedido-cancelado {
+  opacity: 0.55;
+}
 
 /* --- Filtros de pedidos --- */
 
@@ -446,10 +501,15 @@
   font-size: var(--t-xs);
   font-family: var(--fuente);
   cursor: pointer;
-  transition: background-color var(--mov-rapido), color var(--mov-rapido);
+  transition:
+    background-color var(--mov-rapido),
+    color var(--mov-rapido);
 }
 
-.pedidos-chip:hover { background: var(--surface-alto); color: var(--text); }
+.pedidos-chip:hover {
+  background: var(--surface-alto);
+  color: var(--text);
+}
 
 .pedidos-chip.activo {
   background: var(--surface-alto);
@@ -486,8 +546,12 @@
   font-family: var(--fuente);
 }
 
-.pedidos-buscador input:focus { outline: none; }
-.pedidos-buscador:focus-within { border-color: var(--gold); }
+.pedidos-buscador input:focus {
+  outline: none;
+}
+.pedidos-buscador:focus-within {
+  border-color: var(--gold);
+}
 
 .pedidos-cuenta {
   margin: 0;
@@ -556,13 +620,25 @@
   border-color: var(--gold);
 }
 
-.prodfiltros-limpiar { padding: var(--e-2) var(--e-3); }
+.prodfiltros-limpiar {
+  padding: var(--e-2) var(--e-3);
+}
 
 @media (max-width: 767px) {
-  .prodfiltros-campos .pedidos-buscador { flex-basis: 100%; max-width: none; }
-  .prodfiltros-select { flex: 1 1 10rem; }
-  .prodfiltros-precio { flex: 1 1 100%; }
-  .prodfiltros-precio input { flex: 1; width: auto; }
+  .prodfiltros-campos .pedidos-buscador {
+    flex-basis: 100%;
+    max-width: none;
+  }
+  .prodfiltros-select {
+    flex: 1 1 10rem;
+  }
+  .prodfiltros-precio {
+    flex: 1 1 100%;
+  }
+  .prodfiltros-precio input {
+    flex: 1;
+    width: auto;
+  }
 }
 
 .admin-modelos-cuenta {

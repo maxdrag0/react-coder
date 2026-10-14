@@ -71,7 +71,11 @@ const Modal = ({
         <h2 id="modal-titulo">{tittle}</h2>
         <div className="modal-cuerpo">{message}</div>
         <div className="modal-acciones">
-          <button type="button" className="boton boton-secundario" onClick={onAccept}>
+          <button
+            type="button"
+            className="boton boton-secundario"
+            onClick={onAccept}
+          >
             {textoAceptar}
           </button>
           {acciones}

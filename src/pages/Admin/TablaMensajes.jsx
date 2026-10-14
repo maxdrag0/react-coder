@@ -25,14 +25,18 @@ const FilaMensaje = ({ mensaje, onAlternarLeido, onNota, onEliminar }) => {
         </button>
       </td>
 
-      <td data-etiqueta="Fecha">{new Date(mensaje.date).toLocaleString("es-AR")}</td>
+      <td data-etiqueta="Fecha">
+        {new Date(mensaje.date).toLocaleString("es-AR")}
+      </td>
 
       <td data-etiqueta="Contacto">
         <div className="admin-cliente">
           <strong>{mensaje.nombre}</strong>
           <span>{mensaje.email}</span>
           {(mensaje.direccion || mensaje.ciudad) && (
-            <span>{[mensaje.direccion, mensaje.ciudad].filter(Boolean).join(", ")}</span>
+            <span>
+              {[mensaje.direccion, mensaje.ciudad].filter(Boolean).join(", ")}
+            </span>
           )}
         </div>
       </td>

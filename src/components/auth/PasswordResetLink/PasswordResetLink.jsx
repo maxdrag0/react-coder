@@ -41,7 +41,11 @@ const PasswordResetLink = () => {
 
   if (!abierto) {
     return (
-      <button type="button" className="reset-link" onClick={() => setAbierto(true)}>
+      <button
+        type="button"
+        className="reset-link"
+        onClick={() => setAbierto(true)}
+      >
         ¿Olvidaste tu contraseña?
       </button>
     );
@@ -61,7 +65,12 @@ const PasswordResetLink = () => {
           placeholder="Tu email"
           aria-label="Email para restablecer la contraseña"
         />
-        <button type="button" className="boton boton-secundario" onClick={enviar} disabled={enviando}>
+        <button
+          type="button"
+          className="boton boton-secundario"
+          onClick={enviar}
+          disabled={enviando}
+        >
           {enviando ? "Enviando..." : "Enviar link"}
         </button>
       </div>

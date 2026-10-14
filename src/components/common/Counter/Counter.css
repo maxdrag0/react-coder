@@ -16,7 +16,9 @@
   font-weight: 600;
 }
 
-.counter-group .boton-counter:hover:not(:disabled) { background: var(--blue); }
+.counter-group .boton-counter:hover:not(:disabled) {
+  background: var(--blue);
+}
 
 .counter-display {
   min-width: 3rem;

@@ -8,7 +8,9 @@ const NotFound = () => (
       <MediaPlaceholder />
     </div>
     <h1>Esta página no existe</h1>
-    <p>El enlace puede haber cambiado, o el producto ya no está en el catálogo.</p>
+    <p>
+      El enlace puede haber cambiado, o el producto ya no está en el catálogo.
+    </p>
     <Link to="/products" className="boton boton-primario">
       Ver el catálogo
     </Link>

@@ -60,8 +60,12 @@
   backdrop-filter: blur(4px);
 }
 
-.carrusel-flecha.izquierda { left: var(--e-3); }
-.carrusel-flecha.derecha { right: var(--e-3); }
+.carrusel-flecha.izquierda {
+  left: var(--e-3);
+}
+.carrusel-flecha.derecha {
+  right: var(--e-3);
+}
 
 .carrusel-puntos {
   position: absolute;
@@ -81,15 +85,23 @@
   cursor: pointer;
 }
 
-.carrusel-punto.activo { background: var(--gold); }
+.carrusel-punto.activo {
+  background: var(--gold);
+}
 
 @media (min-width: 700px) {
-  .carrusel { aspect-ratio: 21 / 8; }
+  .carrusel {
+    aspect-ratio: 21 / 8;
+  }
 
   .carrusel-texto {
     padding: var(--e-7) var(--e-6) var(--e-5);
   }
 
-  .carrusel-texto h2 { font-size: var(--t-2xl); }
-  .carrusel-texto p { font-size: var(--t-base); }
+  .carrusel-texto h2 {
+    font-size: var(--t-2xl);
+  }
+  .carrusel-texto p {
+    font-size: var(--t-base);
+  }
 }

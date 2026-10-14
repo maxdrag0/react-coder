@@ -47,7 +47,11 @@ const Media = ({ item, modeloId = null, titulo = "", modo = "portada" }) => {
         <img src={principal} alt="" className="media-galeria-grande" />
 
         {fotos.length > 1 && (
-          <div className="media-tiras" role="group" aria-label="Fotos del producto">
+          <div
+            className="media-tiras"
+            role="group"
+            aria-label="Fotos del producto"
+          >
             {fotos.map((f, i) => (
               <button
                 key={f}

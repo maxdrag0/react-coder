@@ -1,6 +1,15 @@
 import "./FormField.css";
 
-const FormField = ({ label, id, type = "text", value, onChange, required = true, autoComplete, ayuda }) => (
+const FormField = ({
+  label,
+  id,
+  type = "text",
+  value,
+  onChange,
+  required = true,
+  autoComplete,
+  ayuda,
+}) => (
   <div className="campo">
     <label htmlFor={id}>{label}</label>
     <input

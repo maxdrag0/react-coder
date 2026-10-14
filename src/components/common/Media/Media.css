@@ -66,10 +66,14 @@
   background: none;
   cursor: pointer;
   opacity: 0.6;
-  transition: opacity var(--mov-rapido), border-color var(--mov-rapido);
+  transition:
+    opacity var(--mov-rapido),
+    border-color var(--mov-rapido);
 }
 
-.media-tira:hover { opacity: 1; }
+.media-tira:hover {
+  opacity: 1;
+}
 
 .media-tira.activa {
   opacity: 1;

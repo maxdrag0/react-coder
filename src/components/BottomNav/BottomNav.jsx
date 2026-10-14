@@ -18,7 +18,12 @@ const BottomNav = () => {
     // sin eso Inicio quedaría marcado como activo en toda la tienda.
     { a: "/", texto: "Inicio", Icono: Home, exacto: true },
     { a: "/products", texto: "Productos", Icono: Sparkles },
-    { a: "/carrito", texto: "Carrito", Icono: ShoppingCart, cuenta: cantidadItems },
+    {
+      a: "/carrito",
+      texto: "Carrito",
+      Icono: ShoppingCart,
+      cuenta: cantidadItems,
+    },
     { a: "/contact", texto: "Contacto", Icono: Mail },
     {
       a: user ? "/profile" : "/login",
@@ -34,8 +39,12 @@ const BottomNav = () => {
           key={d.a}
           to={d.a}
           end={d.exacto}
-          className={({ isActive }) => `nav-abajo-item ${isActive ? "activa" : ""}`}
-          aria-label={d.cuenta > 0 ? `${d.texto}, ${d.cuenta} productos` : undefined}
+          className={({ isActive }) =>
+            `nav-abajo-item ${isActive ? "activa" : ""}`
+          }
+          aria-label={
+            d.cuenta > 0 ? `${d.texto}, ${d.cuenta} productos` : undefined
+          }
         >
           <span className="nav-abajo-icono">
             <d.Icono size={22} aria-hidden="true" />

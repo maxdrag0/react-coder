@@ -41,10 +41,18 @@ const Reconciliar = ({ problemas, onConfirmar, onCancelar }) => (
     </ul>
 
     <div className="reconciliar-botones">
-      <button type="button" className="boton boton-secundario" onClick={onCancelar}>
+      <button
+        type="button"
+        className="boton boton-secundario"
+        onClick={onCancelar}
+      >
         Revisar el carrito
       </button>
-      <button type="button" className="boton boton-primario" onClick={onConfirmar}>
+      <button
+        type="button"
+        className="boton boton-primario"
+        onClick={onConfirmar}
+      >
         Seguir y enviar
       </button>
     </div>

@@ -87,7 +87,9 @@ function NavBar() {
             className="nav-accion nav-solo-escritorio"
           >
             <User size={20} />
-            <span className="nav-accion-texto">{user ? "Perfil" : "Ingresar"}</span>
+            <span className="nav-accion-texto">
+              {user ? "Perfil" : "Ingresar"}
+            </span>
           </NavLink>
 
           <CartMenu />

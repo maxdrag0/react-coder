@@ -112,17 +112,24 @@
   border: 1px solid var(--gold-linea);
   border-radius: var(--r-control);
   cursor: pointer;
-  transition: border-color var(--mov-rapido), background-color var(--mov-rapido);
+  transition:
+    border-color var(--mov-rapido),
+    background-color var(--mov-rapido);
 }
 
-.modal-estado:hover { background: var(--surface-alto); }
+.modal-estado:hover {
+  background: var(--surface-alto);
+}
 
 .modal-estado:has(input:checked) {
   border-color: var(--gold);
   background: var(--surface-alto);
 }
 
-.modal-estado input { accent-color: var(--gold); margin-top: 2px; }
+.modal-estado input {
+  accent-color: var(--gold);
+  margin-top: 2px;
+}
 
 .modal-estado-texto {
   display: grid;
@@ -178,16 +185,24 @@
     padding: var(--e-4);
   }
 
-  .modal-content { border-radius: var(--r-card); }
+  .modal-content {
+    border-radius: var(--r-card);
+  }
 }
 
 @media (min-width: 700px) {
-  .modal-campos { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  .campo-ancho { grid-column: 1 / -1; }
+  .modal-campos {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .campo-ancho {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 639px) {
-  .modal-pie-botones .boton { flex: 1; }
+  .modal-pie-botones .boton {
+    flex: 1;
+  }
 }
 
 /* Campo con un valor que no sirve. El borde solo no alcanza: el texto de
@@ -237,7 +252,9 @@
 }
 
 @media (min-width: 520px) {
-  .modal-presentacion-datos { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .modal-presentacion-datos {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
 }
 
 /* --- Modelos --- */
@@ -293,12 +310,16 @@
 }
 
 @media (min-width: 520px) {
-  .modelo-datos { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .modelo-datos {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
 }
 
 /* --- Fotos --- */
 
-.fotos-editor { gap: var(--e-3); }
+.fotos-editor {
+  gap: var(--e-3);
+}
 
 /* El input de archivo nativo no se puede estilar, asi que se esconde y el
    label hace de boton. */
@@ -317,8 +338,12 @@
   transition: border-color var(--mov-rapido);
 }
 
-.fotos-elegir:hover { border-color: var(--gold); }
-.fotos-elegir input { display: none; }
+.fotos-elegir:hover {
+  border-color: var(--gold);
+}
+.fotos-elegir input {
+  display: none;
+}
 
 .fotos-lista {
   display: flex;

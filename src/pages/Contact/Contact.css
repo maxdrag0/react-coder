@@ -7,6 +7,13 @@
   padding: var(--e-6) var(--e-4) var(--e-8);
 }
 
-.contacto-bajada { color: var(--text-suave); margin: 0; }
+.contacto-bajada {
+  color: var(--text-suave);
+  margin: 0;
+}
 
-.contacto-enviado { display: grid; gap: var(--e-4); justify-items: start; }
+.contacto-enviado {
+  display: grid;
+  gap: var(--e-4);
+  justify-items: start;
+}

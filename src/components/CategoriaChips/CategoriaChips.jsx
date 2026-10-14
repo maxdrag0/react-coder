@@ -10,7 +10,11 @@ const CategoriaChips = ({ limite = 6 }) => {
   return (
     <nav className="chips" aria-label="Categorías destacadas">
       {categorias.map((c) => (
-        <Link key={c} to={`/products/${encodeURIComponent(c)}`} className="chip">
+        <Link
+          key={c}
+          to={`/products/${encodeURIComponent(c)}`}
+          className="chip"
+        >
           {c}
         </Link>
       ))}

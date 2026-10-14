@@ -52,7 +52,9 @@ const FiltrosProductos = ({
       >
         <SlidersHorizontal size={18} />
         Filtros
-        {hayFiltros && <span className="filtros-punto" aria-label="con filtros activos" />}
+        {hayFiltros && (
+          <span className="filtros-punto" aria-label="con filtros activos" />
+        )}
       </button>
 
       <div className={`filtros ${abierto ? "filtros-abiertos" : ""}`}>
@@ -145,7 +147,8 @@ const FiltrosProductos = ({
             style={{ "--relleno": porcentaje(rango[1], precioMin, precioMax) }}
           />
           <p className="filtro-rango">
-            Hasta <strong>{formatearPrecio(rango[1]) ?? "$0"}</strong> por unidad
+            Hasta <strong>{formatearPrecio(rango[1]) ?? "$0"}</strong> por
+            unidad
           </p>
         </fieldset>
 
@@ -173,7 +176,11 @@ const FiltrosProductos = ({
       </div>
 
       {abierto && (
-        <div className="filtros-fondo" onClick={() => setAbierto(false)} aria-hidden="true" />
+        <div
+          className="filtros-fondo"
+          onClick={() => setAbierto(false)}
+          aria-hidden="true"
+        />
       )}
     </>
   );

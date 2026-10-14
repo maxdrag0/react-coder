@@ -1,8 +1,17 @@
-.carrito { padding-block: var(--e-5) var(--e-8); }
+.carrito {
+  padding-block: var(--e-5) var(--e-8);
+}
 
-.carrito-grid { display: grid; gap: var(--e-5); }
+.carrito-grid {
+  display: grid;
+  gap: var(--e-5);
+}
 
-.carrito-lista { display: grid; gap: var(--e-3); align-content: start; }
+.carrito-lista {
+  display: grid;
+  gap: var(--e-3);
+  align-content: start;
+}
 
 .carrito-resumen {
   display: grid;
@@ -21,7 +30,10 @@
   font-variant-numeric: tabular-nums;
 }
 
-.carrito-total span { color: var(--text-suave); font-size: var(--t-sm); }
+.carrito-total span {
+  color: var(--text-suave);
+  font-size: var(--t-sm);
+}
 
 .carrito-total strong {
   font-size: var(--t-xl);
@@ -50,7 +62,10 @@
     gap: var(--e-6);
     align-items: start;
   }
-  .carrito-resumen { position: sticky; top: calc(64px + var(--e-5)); }
+  .carrito-resumen {
+    position: sticky;
+    top: calc(64px + var(--e-5));
+  }
 }
 
 /* En celular el resumen queda fijo abajo: el total siempre a la vista.
@@ -69,7 +84,9 @@
   }
 
   /* Aire para que el resumen fijo no tape el último producto. */
-  .carrito-grid { padding-bottom: 13rem; }
+  .carrito-grid {
+    padding-bottom: 13rem;
+  }
 }
 
 /* Se pide acá cuando el perfil no lo tiene: los usuarios que ya existían y

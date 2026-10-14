@@ -26,7 +26,7 @@ const Carrusel = () => {
 
     temporizador.current = setInterval(
       () => setActual((i) => (i + 1) % slides.length),
-      CADA
+      CADA,
     );
     return () => clearInterval(temporizador.current);
   }, [automatico, slides.length]);
@@ -46,7 +46,11 @@ const Carrusel = () => {
       aria-roledescription="carrusel"
       aria-label="Novedades"
     >
-      <img className="carrusel-imagen" src={slide.imagen} alt={slide.titulo ?? ""} />
+      <img
+        className="carrusel-imagen"
+        src={slide.imagen}
+        alt={slide.titulo ?? ""}
+      />
 
       {(slide.titulo || slide.texto || slide.enlace) && (
         <div className="carrusel-texto">

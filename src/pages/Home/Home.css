@@ -1,4 +1,6 @@
-.home { padding-block: var(--e-6) var(--e-8); }
+.home {
+  padding-block: var(--e-6) var(--e-8);
+}
 
 .home-hero {
   display: grid;
@@ -12,7 +14,10 @@
   margin: 0;
 }
 
-.home-seccion { display: grid; gap: var(--e-5); }
+.home-seccion {
+  display: grid;
+  gap: var(--e-5);
+}
 
 .home-cargando {
   display: grid;
@@ -26,8 +31,13 @@
   padding-block: var(--e-6);
 }
 
-.home-cargando { gap: var(--e-3); }
-.home-cargando p { color: var(--text-suave); margin: 0; }
+.home-cargando {
+  gap: var(--e-3);
+}
+.home-cargando p {
+  color: var(--text-suave);
+  margin: 0;
+}
 
 /* Portada sin nada que mostrar: pasa si todo el catálogo está oculto. Un
    cartel y una salida, en vez de una grilla vacía bajo "Más vendidos". */
@@ -39,11 +49,16 @@
   color: var(--text-suave);
 }
 
-.home-vacio p { margin: 0; }
+.home-vacio p {
+  margin: 0;
+}
 
 /* --- Portada nueva --- */
 
-.home { display: grid; gap: var(--e-6); }
+.home {
+  display: grid;
+  gap: var(--e-6);
+}
 
 .home-acciones {
   display: flex;
@@ -71,7 +86,9 @@
   border-radius: var(--r-card);
 }
 
-.home-ventajas svg { color: var(--gold); }
+.home-ventajas svg {
+  color: var(--gold);
+}
 
 .home-ventajas h2 {
   margin: 0;
@@ -117,6 +134,10 @@
 }
 
 @media (min-width: 700px) {
-  .home-ventajas { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .home-shows { padding: var(--e-7) var(--e-6); }
+  .home-ventajas {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .home-shows {
+    padding: var(--e-7) var(--e-6);
+  }
 }

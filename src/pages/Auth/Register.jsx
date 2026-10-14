@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { registerWithEmail, loginWithGoogle } from "@/services/firebase/authFirebase";
+import {
+  registerWithEmail,
+  loginWithGoogle,
+} from "@/services/firebase/authFirebase";
 import { mensajeDeError } from "@/constants/authErrors";
 import { validarPassword, PASSWORD_MINIMO } from "@/utils/validarPassword";
 import { errorDeTelefono, soloDigitos } from "@/utils/telefono";
@@ -22,7 +25,8 @@ const Register = () => {
   const [cargando, setCargando] = useState(false);
   const navigate = useNavigate();
 
-  const cambiar = (e) => setDatos({ ...datos, [e.target.name]: e.target.value });
+  const cambiar = (e) =>
+    setDatos({ ...datos, [e.target.name]: e.target.value });
 
   const ejecutar = async (accion) => {
     setCargando(true);
@@ -66,8 +70,8 @@ const Register = () => {
         datos.email.trim(),
         password,
         datos.name.trim(),
-        soloDigitos(datos.telefono)
-      )
+        soloDigitos(datos.telefono),
+      ),
     );
   };
 
@@ -76,8 +80,21 @@ const Register = () => {
       <FormError mensaje={error} />
 
       <form onSubmit={registrar} className="auth-form">
-        <FormField label="Nombre completo" id="name" value={datos.name} onChange={cambiar} autoComplete="name" />
-        <FormField label="Email" id="email" type="email" value={datos.email} onChange={cambiar} autoComplete="email" />
+        <FormField
+          label="Nombre completo"
+          id="name"
+          value={datos.name}
+          onChange={cambiar}
+          autoComplete="name"
+        />
+        <FormField
+          label="Email"
+          id="email"
+          type="email"
+          value={datos.email}
+          onChange={cambiar}
+          autoComplete="email"
+        />
         <FormField
           label="Teléfono"
           id="telefono"
@@ -105,12 +122,18 @@ const Register = () => {
           autoComplete="new-password"
         />
 
-        <button type="submit" className="boton boton-primario boton-ancho" disabled={cargando}>
+        <button
+          type="submit"
+          className="boton boton-primario boton-ancho"
+          disabled={cargando}
+        >
           {cargando ? "Creando tu cuenta..." : "Registrarse"}
         </button>
       </form>
 
-      <div className="auth-divider"><span>o</span></div>
+      <div className="auth-divider">
+        <span>o</span>
+      </div>
 
       <GoogleAuthButton
         texto="Continuar con Google"

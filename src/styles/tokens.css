@@ -10,33 +10,44 @@
 :root {
   /* Color — el fondo es el azul del logo al 12% de luminosidad, no negro.
      Negro puro es el cliché del rubro; el cielo nocturno real es azul. */
-  --ground: #0E1726;
+  --ground: #0e1726;
   --surface: #162233;
-  --surface-alto: #1E2D42;
+  --surface-alto: #1e2d42;
 
-  --gold: #E6B32E;
-  --gold-suave: #F0CC6B;
+  --gold: #e6b32e;
+  --gold-suave: #f0cc6b;
   --gold-linea: rgba(230, 179, 46, 0.15);
-  --sobre-gold: #16202E;
+  --sobre-gold: #16202e;
 
-  --blue: #3B7CB8;
-  --blue-suave: #5B9AD4;
+  /* El relleno de la acción principal. En oscuro es el dorado: sobre
+     casi-negro brilla y es la marca. Se separa de --gold porque en claro el
+     dorado legible es un oliva que como RELLENO se lee sucio, no premium. */
+  --accion: var(--gold);
+  --accion-hover: var(--gold-suave);
+  --sobre-accion: var(--sobre-gold);
 
-  --danger: #F07A80;
+  /* Borde estructural. --gold-linea es un acento dorado; esto es el trazo que
+     separa una tarjeta de otra y no tiene por qué ser de marca. */
+  --linea: rgba(230, 179, 46, 0.15);
+
+  --blue: #3b7cb8;
+  --blue-suave: #5b9ad4;
+
+  --danger: #f07a80;
   --danger-fondo: rgba(240, 122, 128, 0.14);
-  --exito: #4FBF85;
+  --exito: #4fbf85;
   --exito-fondo: rgba(79, 191, 133, 0.12);
 
-  --text: #F2F0EB;
-  --text-suave: #9FB2C9;
-  --text-tenue: #93A5BC;
+  --text: #f2f0eb;
+  --text-suave: #9fb2c9;
+  --text-tenue: #93a5bc;
 
   /* Elevación — sin sombras: sobre fondo oscuro no se leen. */
   --elev-1: 0 0 0 1px var(--gold-linea);
   --elev-2: 0 0 0 1px var(--gold-linea), 0 8px 24px rgba(0, 0, 0, 0.4);
 
   /* Tipografía */
-  --fuente: 'Archivo', system-ui, -apple-system, sans-serif;
+  --fuente: "Archivo", system-ui, -apple-system, sans-serif;
   --ancho-display: 110%;
   --ancho-cuerpo: 100%;
 
@@ -80,30 +91,45 @@
 }
 
 [data-theme="light"] {
-  --ground: #F5F6F8;
-  --surface: #FFFFFF;
-  --surface-alto: #EDF0F4;
+  --ground: #f5f6f8;
+  --surface: #ffffff;
+  --surface-alto: #edf0f4;
 
   /* El dorado de marca da 2.1:1 sobre blanco: ilegible. Se oscurece hasta
      alcanzar 4.5:1 sin dejar de ser el mismo color. */
-  --gold: #7A5A0E;
-  --gold-suave: #5E460A;
+  /* El dorado de marca da 2.1:1 sobre blanco: ilegible. Se oscurece hasta
+     alcanzar 4.5:1 sin dejar de ser el mismo color. Sirve para TEXTO —el
+     precio, un acento— y no para rellenar un botón, donde ese mismo oliva se
+     lee como un error de color. */
+  --gold: #7a5a0e;
+  --gold-suave: #5e460a;
   --gold-linea: rgba(122, 90, 14, 0.18);
-  --sobre-gold: #F7F6F3;
+  --sobre-gold: #f7f6f3;
 
-  --blue: #1F4E76;
-  --blue-suave: #163A58;
+  /* Sobre blanco el relleno es el azul del logo: mismo paleta de marca, y un
+     azul profundo sobre blanco es nítido donde el oliva es barro. */
+  --accion: #1f4e76;
+  --accion-hover: #163a58;
+  --sobre-accion: #ffffff;
 
-  --danger: #A81F25;
+  /* En claro el trazo estructural es neutro: el dorado al 18% sobre blanco
+     es casi invisible y las tarjetas quedaban sin borde. */
+  --linea: rgba(22, 32, 46, 0.12);
+
+  --blue: #1f4e76;
+  --blue-suave: #163a58;
+
+  --danger: #a81f25;
   --danger-fondo: rgba(168, 31, 37, 0.08);
-  --exito: #1F6B44;
+  --exito: #1f6b44;
   --exito-fondo: rgba(31, 107, 68, 0.08);
 
-  --text: #16202E;
-  --text-suave: #46566A;
-  --text-tenue: #5E6E84;
+  --text: #16202e;
+  --text-suave: #46566a;
+  --text-tenue: #5e6e84;
 
   /* En claro las sombras sí funcionan */
   --elev-1: 0 1px 2px rgba(22, 32, 46, 0.06), 0 0 0 1px rgba(22, 32, 46, 0.06);
-  --elev-2: 0 12px 32px rgba(22, 32, 46, 0.12), 0 0 0 1px rgba(22, 32, 46, 0.08);
+  --elev-2:
+    0 12px 32px rgba(22, 32, 46, 0.12), 0 0 0 1px rgba(22, 32, 46, 0.08);
 }

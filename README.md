@@ -46,6 +46,7 @@ Sigue estos pasos para correr el proyecto localmente:
 | `npm run test:rules` | Reglas de Firestore y Storage contra el emulador |
 | `npm run set-admin -- <email>` | Da permisos de admin a un usuario |
 | `npm run seed` | Carga el catálogo inicial en Firestore (una sola vez) |
+| `npm run unificar-campos` | Reporta qué productos tienen los campos duplicados en inglés |
 
 Los tests de reglas necesitan Java instalado (lo usa el emulador de Firebase).
 
@@ -84,6 +85,30 @@ fallaba ahí con `vite build: command not found` y mandaba un mail por cada
 push. `vercel.json` además tiene esa rama excluida por si alguien la vuelve a
 pushear a mano. Para recuperar el deploy a Pages alcanza con volver a agregar
 los scripts `predeploy` y `deploy` (están en el historial de git).
+
+## Un solo idioma en el catálogo
+
+El esquema arrastra cada campo del producto en dos idiomas: el panel viejo
+escribía `name`, `category`, `description` e `image`, y el nuevo escribe
+`nombre`, `categoria`, `descripcion` y `fotoUrl`.
+
+```bash
+npm run unificar-campos              # reporta, no escribe
+npm run unificar-campos -- --aplicar # escribe
+```
+
+Cuando los dos campos tienen valores **distintos**, el script no elige: los
+lista como conflicto y los deja intactos. Puede que alguien haya corregido el
+nombre en un panel y no en el otro, y quedarse con uno en silencio pierde el
+otro. Se corrigen a mano en el panel y se vuelve a correr.
+
+Los **pedidos no se tocan**. Un pedido es el registro de lo que se acordó y
+guarda el nombre que el producto tenía ese día; reescribirlo falsearía el
+historial. Por eso `nombreDeItem` en `src/constants/renglon.js` conserva el
+fallback a `name`: es para leer renglones viejos, no productos.
+
+Recién **después** de correr el script con `--aplicar` y ver cero conflictos
+se pueden sacar los `|| item.name` que quedan del lado del catálogo.
 
 ## Seguridad
 

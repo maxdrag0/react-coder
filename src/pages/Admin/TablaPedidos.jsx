@@ -3,12 +3,7 @@ import { MessageCircle } from "lucide-react";
 import { formatearPrecio } from "../../utils/formatearPrecio";
 import { paraWhatsapp } from "../../utils/telefono";
 import { ESTADOS_PEDIDO, estadoDePedido } from "../../constants/estadoPedido";
-
-const renglonDe = (item) => {
-  const nombre = item.nombre || item.name || "";
-  const unidad = item.unidad && item.unidad !== "unitario" ? ` (${item.unidad})` : "";
-  return `${item.cantidad}x ${nombre}${unidad}`;
-};
+import { renglonDe } from "../../constants/renglon";
 
 /**
  * Una fila con estado propio porque la nota se escribe acá y se guarda al
@@ -32,7 +27,9 @@ const FilaPedido = ({ pedido, onEstado, onNota }) => {
         <code className="admin-orden-id">{pedido.id}</code>
       </td>
 
-      <td data-etiqueta="Fecha">{new Date(pedido.date).toLocaleString("es-AR")}</td>
+      <td data-etiqueta="Fecha">
+        {new Date(pedido.date).toLocaleString("es-AR")}
+      </td>
 
       <td data-etiqueta="Cliente">
         <div className="admin-cliente">

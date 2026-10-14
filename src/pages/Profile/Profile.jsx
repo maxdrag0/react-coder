@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/auth/useAuth";
 import { usePerfil } from "@/hooks/usePerfil";
 import { errorDeTelefono, soloDigitos } from "@/utils/telefono";
 import { logoutUser } from "@/services/firebase/authFirebase";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts/theme/useTheme";
 import VerificacionPendiente from "@/components/auth/VerificacionPendiente/VerificacionPendiente";
 import MisPedidos from "./MisPedidos";
 import "./Profile.css";

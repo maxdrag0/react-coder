@@ -1,6 +1,6 @@
-import { useContext, useRef, useState } from "react";
-import { CartContext } from "../../contexts/cart/CartContext";
-import { useAuth } from "../../contexts/AuthContext";
+import { useRef, useState } from "react";
+import { useCart } from "../../contexts/cart/useCart";
+import { useAuth } from "../../contexts/auth/useAuth";
 import { Button } from "../../components/common/Button/Button";
 import CarritoCard from "../../components/CarritoCard/CarritoCard";
 import { useNavigate, Link } from "react-router-dom";
@@ -14,7 +14,7 @@ import { formatearTotal } from "@/utils/formatearPrecio";
 
 function Carrito() {
   const { removeList, cartList, total, actualizarPrecio, deleteItem } =
-    useContext(CartContext);
+    useCart();
   const { user } = useAuth();
   const {
     perfil,

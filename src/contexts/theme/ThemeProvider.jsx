@@ -1,6 +1,5 @@
-import { createContext, useContext, useEffect, useState } from "react";
-
-export const ThemeContext = createContext();
+import { useEffect, useState } from "react";
+import { ThemeContext } from "./ThemeContext.js";
 
 export const ThemeProvider = ({ children }) => {
   const [themeMode, setThemeMode] = useState(() => {
@@ -9,10 +8,10 @@ export const ThemeProvider = ({ children }) => {
 
   useEffect(() => {
     localStorage.setItem("app-theme", themeMode);
-    
+
     const root = document.documentElement;
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    
+
     const updateTheme = () => {
       if (themeMode === "system") {
         const systemPrefersDark = mediaQuery.matches;
@@ -23,13 +22,13 @@ export const ThemeProvider = ({ children }) => {
     };
 
     updateTheme();
-    
+
     const listener = () => {
       if (themeMode === "system") {
         updateTheme();
       }
     };
-    
+
     mediaQuery.addEventListener("change", listener);
     return () => mediaQuery.removeEventListener("change", listener);
   }, [themeMode]);
@@ -40,5 +39,3 @@ export const ThemeProvider = ({ children }) => {
     </ThemeContext.Provider>
   );
 };
-
-export const useTheme = () => useContext(ThemeContext);

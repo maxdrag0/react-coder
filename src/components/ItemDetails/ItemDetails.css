@@ -4,14 +4,25 @@
   padding-block: var(--e-5) var(--e-8);
 }
 
+/*
+  Cuadrada y acotada. Con 4/3 sobre una columna de 60% la foto medía ~750x560
+  en un portátil y empujaba el "cómo lo querés comprar" abajo del fold: para
+  comprar había que scrollear, y el que scrollea para encontrar el precio se
+  va. La foto vende, pero no decide.
+*/
 .detalle-media {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1 / 1;
+  max-width: 420px;
   background: var(--surface);
   border-radius: var(--r-card);
   overflow: hidden;
 }
 
-.detalle-media img { width: 100%; height: 100%; object-fit: cover; }
+/*
+  contain y no cover: las fotos vienen del proveedor con el producto centrado
+  sobre su fondo, y recortar le come las puntas a una bengala parada.
+*/
+.detalle-media img { width: 100%; height: 100%; object-fit: contain; }
 
 .detalle-info {
   display: grid;
@@ -20,22 +31,35 @@
   min-width: 0;
 }
 
-.detalle-info h1 { overflow-wrap: anywhere; }
+/*
+  Más chico que el h1 global (que llega a 3rem): acá compite con el precio,
+  que es lo que el comprador vino a ver.
+*/
+.detalle-info h1 {
+  overflow-wrap: anywhere;
+  font-size: clamp(var(--t-lg), 3vw, var(--t-2xl));
+  margin: 0;
+}
 
-.detalle-desc { color: var(--text-suave); }
+.detalle-desc {
+  margin: 0;
+  color: var(--text-suave);
+  font-size: var(--t-sm);
+}
 
 .detalle-ficha {
   display: grid;
-  gap: var(--e-2);
-  padding-block: var(--e-3);
-  border-block: 1px solid var(--gold-linea);
+  gap: var(--e-1);
+  margin: 0;
+  padding-top: var(--e-3);
+  border-top: 1px solid var(--gold-linea);
 }
 
 .detalle-ficha > div {
   display: grid;
-  grid-template-columns: 9rem minmax(0, 1fr);
+  grid-template-columns: 7rem minmax(0, 1fr);
   gap: var(--e-3);
-  font-size: var(--t-sm);
+  font-size: var(--t-xs);
 }
 
 .detalle-ficha dt { color: var(--text-tenue); }
@@ -57,9 +81,11 @@
 }
 
 @media (min-width: 900px) {
+  /* La columna de compra manda y la foto se acota: al revés (3fr 2fr) la
+     foto se llevaba el 60% del ancho y la compra quedaba apretada. */
   .detalle {
-    grid-template-columns: 3fr 2fr;
-    gap: var(--e-7);
+    grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+    gap: var(--e-6);
     align-items: start;
   }
   /* El media es lo único que vende el producto: se queda a la vista

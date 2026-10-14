@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
 import CartMenu from "./CartMenu/CartMenu";
 import Logo from "./Logo/Logo";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../contexts/auth/useAuth";
 import { NavLink, useNavigate } from "react-router-dom";
 import { User, Shield, Search } from "lucide-react";
 

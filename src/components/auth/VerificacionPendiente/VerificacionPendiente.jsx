@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/auth/useAuth";
 import { reenviarVerificacion } from "@/services/firebase/authFirebase";
 import "./VerificacionPendiente.css";
 

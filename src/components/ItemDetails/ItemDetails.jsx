@@ -1,17 +1,21 @@
-import { useState, useContext } from "react";
-import { CartContext } from "../../contexts/cart/CartContext";
+import { useState } from "react";
+import { useCart } from "../../contexts/cart/useCart";
 import { Counter } from "../common/Counter/Counter";
 import Modal from "../common/Modal/Modal";
 import Media from "@/components/common/Media/Media";
 import { formatearPrecio } from "@/utils/formatearPrecio";
-import { unidadesDisponibles, precioDe, unidadesQueTrae } from "@/constants/unidades";
+import {
+  unidadesDisponibles,
+  precioDe,
+  unidadesQueTrae,
+} from "@/constants/unidades";
 import { sePuedeComprar } from "@/constants/estadoProducto";
 import { modelosDe } from "@/constants/modelos";
 import { Link } from "react-router-dom";
 import "./ItemDetails.css";
 
 function ItemDetails({ item }) {
-  const { addToCart } = useContext(CartContext);
+  const { addToCart } = useCart();
 
   // El modelo se elige primero: de el dependen las presentaciones y los
   // precios. Si el producto tiene uno solo, se elige solo y no se muestra el
@@ -46,7 +50,9 @@ function ItemDetails({ item }) {
   // Sin límite por stock: hasta definir si el stock se cuenta por unidad,
   // display o bulto, limitar la compra daría un número equivocado.
   const sumar = () => setCount(count + 1);
-  const restar = () => { if (count > 1) setCount(count - 1); };
+  const restar = () => {
+    if (count > 1) setCount(count - 1);
+  };
 
   const precio = precioDe(item, unidad, modeloId);
   const subtotal = precio ? precio * count : 0;
@@ -77,24 +83,18 @@ function ItemDetails({ item }) {
   return (
     <article className="detalle">
       <div className="detalle-media">
-        <Media item={item} modeloId={modeloId} titulo={nombre} modo="completo" />
+        <Media
+          item={item}
+          modeloId={modeloId}
+          titulo={nombre}
+          modo="completo"
+        />
       </div>
 
       <div className="detalle-info">
         <h1>{nombre}</h1>
         {descripcion && descripcion !== nombre && (
           <p className="detalle-desc">{descripcion}</p>
-        )}
-
-        {ficha.length > 0 && (
-          <dl className="detalle-ficha">
-            {ficha.map(([clave, valor]) => (
-              <div key={clave}>
-                <dt>{clave}</dt>
-                <dd>{valor}</dd>
-              </div>
-            ))}
-          </dl>
         )}
 
         {/* Un select y no una lista de opciones: un producto con diez
@@ -167,7 +167,11 @@ function ItemDetails({ item }) {
         ) : (
           <div className="detalle-compra">
             <Counter count={count} sumar={sumar} restar={restar} />
-            <button type="button" className="boton boton-primario" onClick={agregar}>
+            <button
+              type="button"
+              className="boton boton-primario"
+              onClick={agregar}
+            >
               Agregar al carrito
             </button>
           </div>
@@ -177,6 +181,21 @@ function ItemDetails({ item }) {
           <p className="detalle-subtotal">
             Subtotal <strong>{formatearPrecio(subtotal)}</strong>
           </p>
+        )}
+
+        {/* La ficha va DESPUÉS de comprar. Entre el título y el selector
+            empujaba el precio y el botón abajo del fold: el comprador tenía
+            que scrollear para encontrar cómo comprar, y el que no scrollea se
+            va. Marca y código no deciden la compra, la confirman. */}
+        {ficha.length > 0 && (
+          <dl className="detalle-ficha">
+            {ficha.map(([clave, valor]) => (
+              <div key={clave}>
+                <dt>{clave}</dt>
+                <dd>{valor}</dd>
+              </div>
+            ))}
+          </dl>
         )}
       </div>
 
@@ -197,7 +216,9 @@ function ItemDetails({ item }) {
             <br />
             {agregado?.modelo && <>{agregado.modelo} · </>}
             {agregado?.cantidad}{" "}
-            {agregado?.cantidad === 1 ? "unidad de compra" : "unidades de compra"}
+            {agregado?.cantidad === 1
+              ? "unidad de compra"
+              : "unidades de compra"}
             {agregado?.unidad && <> · {agregado.unidad}</>}
           </>
         }

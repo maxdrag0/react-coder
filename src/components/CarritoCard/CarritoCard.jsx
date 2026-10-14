@@ -1,18 +1,24 @@
-import { useContext } from "react";
-import { CartContext } from "../../contexts/cart/CartContext";
+import { useCart } from "../../contexts/cart/useCart";
 import { Trash2 } from "lucide-react";
 import { Counter } from "../common/Counter/Counter";
 import MediaPlaceholder from "@/components/common/MediaPlaceholder/MediaPlaceholder";
 import { formatearPrecio } from "@/utils/formatearPrecio";
 import { UNIDADES } from "@/constants/unidades";
+import { fotosDe } from "@/constants/fotos";
+import { nombreDeItem } from "@/constants/renglon";
 import "./CarritoCard.css";
 
 function CarritoCard({ item }) {
-  const { deleteItem, updateQuantity } = useContext(CartContext);
+  const { deleteItem, updateQuantity } = useCart();
 
   const subtotal = (item.precioElegido || 0) * item.cantidad;
-  const nombre = item.nombre || item.name;
-  const foto = item.fotoUrl || item.image;
+  const nombre = nombreDeItem(item);
+  /*
+    La foto DEL MODELO elegido. Leer item.fotoUrl mostraba la del producto, y
+    tres bengalas de colores distintos quedaban como tres filas identicas: el
+    comprador no podia saber si habia elegido bien.
+  */
+  const foto = fotosDe(item, item.modelo)[0] ?? null;
   const etiquetaUnidad =
     UNIDADES.find((u) => u.clave === item.unidad)?.etiqueta ?? "Unidad";
 
@@ -30,6 +36,8 @@ function CarritoCard({ item }) {
       <div className="carrito-item-info">
         <h3 className="carrito-item-nombre">{nombre}</h3>
         <p className="carrito-item-sub">
+          {item.modeloEtiqueta && <strong>{item.modeloEtiqueta}</strong>}
+          {item.modeloEtiqueta && " · "}
           {etiquetaUnidad} · {formatearPrecio(item.precioElegido)} c/u
         </p>
         <p className="carrito-item-subtotal">{formatearPrecio(subtotal)}</p>

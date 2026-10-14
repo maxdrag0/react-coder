@@ -5,7 +5,7 @@ import { MemoryRouter } from "react-router-dom";
 import { CartContext } from "@/contexts/cart/CartContext";
 
 const useAuthMock = vi.fn();
-vi.mock("@/contexts/AuthContext", () => ({ useAuth: () => useAuthMock() }));
+vi.mock("@/contexts/auth/useAuth", () => ({ useAuth: () => useAuthMock() }));
 
 const { default: BottomNav } = await import("@/components/BottomNav/BottomNav");
 

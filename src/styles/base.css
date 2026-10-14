@@ -32,7 +32,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-stretch: var(--ancho-display);
   font-weight: 600;
   line-height: 1.15;
@@ -40,11 +43,19 @@ h1, h2, h3, h4 {
   text-wrap: balance;
 }
 
-h1 { font-size: clamp(var(--t-xl), 5vw, var(--t-3xl)); }
-h2 { font-size: clamp(var(--t-lg), 3.5vw, var(--t-2xl)); }
-h3 { font-size: var(--t-md); }
+h1 {
+  font-size: clamp(var(--t-xl), 5vw, var(--t-3xl));
+}
+h2 {
+  font-size: clamp(var(--t-lg), 3.5vw, var(--t-2xl));
+}
+h3 {
+  font-size: var(--t-md);
+}
 
-p { max-width: var(--medida); }
+p {
+  max-width: var(--medida);
+}
 
 a {
   color: var(--blue-suave);
@@ -52,14 +63,21 @@ a {
   transition: color var(--mov-rapido);
 }
 
-a:hover { color: var(--gold); }
+a:hover {
+  color: var(--gold);
+}
 
-button, input, select, textarea {
+button,
+input,
+select,
+textarea {
   font: inherit;
   color: inherit;
 }
 
-button { cursor: pointer; }
+button {
+  cursor: pointer;
+}
 
 /* Foco visible en todo lo enfocable. Nunca outline:none sin reemplazo. */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
@@ -68,10 +86,17 @@ button { cursor: pointer; }
   border-radius: var(--r-control);
 }
 
-img, video, svg { display: block; max-width: 100%; }
+img,
+video,
+svg {
+  display: block;
+  max-width: 100%;
+}
 
 /* Área táctil mínima en todo lo clickeable */
-button, a[role="button"], [role="tab"] {
+button,
+a[role="button"],
+[role="tab"] {
   min-height: 44px;
   min-width: 44px;
 }

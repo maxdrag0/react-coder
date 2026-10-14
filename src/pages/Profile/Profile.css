@@ -1,4 +1,6 @@
-.profile-container { padding-block: var(--e-6) var(--e-8); }
+.profile-container {
+  padding-block: var(--e-6) var(--e-8);
+}
 
 .profile-card {
   width: 100%;
@@ -12,9 +14,14 @@
   box-shadow: var(--elev-1);
 }
 
-.profile-card h2 { font-size: var(--t-xl); }
+.profile-card h2 {
+  font-size: var(--t-xl);
+}
 
-.profile-info { display: grid; gap: var(--e-1); }
+.profile-info {
+  display: grid;
+  gap: var(--e-1);
+}
 
 .info-group {
   display: grid;
@@ -24,11 +31,22 @@
   border-bottom: 1px solid var(--gold-linea);
 }
 
-.info-group:last-child { border-bottom: none; }
+.info-group:last-child {
+  border-bottom: none;
+}
 
-.info-label { font-size: var(--t-xs); color: var(--text-tenue); }
-.info-value { color: var(--text); overflow-wrap: anywhere; }
-.profile-role { color: var(--gold); font-weight: 600; }
+.info-label {
+  font-size: var(--t-xs);
+  color: var(--text-tenue);
+}
+.info-value {
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+.profile-role {
+  color: var(--gold);
+  font-weight: 600;
+}
 
 .theme-select {
   width: 100%;
@@ -49,13 +67,21 @@
   color: var(--danger);
   font-size: var(--t-sm);
   font-weight: 500;
-  transition: background-color var(--mov-rapido), color var(--mov-rapido);
+  transition:
+    background-color var(--mov-rapido),
+    color var(--mov-rapido);
 }
 
-.logout-btn:hover { background: var(--danger); color: var(--ground); }
+.logout-btn:hover {
+  background: var(--danger);
+  color: var(--ground);
+}
 
 @media (min-width: 640px) {
-  .info-group { grid-template-columns: 9rem minmax(0, 1fr); align-items: baseline; }
+  .info-group {
+    grid-template-columns: 9rem minmax(0, 1fr);
+    align-items: baseline;
+  }
 }
 
 /* El unico campo editable del perfil. Se apila en celular porque el input

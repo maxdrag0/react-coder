@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { loginWithEmail, loginWithGoogle } from "@/services/firebase/authFirebase";
+import {
+  loginWithEmail,
+  loginWithGoogle,
+} from "@/services/firebase/authFirebase";
 import { mensajeDeError } from "@/constants/authErrors";
 import AuthCard from "@/components/auth/AuthCard/AuthCard";
 import GoogleAuthButton from "@/components/auth/GoogleAuthButton/GoogleAuthButton";
@@ -19,7 +22,8 @@ const Login = () => {
   // ProtectedRoute guarda a donde queria ir la persona antes de rebotarla.
   const destino = location.state?.volverA ?? "/";
 
-  const cambiar = (e) => setDatos({ ...datos, [e.target.name]: e.target.value });
+  const cambiar = (e) =>
+    setDatos({ ...datos, [e.target.name]: e.target.value });
 
   const ejecutar = async (accion) => {
     setCargando(true);
@@ -44,7 +48,14 @@ const Login = () => {
       <FormError mensaje={error} />
 
       <form onSubmit={ingresar} className="auth-form">
-        <FormField label="Email" id="email" type="email" value={datos.email} onChange={cambiar} autoComplete="email" />
+        <FormField
+          label="Email"
+          id="email"
+          type="email"
+          value={datos.email}
+          onChange={cambiar}
+          autoComplete="email"
+        />
         <FormField
           label="Contraseña"
           id="password"
@@ -56,12 +67,18 @@ const Login = () => {
 
         <PasswordResetLink />
 
-        <button type="submit" className="boton boton-primario boton-ancho" disabled={cargando}>
+        <button
+          type="submit"
+          className="boton boton-primario boton-ancho"
+          disabled={cargando}
+        >
           {cargando ? "Ingresando..." : "Ingresar"}
         </button>
       </form>
 
-      <div className="auth-divider"><span>o</span></div>
+      <div className="auth-divider">
+        <span>o</span>
+      </div>
 
       <GoogleAuthButton
         texto="Continuar con Google"

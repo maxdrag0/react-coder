@@ -29,7 +29,9 @@
   line-height: 1.1;
 }
 
-.nav-abajo-item.activa { color: var(--gold); }
+.nav-abajo-item.activa {
+  color: var(--gold);
+}
 
 .nav-abajo-icono {
   position: relative;
@@ -46,13 +48,15 @@
   place-items: center;
   padding-inline: 4px;
   border-radius: var(--r-pill);
-  background: var(--gold);
-  color: var(--sobre-gold);
+  background: var(--accion);
+  color: var(--sobre-accion);
   font-size: 10px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
 @media (min-width: 900px) {
-  .nav-abajo { display: none; }
+  .nav-abajo {
+    display: none;
+  }
 }

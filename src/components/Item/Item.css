@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   background: var(--surface);
-  border: 1px solid var(--gold-linea);
+  border: 1px solid var(--linea);
   border-radius: var(--r-card);
   overflow: hidden;
   /* Sin min-width:0 el texto largo fuerza scroll horizontal en toda la
@@ -28,15 +28,18 @@
   /* Más cuadrada que antes: la foto ES el producto, y en pirotecnia lo que
      se compra se reconoce por la imagen. */
   aspect-ratio: 1 / 1;
+  padding: var(--e-3);
   background: var(--surface-alto);
   overflow: hidden;
   flex-shrink: 0;
 }
 
+/* contain y no cover: con cover una bengala parada perdía las puntas, y el
+   recorte de la grilla no coincidía con lo que se veía al entrar. */
 .item-media img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform var(--mov-base);
 }
 
@@ -68,22 +71,27 @@
 
 /* El precio se va al piso de la card: con nombres de largos distintos, si no,
    cada card lo muestra a una altura distinta. */
-.item-cuerpo .precio { margin-top: auto; }
+.item-cuerpo .precio {
+  margin-top: auto;
+}
 
 /* --- Movimiento --- */
 
 /* Un levante mínimo y un acercamiento de la foto. Es lo único que se mueve, y
    responde a la acción de la persona: nada se anima solo. */
 .item:hover {
-  border-color: var(--gold-suave);
+  border-color: var(--accion);
   transform: translateY(-2px);
+  box-shadow: var(--elev-2);
 }
 
-.item:hover .item-media img { transform: scale(1.04); }
+.item:hover .item-media img {
+  transform: scale(1.04);
+}
 
 .item-link:hover .item-titulo,
 .item-link:focus-visible .item-titulo {
-  color: var(--gold);
+  color: var(--accion);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -91,16 +99,22 @@
   .item-media img {
     transition: none;
   }
-  .item:hover { transform: none; }
-  .item:hover .item-media img { transform: none; }
+  .item:hover {
+    transform: none;
+  }
+  .item:hover .item-media img {
+    transform: none;
+  }
 }
 
 .item:has(.item-link:focus-visible) {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--accion);
   outline-offset: 2px;
 }
 
-.item-link:focus-visible { outline: none; }
+.item-link:focus-visible {
+  outline: none;
+}
 
 /* --- Sellos sobre la foto --- */
 
@@ -112,11 +126,11 @@
   left: var(--e-2);
   padding: 2px var(--e-2);
   border-radius: var(--r-pill);
-  background: color-mix(in srgb, var(--ground) 86%, transparent);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
   color: var(--text-suave);
   font-size: var(--t-xs);
   font-weight: 600;
-  border: 1px solid var(--gold-linea);
+  border: 1px solid var(--linea);
   backdrop-filter: blur(4px);
 }
 
@@ -125,5 +139,5 @@
 .item-sello-modelos {
   left: auto;
   right: var(--e-2);
-  color: var(--gold);
+  color: var(--accion);
 }

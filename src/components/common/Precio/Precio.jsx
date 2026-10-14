@@ -53,7 +53,9 @@ const Precio = ({ item, compacto = false }) => {
   if (compacto) {
     return (
       <div className="precio">
-        <p className="precio-principal">{formatearPrecio(precioDe(item, "unitario"))}</p>
+        <p className="precio-principal">
+          {formatearPrecio(precioDe(item, "unitario"))}
+        </p>
 
         {otras.length > 0 && (
           <p className="precio-otras">
@@ -62,7 +64,7 @@ const Precio = ({ item, compacto = false }) => {
                 const trae = unidadesQueTrae(item, u.clave);
                 const cantidad = trae ? ` ×${trae}` : "";
                 return `${u.etiqueta.toLowerCase()} ${formatearPrecio(
-                  precioDe(item, u.clave)
+                  precioDe(item, u.clave),
                 )}${cantidad}`;
               })
               .join(" · ")}

@@ -13,7 +13,8 @@ const VENTAJAS = [
   {
     Icono: Tag,
     titulo: "Precio por bulto",
-    texto: "Mayorista y minorista, con el precio de cada presentación a la vista.",
+    texto:
+      "Mayorista y minorista, con el precio de cada presentación a la vista.",
   },
   {
     Icono: Truck,

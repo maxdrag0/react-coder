@@ -1,6 +1,11 @@
 import { PuffLoader } from "react-spinners";
 import { useState, useEffect, useMemo } from "react";
-import { useParams, useSearchParams, useNavigate, Link } from "react-router-dom";
+import {
+  useParams,
+  useSearchParams,
+  useNavigate,
+  Link,
+} from "react-router-dom";
 import { Search } from "lucide-react";
 import ItemListContainer from "../../components/ItemListContainer/ItemListContainer";
 import FiltrosProductos from "../../components/FiltrosProductos/FiltrosProductos";
@@ -56,7 +61,7 @@ function Products() {
   const marcas = useMemo(() => {
     const vistas = new Set(visibles.map(marcaDe));
     return [...vistas].sort((a, b) =>
-      a === SIN_MARCA ? 1 : b === SIN_MARCA ? -1 : a.localeCompare(b)
+      a === SIN_MARCA ? 1 : b === SIN_MARCA ? -1 : a.localeCompare(b),
     );
   }, [visibles]);
 
@@ -73,9 +78,10 @@ function Products() {
         (item) =>
           coincideTexto(item, localSearch) &&
           coincidePrecio(item, tope) &&
-          (marcasElegidas.length === 0 || marcasElegidas.includes(marcaDe(item)))
+          (marcasElegidas.length === 0 ||
+            marcasElegidas.includes(marcaDe(item))),
       ),
-    [visibles, localSearch, marcasElegidas, tope]
+    [visibles, localSearch, marcasElegidas, tope],
   );
 
   // El conteo por marca aplica los demás filtros pero NO el de marca: así
@@ -102,7 +108,7 @@ function Products() {
     setMarcasElegidas((actual) =>
       actual.includes(marca)
         ? actual.filter((m) => m !== marca)
-        : [...actual, marca]
+        : [...actual, marca],
     );
 
   const limpiar = () => {
@@ -118,7 +124,11 @@ function Products() {
         <h1>{category || "Todos los productos"}</h1>
 
         <div className="productos-buscador">
-          <Search size={18} className="productos-buscador-icono" aria-hidden="true" />
+          <Search
+            size={18}
+            className="productos-buscador-icono"
+            aria-hidden="true"
+          />
           <input
             type="search"
             className="campo-control"
@@ -153,13 +163,17 @@ function Products() {
         <div className="productos-resultado">
           {loading && items.length === 0 ? (
             <div className="productos-cargando">
-              <PuffLoader color="currentColor" aria-label="Cargando productos" />
+              <PuffLoader
+                color="currentColor"
+                aria-label="Cargando productos"
+              />
               <p>Cargando productos...</p>
             </div>
           ) : (
             <>
               <p className="productos-cuenta">
-                {filtrados.length} {filtrados.length === 1 ? "producto" : "productos"}
+                {filtrados.length}{" "}
+                {filtrados.length === 1 ? "producto" : "productos"}
               </p>
 
               {filtrados.length > 0 ? (

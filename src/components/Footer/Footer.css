@@ -19,7 +19,9 @@
   justify-items: start;
 }
 
-.pie-estrella { color: var(--gold); }
+.pie-estrella {
+  color: var(--gold);
+}
 
 .pie-nombre {
   margin: 0;
@@ -63,9 +65,13 @@
   color: var(--text-suave);
 }
 
-.pie-grupo a:hover { color: var(--gold); }
+.pie-grupo a:hover {
+  color: var(--gold);
+}
 
-.pie-boton { justify-self: start; }
+.pie-boton {
+  justify-self: start;
+}
 
 .pie-legal {
   display: flex;
@@ -91,5 +97,7 @@
 
 @media (min-width: 900px) {
   /* En escritorio no hay barra inferior. */
-  .pie { padding-bottom: 0; }
+  .pie {
+    padding-bottom: 0;
+  }
 }

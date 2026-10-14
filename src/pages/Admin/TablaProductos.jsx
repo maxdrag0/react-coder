@@ -21,8 +21,13 @@ const categoriaDe = (p) => p.category || p.categoria || "";
 
 const EstadoBadge = ({ producto }) => {
   const estado = estadoDe(producto);
-  if (estado === ACTIVO) return <span className="admin-badge-activo">Activo</span>;
-  return <span className={`admin-badge admin-badge-${estado}`}>{etiquetaDe(estado)}</span>;
+  if (estado === ACTIVO)
+    return <span className="admin-badge-activo">Activo</span>;
+  return (
+    <span className={`admin-badge admin-badge-${estado}`}>
+      {etiquetaDe(estado)}
+    </span>
+  );
 };
 
 /**
@@ -50,7 +55,9 @@ const TablaProductos = ({
               checked={todosElegidos}
               onChange={() => onAlternarTodos(!todosElegidos)}
               aria-label={
-                todosElegidos ? "Deseleccionar todos" : "Seleccionar todos los visibles"
+                todosElegidos
+                  ? "Deseleccionar todos"
+                  : "Seleccionar todos los visibles"
               }
             />
           </th>
@@ -69,7 +76,10 @@ const TablaProductos = ({
           const foto = fotoDe(prod);
 
           return (
-            <tr key={prod.codigo} className={elegido ? "admin-fila-elegida" : ""}>
+            <tr
+              key={prod.codigo}
+              className={elegido ? "admin-fila-elegida" : ""}
+            >
               <td className="admin-col-check" data-etiqueta="Seleccionar">
                 <input
                   type="checkbox"
@@ -82,7 +92,10 @@ const TablaProductos = ({
                 {foto ? (
                   <img src={foto} alt="" className="admin-prod-img" />
                 ) : (
-                  <div className="admin-prod-img admin-prod-sin-foto" aria-hidden="true" />
+                  <div
+                    className="admin-prod-img admin-prod-sin-foto"
+                    aria-hidden="true"
+                  />
                 )}
               </td>
               <td data-etiqueta="Código">{prod.codigo}</td>

@@ -13,4 +13,6 @@
   overflow: hidden;
 }
 
-.no-encontrado p { color: var(--text-suave); }
+.no-encontrado p {
+  color: var(--text-suave);
+}

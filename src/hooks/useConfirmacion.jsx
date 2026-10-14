@@ -21,7 +21,7 @@ export const useConfirmacion = () => {
       new Promise((resolver) => {
         setPedido({ ...opciones, resolver });
       }),
-    []
+    [],
   );
 
   const responder = useCallback(
@@ -31,7 +31,7 @@ export const useConfirmacion = () => {
       setPedido(null);
       pedido?.resolver(respuesta);
     },
-    [pedido]
+    [pedido],
   );
 
   return {

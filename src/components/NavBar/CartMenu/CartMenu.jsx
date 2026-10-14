@@ -7,7 +7,11 @@ function CartWidget() {
   const { cantidadItems } = useCart();
 
   return (
-    <NavLink to="/carrito" className="nav-accion nav-solo-escritorio" aria-label={`Carrito, ${cantidadItems} productos`}>
+    <NavLink
+      to="/carrito"
+      className="nav-accion nav-solo-escritorio"
+      aria-label={`Carrito, ${cantidadItems} productos`}
+    >
       <ShoppingCart size={20} />
       {cantidadItems > 0 && (
         <span className="nav-carrito-cuenta" aria-hidden="true">

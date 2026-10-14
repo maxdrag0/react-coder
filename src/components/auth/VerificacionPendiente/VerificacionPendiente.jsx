@@ -21,7 +21,10 @@ const VerificacionPendiente = () => {
 
   return (
     <div className="verificacion-pendiente" role="status">
-      <p>Tu email todavía no está verificado. Vas a necesitarlo para enviar un pedido.</p>
+      <p>
+        Tu email todavía no está verificado. Vas a necesitarlo para enviar un
+        pedido.
+      </p>
       {estado ? (
         <p className="verificacion-estado">{estado}</p>
       ) : (

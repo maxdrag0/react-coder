@@ -1,6 +1,11 @@
-.form-container { display: grid; }
+.form-container {
+  display: grid;
+}
 
-.formulario-contacto { display: grid; gap: var(--e-4); }
+.formulario-contacto {
+  display: grid;
+  gap: var(--e-4);
+}
 
 .formulario-contacto textarea {
   min-height: 8rem;

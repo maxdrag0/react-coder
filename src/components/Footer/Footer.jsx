@@ -62,7 +62,9 @@ const Footer = () => (
     <div className="pie-legal contenedor">
       {/* El año se calcula: un año escrito a mano queda viejo en enero. */}
       <p>© {new Date().getFullYear()} Pirotecnia</p>
-      <p>La venta de pirotecnia está sujeta a la normativa de cada municipio.</p>
+      <p>
+        La venta de pirotecnia está sujeta a la normativa de cada municipio.
+      </p>
     </div>
   </footer>
 );

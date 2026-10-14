@@ -21,7 +21,11 @@ const CON_MODELOS = {
   codigo: "M100",
   nombre: "Mortero",
   modelos: [
-    { id: "tres", etiqueta: "3 pulgadas", presentaciones: { unitario: { precio: 8000 } } },
+    {
+      id: "tres",
+      etiqueta: "3 pulgadas",
+      presentaciones: { unitario: { precio: 8000 } },
+    },
     {
       id: "cinco",
       etiqueta: "5 pulgadas",
@@ -39,11 +43,12 @@ const montar = (item) =>
       <CartContext.Provider value={{ addToCart }}>
         <ItemDetails item={item} />
       </CartContext.Provider>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 
 const sumar = () => screen.getByRole("button", { name: "+" });
-const agregar = () => screen.getByRole("button", { name: /agregar al carrito/i });
+const agregar = () =>
+  screen.getByRole("button", { name: /agregar al carrito/i });
 const selectorModelo = () => screen.getByRole("combobox", { name: /modelo/i });
 
 beforeEach(() => addToCart.mockReset());
@@ -97,7 +102,9 @@ describe("ItemDetails: el selector de modelo", () => {
     // el precio y el boton de comprar abajo del todo.
     montar(CON_MODELOS);
     expect(selectorModelo()).toBeInTheDocument();
-    expect(screen.queryAllByRole("radio", { name: /pulgadas/ })).toHaveLength(0);
+    expect(screen.queryAllByRole("radio", { name: /pulgadas/ })).toHaveLength(
+      0,
+    );
   });
 
   it("arranca con el primer modelo elegido", () => {
@@ -120,7 +127,11 @@ describe("ItemDetails: el selector de modelo", () => {
       codigo: "X1",
       nombre: "Bengala",
       modelos: [
-        { id: "rojo", etiqueta: "Rojo", presentaciones: { unitario: { precio: 100 } } },
+        {
+          id: "rojo",
+          etiqueta: "Rojo",
+          presentaciones: { unitario: { precio: 100 } },
+        },
       ],
     });
     expect(screen.queryByRole("combobox", { name: /modelo/i })).toBeNull();
@@ -136,7 +147,7 @@ describe("ItemDetails: el selector de modelo", () => {
       CON_MODELOS,
       1,
       expect.any(String),
-      expect.objectContaining({ id: "cinco" })
+      expect.objectContaining({ id: "cinco" }),
     );
   });
 
@@ -166,7 +177,31 @@ describe("ItemDetails: el selector de modelo", () => {
       CON_MODELOS,
       1,
       "unitario",
-      expect.objectContaining({ id: "tres" })
+      expect.objectContaining({ id: "tres" }),
     );
+  });
+});
+
+describe("ItemDetails: la descripcion que repite el nombre", () => {
+  /*
+    Buena parte del catalogo trae la descripcion igual al nombre con un punto
+    al final ("Bengala de humo" / "Bengala de humo."). Mostrarla deja el
+    titulo escrito dos veces seguidas, que se lee como un error de la tienda.
+  */
+  it("no muestra una descripcion que solo agrega un punto", () => {
+    montar({ ...SIMPLE, descripcion: "Torta 100 tiros." });
+    expect(screen.queryByText("Torta 100 tiros.")).toBeNull();
+  });
+
+  it("tampoco si solo cambia por mayusculas o espacios", () => {
+    montar({ ...SIMPLE, descripcion: "  TORTA 100 TIROS  " });
+    expect(screen.queryByText(/^\s*TORTA 100 TIROS\s*$/)).toBeNull();
+  });
+
+  it("muestra una descripcion que SI aporta algo", () => {
+    montar({ ...SIMPLE, descripcion: "Cien tiros de colores, 45 segundos." });
+    expect(
+      screen.getByText("Cien tiros de colores, 45 segundos."),
+    ).toBeInTheDocument();
   });
 });

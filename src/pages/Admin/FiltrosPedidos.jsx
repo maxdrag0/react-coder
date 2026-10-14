@@ -10,7 +10,14 @@ const CHIPS = [
   { clave: TODOS, etiqueta: "Todos" },
 ];
 
-const FiltrosPedidos = ({ estado, onEstado, texto, onTexto, cuenta, visibles }) => (
+const FiltrosPedidos = ({
+  estado,
+  onEstado,
+  texto,
+  onTexto,
+  cuenta,
+  visibles,
+}) => (
   <div className="pedidos-filtros">
     <div className="pedidos-chips" role="group" aria-label="Filtrar por estado">
       {CHIPS.map((c) => (

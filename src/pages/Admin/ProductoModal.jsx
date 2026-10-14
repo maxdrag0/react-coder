@@ -61,7 +61,9 @@ const Presentacion = ({ clave, etiqueta, valores, onCampo }) => {
             />
           </div>
           <div className="campo">
-            <label htmlFor={`pres-${clave}-unidades`}>Cuántas unidades trae</label>
+            <label htmlFor={`pres-${clave}-unidades`}>
+              Cuántas unidades trae
+            </label>
             <input
               id={`pres-${clave}-unidades`}
               className="campo-control"
@@ -357,7 +359,6 @@ const ProductoModal = ({
                 aria-invalid={videoMal || undefined}
               />
             </Campo>
-
           </Seccion>
         </form>
 

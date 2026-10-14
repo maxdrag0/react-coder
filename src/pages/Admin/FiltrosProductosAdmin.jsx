@@ -24,7 +24,11 @@ const FiltrosProductosAdmin = ({
 
   return (
     <div className="prodfiltros">
-      <div className="prodfiltros-chips" role="group" aria-label="Filtrar por estado">
+      <div
+        className="prodfiltros-chips"
+        role="group"
+        aria-label="Filtrar por estado"
+      >
         {CHIPS.map((c) => (
           <button
             key={c.clave}

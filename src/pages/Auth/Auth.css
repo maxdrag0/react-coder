@@ -17,9 +17,14 @@
   box-shadow: var(--elev-1);
 }
 
-.auth-card h2 { font-size: var(--t-xl); }
+.auth-card h2 {
+  font-size: var(--t-xl);
+}
 
-.auth-form { display: grid; gap: var(--e-4); }
+.auth-form {
+  display: grid;
+  gap: var(--e-4);
+}
 
 .auth-divider {
   display: grid;
@@ -54,8 +59,15 @@
   }
   .auth::before {
     content: "";
-    background: radial-gradient(circle at 60% 40%, var(--surface-alto), var(--ground) 70%);
+    background: radial-gradient(
+      circle at 60% 40%,
+      var(--surface-alto),
+      var(--ground) 70%
+    );
     border-right: 1px solid var(--gold-linea);
   }
-  .auth-card { justify-self: center; align-self: center; }
+  .auth-card {
+    justify-self: center;
+    align-self: center;
+  }
 }

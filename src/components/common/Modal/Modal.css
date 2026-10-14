@@ -30,8 +30,14 @@
 }
 
 @keyframes modal-subir {
-  from { transform: translateY(12px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .modal h2 {
@@ -45,7 +51,9 @@
   line-height: 1.5;
 }
 
-.modal-cuerpo strong { color: var(--text); }
+.modal-cuerpo strong {
+  color: var(--text);
+}
 
 .modal-acciones {
   display: flex;
@@ -53,20 +61,33 @@
   gap: var(--e-2);
 }
 
-.modal-acciones > * { flex: 1 1 auto; }
+.modal-acciones > * {
+  flex: 1 1 auto;
+}
 
-.modal:focus-visible { outline: none; }
+.modal:focus-visible {
+  outline: none;
+}
 
 @media (min-width: 640px) {
-  .modal-fondo { align-items: center; padding: var(--e-4); }
+  .modal-fondo {
+    align-items: center;
+    padding: var(--e-4);
+  }
   .modal {
     align-self: center;
     border-radius: var(--r-card);
   }
-  .modal-acciones { justify-content: flex-end; }
-  .modal-acciones > * { flex: 0 0 auto; }
+  .modal-acciones {
+    justify-content: flex-end;
+  }
+  .modal-acciones > * {
+    flex: 0 0 auto;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .modal { animation: none; }
+  .modal {
+    animation: none;
+  }
 }

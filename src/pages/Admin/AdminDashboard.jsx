@@ -21,14 +21,13 @@ import {
   eliminarMensaje,
   actualizarMensaje,
 } from "../../services/firebase/contactoFirebase";
-import { uploadFile, uploadFiles } from "../../services/firebase/storageFirebase";
+import {
+  uploadFile,
+  uploadFiles,
+} from "../../services/firebase/storageFirebase";
 import { invalidarCatalogo } from "../../services/firebase/cacheCatalogo";
 import { estaAbierto } from "../../constants/estadoPedido";
-import {
-  aFormulario,
-  aFirestore,
-  PRODUCTO_VACIO,
-} from "./mapearProducto";
+import { aFormulario, aFirestore, PRODUCTO_VACIO } from "./mapearProducto";
 import ProductoModal from "./ProductoModal";
 import TablaProductos from "./TablaProductos";
 import TablaPedidos from "./TablaPedidos";
@@ -137,7 +136,7 @@ const AdminDashboard = () => {
     setFormulario((actual) => ({
       ...actual,
       modelos: actual.modelos.map((m, i) =>
-        i === indice ? { ...m, [campo]: valor } : m
+        i === indice ? { ...m, [campo]: valor } : m,
       ),
     }));
 
@@ -153,7 +152,7 @@ const AdminDashboard = () => {
                 [clave]: { ...m.presentaciones?.[clave], [campo]: valor },
               },
             }
-          : m
+          : m,
       ),
     }));
 
@@ -255,7 +254,7 @@ const AdminDashboard = () => {
       const modelos = [];
       for (const m of formulario.modelos ?? []) {
         modelos.push(
-          m.archivoNuevo ? { ...m, foto: await uploadFile(m.archivoNuevo) } : m
+          m.archivoNuevo ? { ...m, foto: await uploadFile(m.archivoNuevo) } : m,
         );
       }
 
@@ -268,7 +267,7 @@ const AdminDashboard = () => {
         // El codigo es el id del documento: cambiarlo mueve el producto y
         // deja atras los pedidos y los links que apuntaban al viejo.
         const cuantos = pedidos.filter((p) =>
-          p.items?.some((i) => i.codigo === original)
+          p.items?.some((i) => i.codigo === original),
         ).length;
 
         const acepta = await confirmacion.pedir({
@@ -304,7 +303,7 @@ const AdminDashboard = () => {
       setErrorModal(
         error.code === "codigo-ocupado"
           ? "Ya existe un producto con ese código. Elegí otro."
-          : "No se pudo guardar. Revisá la conexión y probá de nuevo."
+          : "No se pudo guardar. Revisá la conexión y probá de nuevo.",
       );
     } finally {
       setGuardando(false);
@@ -341,12 +340,12 @@ const AdminDashboard = () => {
 
   const filtrados = useMemo(
     () => filtrarProductos(productos, filtros),
-    [productos, filtros]
+    [productos, filtros],
   );
 
   const cuentaProductos = useMemo(
     () => contarEstadosProducto(productos),
-    [productos]
+    [productos],
   );
   const categorias = useMemo(() => categoriasPresentes(productos), [productos]);
   const marcas = useMemo(() => marcasPresentes(productos), [productos]);
@@ -395,7 +394,8 @@ const AdminDashboard = () => {
     const cuantos = seleccion.size;
 
     const acepta = await confirmacion.pedir({
-      titulo: cuantos === 1 ? "Eliminar 1 producto" : `Eliminar ${cuantos} productos`,
+      titulo:
+        cuantos === 1 ? "Eliminar 1 producto" : `Eliminar ${cuantos} productos`,
       mensaje: "Se borran de la base y no se pueden recuperar.",
       detalles: [
         "Si solo querés que dejen de venderse, usá Ocultar: se puede volver atrás.",
@@ -486,7 +486,7 @@ const AdminDashboard = () => {
 
   const pedidosFiltrados = useMemo(
     () => filtrarPedidos(pedidos, { estado: filtroEstado, texto: filtroTexto }),
-    [pedidos, filtroEstado, filtroTexto]
+    [pedidos, filtroEstado, filtroTexto],
   );
   const cuentaPedidos = useMemo(() => contarPorEstado(pedidos), [pedidos]);
 

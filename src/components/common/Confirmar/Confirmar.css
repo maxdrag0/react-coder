@@ -69,11 +69,15 @@
   margin-top: var(--e-2);
 }
 
-.confirmar-botones .boton { flex: 1; }
+.confirmar-botones .boton {
+  flex: 1;
+}
 
 @media (min-width: 480px) {
   .confirmar-botones {
     justify-content: flex-end;
   }
-  .confirmar-botones .boton { flex: 0 0 auto; }
+  .confirmar-botones .boton {
+    flex: 0 0 auto;
+  }
 }

@@ -13,7 +13,9 @@ const ProtectedRoute = ({ requireAdmin = false }) => {
   }
 
   if (!user) {
-    return <Navigate to="/login" state={{ volverA: location.pathname }} replace />;
+    return (
+      <Navigate to="/login" state={{ volverA: location.pathname }} replace />
+    );
   }
 
   if (requireAdmin && !isAdmin) {

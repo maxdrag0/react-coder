@@ -16,12 +16,16 @@ function Item({ item }) {
         <div className="item-media">
           <Media item={item} titulo={nombre} />
 
-          {!sePuedeComprar(item) && <span className="item-sello">Sin stock</span>}
+          {!sePuedeComprar(item) && (
+            <span className="item-sello">Sin stock</span>
+          )}
 
           {/* Cuántas variantes trae: es la razón para entrar al producto, y
               de otro modo no se descubre desde la grilla. */}
           {modelos > 1 && (
-            <span className="item-sello item-sello-modelos">{modelos} modelos</span>
+            <span className="item-sello item-sello-modelos">
+              {modelos} modelos
+            </span>
           )}
         </div>
 

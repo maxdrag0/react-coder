@@ -14,6 +14,22 @@ import { modelosDe } from "@/constants/modelos";
 import { Link } from "react-router-dom";
 import "./ItemDetails.css";
 
+/*
+  Buena parte del catálogo trae la descripción igual al nombre con un punto al
+  final ("Bengala de humo" / "Bengala de humo."). Mostrarla deja el título
+  escrito dos veces seguidas, que se lee como un error de la tienda y no como
+  información. Se comparan sin acentos de formato: mayúsculas, espacios y
+  puntuación del final.
+*/
+const mismoTexto = (a, b) => {
+  const normal = (v) =>
+    String(v ?? "")
+      .trim()
+      .toLowerCase()
+      .replace(/[.·,;:!¡?¿s]+$/u, "");
+  return normal(a) === normal(b);
+};
+
 function ItemDetails({ item }) {
   const { addToCart } = useCart();
 
@@ -93,7 +109,7 @@ function ItemDetails({ item }) {
 
       <div className="detalle-info">
         <h1>{nombre}</h1>
-        {descripcion && descripcion !== nombre && (
+        {descripcion && !mismoTexto(descripcion, nombre) && (
           <p className="detalle-desc">{descripcion}</p>
         )}
 

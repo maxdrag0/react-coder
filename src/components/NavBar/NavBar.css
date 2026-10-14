@@ -26,7 +26,10 @@
   flex: 0 0 auto;
 }
 
-.nav-logo img { height: 32px; width: auto; }
+.nav-logo img {
+  height: 32px;
+  width: auto;
+}
 
 /* El buscador se come todo el espacio que sobra. */
 .nav-buscador {
@@ -64,7 +67,9 @@
    cualquier reordenamiento futuro. */
 .nav-links,
 .nav-solo-escritorio,
-.nav-accion.nav-solo-escritorio { display: none; }
+.nav-accion.nav-solo-escritorio {
+  display: none;
+}
 
 .nav-acciones {
   display: flex;
@@ -85,8 +90,13 @@
   color: var(--text-suave);
 }
 
-.nav-accion:hover { color: var(--gold); background: var(--surface); }
-.nav-accion-texto { display: none; }
+.nav-accion:hover {
+  color: var(--gold);
+  background: var(--surface);
+}
+.nav-accion-texto {
+  display: none;
+}
 
 .nav-carrito-cuenta {
   position: absolute;
@@ -98,8 +108,8 @@
   place-items: center;
   padding-inline: 4px;
   border-radius: var(--r-pill);
-  background: var(--gold);
-  color: var(--ground);
+  background: var(--accion);
+  color: var(--sobre-accion);
   font-size: 11px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -111,7 +121,9 @@
     padding: var(--e-3) var(--e-4);
   }
 
-  .nav-logo img { height: 38px; }
+  .nav-logo img {
+    height: 38px;
+  }
 
   /* El logo tiene order 0 por defecto; el resto se acomoda detrás. */
   .nav-links {
@@ -121,9 +133,14 @@
     flex: 0 0 auto;
   }
 
-  .nav-links a { color: var(--text-suave); white-space: nowrap; }
+  .nav-links a {
+    color: var(--text-suave);
+    white-space: nowrap;
+  }
   .nav-links a:hover,
-  .nav-links a.active { color: var(--gold); }
+  .nav-links a.active {
+    color: var(--gold);
+  }
 
   .nav-buscador {
     order: 2;
@@ -131,9 +148,16 @@
     margin-left: auto;
   }
 
-  .nav-acciones { order: 3; }
+  .nav-acciones {
+    order: 3;
+  }
 
   .nav-solo-escritorio,
-  .nav-accion.nav-solo-escritorio { display: inline-flex; }
-  .nav-accion-texto { display: inline; font-size: var(--t-sm); }
+  .nav-accion.nav-solo-escritorio {
+    display: inline-flex;
+  }
+  .nav-accion-texto {
+    display: inline;
+    font-size: var(--t-sm);
+  }
 }

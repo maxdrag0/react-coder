@@ -1,4 +1,6 @@
 /* El tamaño del logo lo define NavBar.css, que es donde vive el layout
    de la barra. Tenerlo en dos archivos hacía que ganara el que se
    inyectara último. */
-.nav-logo { flex: 0 0 auto; }
+.nav-logo {
+  flex: 0 0 auto;
+}

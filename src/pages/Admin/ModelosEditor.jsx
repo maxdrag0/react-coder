@@ -8,7 +8,13 @@ const OPCIONALES = UNIDADES.filter((u) => u.clave !== "unitario");
  * de esa forma: el display de un mortero de 3 pulgadas puede existir y el de
  * 5 no.
  */
-const PresentacionModelo = ({ idModelo, clave, etiqueta, valores, onCampo }) => {
+const PresentacionModelo = ({
+  idModelo,
+  clave,
+  etiqueta,
+  valores,
+  onCampo,
+}) => {
   const activa = Boolean(valores.activa);
   const base = `mod-${idModelo}-${clave}`;
 
@@ -196,13 +202,19 @@ const ModelosEditor = ({
             clave={u.clave}
             etiqueta={u.etiqueta}
             valores={m.presentaciones?.[u.clave] ?? {}}
-            onCampo={(clave, campo, valor) => onPresentacion(i, clave, campo, valor)}
+            onCampo={(clave, campo, valor) =>
+              onPresentacion(i, clave, campo, valor)
+            }
           />
         ))}
       </fieldset>
     ))}
 
-    <button type="button" className="boton boton-secundario" onClick={onAgregar}>
+    <button
+      type="button"
+      className="boton boton-secundario"
+      onClick={onAgregar}
+    >
       <Plus size={16} />
       Agregar modelo
     </button>

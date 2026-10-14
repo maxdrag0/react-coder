@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/auth/useAuth";
-import { obtenerPerfil, actualizarPerfil } from "@/services/firebase/usuariosFirebase";
+import {
+  obtenerPerfil,
+  actualizarPerfil,
+} from "@/services/firebase/usuariosFirebase";
 
 /**
  * El documento del comprador en Firestore, que es distinto del usuario de
@@ -42,7 +45,7 @@ export const usePerfil = () => {
       await actualizarPerfil(user.uid, campos);
       setPerfil((actual) => ({ ...(actual ?? {}), ...campos }));
     },
-    [user]
+    [user],
   );
 
   return { perfil, cargando, guardar, recargar: cargar };

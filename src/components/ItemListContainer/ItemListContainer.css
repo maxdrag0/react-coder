@@ -16,5 +16,7 @@
 }
 
 @media (min-width: 900px) {
-  .lista-items { gap: var(--e-5); }
+  .lista-items {
+    gap: var(--e-5);
+  }
 }

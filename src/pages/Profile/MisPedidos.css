@@ -25,7 +25,9 @@
   color: var(--text-suave);
 }
 
-.mis-pedidos-vacio p { margin: 0; }
+.mis-pedidos-vacio p {
+  margin: 0;
+}
 
 .mis-pedidos-lista {
   display: grid;

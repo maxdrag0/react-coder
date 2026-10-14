@@ -28,7 +28,9 @@
   background: var(--panel);
 }
 
-.filtros-abiertos { display: grid; }
+.filtros-abiertos {
+  display: grid;
+}
 
 .filtros-fondo {
   position: fixed;
@@ -46,7 +48,9 @@
   border-bottom: 1px solid var(--gold-linea);
 }
 
-.filtros-cabecera h2 { font-size: var(--t-lg); }
+.filtros-cabecera h2 {
+  font-size: var(--t-lg);
+}
 
 .filtro-grupo {
   display: grid;
@@ -57,7 +61,9 @@
 }
 
 /* Sin esto queda una línea colgando entre el último grupo y el pie. */
-.filtro-grupo:last-of-type { border-bottom: none; }
+.filtro-grupo:last-of-type {
+  border-bottom: none;
+}
 
 .filtro-grupo legend {
   font-size: var(--t-sm);
@@ -84,10 +90,15 @@
   text-align: left;
   font-size: var(--t-sm);
   color: var(--text-suave);
-  transition: background-color var(--mov-rapido), color var(--mov-rapido);
+  transition:
+    background-color var(--mov-rapido),
+    color var(--mov-rapido);
 }
 
-.filtro-opcion:hover { background: var(--surface-alto); color: var(--text); }
+.filtro-opcion:hover {
+  background: var(--surface-alto);
+  color: var(--text);
+}
 
 .filtro-opcion.activa {
   background: var(--surface-alto);
@@ -105,17 +116,33 @@
   font-size: var(--t-sm);
   color: var(--text-suave);
   cursor: pointer;
-  transition: background-color var(--mov-rapido), color var(--mov-rapido);
+  transition:
+    background-color var(--mov-rapido),
+    color var(--mov-rapido);
 }
 
-.filtro-check:hover { background: var(--surface-alto); color: var(--text); }
-.filtro-check input { accent-color: var(--gold); width: 16px; height: 16px; }
-.filtro-check em { color: var(--text-tenue); font-style: normal; }
-.filtro-check-texto { min-width: 0; }
+.filtro-check:hover {
+  background: var(--surface-alto);
+  color: var(--text);
+}
+.filtro-check input {
+  accent-color: var(--gold);
+  width: 16px;
+  height: 16px;
+}
+.filtro-check em {
+  color: var(--text-tenue);
+  font-style: normal;
+}
+.filtro-check-texto {
+  min-width: 0;
+}
 
 /* Una marca sin resultados bajo la búsqueda actual se apaga en vez de
    desaparecer: si se fuera, la lista saltaría con cada tecla. */
-.filtro-check-vacia { opacity: 0.45; }
+.filtro-check-vacia {
+  opacity: 0.45;
+}
 
 .filtro-cuenta {
   margin-left: auto;
@@ -213,7 +240,9 @@
   .filtros-abrir,
   .filtros-cabecera,
   .filtros-fondo,
-  .filtros-ver { display: none; }
+  .filtros-ver {
+    display: none;
+  }
 
   .filtros {
     --panel: var(--surface);
@@ -232,5 +261,7 @@
     box-shadow: var(--elev-1);
   }
 
-  .filtro-grupo:first-of-type { padding-top: 0; }
+  .filtro-grupo:first-of-type {
+    padding-top: 0;
+  }
 }

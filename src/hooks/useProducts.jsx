@@ -1,6 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { services } from "../services/index.js";
-import { leerCatalogo, guardarCatalogo } from "../services/firebase/cacheCatalogo.js";
+import {
+  leerCatalogo,
+  guardarCatalogo,
+} from "../services/firebase/cacheCatalogo.js";
 
 const useProducts = (category, { traerTodo = false } = {}) => {
   const [items, setItems] = useState([]);

@@ -7,7 +7,13 @@ import { X, ImagePlus } from "lucide-react";
  * Subirlos al elegirlos dejaría basura en Storage cada vez que alguien abre
  * el modal, cambia de idea y cancela.
  */
-const FotosEditor = ({ fotos, archivos, onQuitarFoto, onArchivos, onQuitarArchivo }) => (
+const FotosEditor = ({
+  fotos,
+  archivos,
+  onQuitarFoto,
+  onArchivos,
+  onQuitarArchivo,
+}) => (
   <div className="campo campo-ancho fotos-editor">
     <span className="campo-etiqueta">Fotos</span>
 
@@ -61,9 +67,9 @@ const FotosEditor = ({ fotos, archivos, onQuitarFoto, onArchivos, onQuitarArchiv
     )}
 
     <small className="campo-ayuda">
-      La primera es la que se ve en el catálogo. JPG o PNG, hasta 5 MB cada
-      una; conviene que pesen poco, porque el plan gratuito da 1 GB de descarga
-      por día para todo el catálogo.
+      La primera es la que se ve en el catálogo. JPG o PNG, hasta 5 MB cada una;
+      conviene que pesen poco, porque el plan gratuito da 1 GB de descarga por
+      día para todo el catálogo.
     </small>
   </div>
 );

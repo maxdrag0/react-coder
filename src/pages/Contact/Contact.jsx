@@ -17,7 +17,7 @@ function Contact() {
     } catch {
       // El alert() no decía nada útil y bloqueaba la página.
       setError(
-        "No pudimos enviar tu mensaje. Revisá tu conexión y probá de nuevo."
+        "No pudimos enviar tu mensaje. Revisá tu conexión y probá de nuevo.",
       );
     }
   };

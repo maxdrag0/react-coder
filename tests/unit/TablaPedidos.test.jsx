@@ -133,19 +133,25 @@ describe("TablaPedidos: el renglon distingue un modelo de otro", () => {
 
   it("nombra el modelo de cada renglon", () => {
     montar([CON_MODELOS]);
-    expect(screen.getByText("1x Bengala de humo (Rojo)")).toBeInTheDocument();
-    expect(screen.getByText("1x Bengala de humo (Azul)")).toBeInTheDocument();
+    expect(
+      screen.getByText("1x Bengala de humo (Rojo, Unidad)"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("1x Bengala de humo (Azul, Unidad)"),
+    ).toBeInTheDocument();
   });
 
   it("no deja dos renglones iguales cuando los modelos son distintos", () => {
     montar([CON_MODELOS]);
-    expect(screen.queryAllByText("1x Bengala de humo")).toHaveLength(0);
+    expect(screen.queryAllByText("1x Bengala de humo (Unidad)")).toHaveLength(
+      0,
+    );
   });
 
   it("sigue nombrando la unidad de un producto sin modelos", () => {
     montar([PEDIDO]);
     expect(
-      screen.getByText("2x Torta 100 tiros (display)"),
+      screen.getByText("2x Torta 100 tiros (Display)"),
     ).toBeInTheDocument();
   });
 });

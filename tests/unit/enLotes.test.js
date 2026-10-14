@@ -11,7 +11,10 @@ describe("enLotes", () => {
   });
 
   it("no devuelve lotes vacíos cuando el total es múltiplo exacto", () => {
-    expect(enLotes([1, 2, 3, 4], 2)).toEqual([[1, 2], [3, 4]]);
+    expect(enLotes([1, 2, 3, 4], 2)).toEqual([
+      [1, 2],
+      [3, 4],
+    ]);
   });
 
   it("con una lista vacía no devuelve ningún lote, así no se escribe de más", () => {

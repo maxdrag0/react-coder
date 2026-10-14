@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { filtrarPedidos, contarPorEstado } from "../../src/pages/Admin/filtrarPedidos";
+import {
+  filtrarPedidos,
+  contarPorEstado,
+} from "../../src/pages/Admin/filtrarPedidos";
 
 const pedido = (id, extra = {}) => ({
   id,
@@ -52,7 +55,10 @@ describe("filtrarPedidos: por texto", () => {
   });
 
   it("busca por email", () => {
-    const otros = [...LISTA, pedido("ORD-9", { buyer: { email: "ana@test.com" } })];
+    const otros = [
+      ...LISTA,
+      pedido("ORD-9", { buyer: { email: "ana@test.com" } }),
+    ];
     expect(ids(filtrarPedidos(otros, { texto: "ana@" }))).toEqual(["ORD-9"]);
   });
 
@@ -74,7 +80,9 @@ describe("filtrarPedidos: por texto", () => {
   });
 
   it("no explota con un pedido al que le falta todo", () => {
-    expect(() => filtrarPedidos([{ id: "X" }], { texto: "algo" })).not.toThrow();
+    expect(() =>
+      filtrarPedidos([{ id: "X" }], { texto: "algo" }),
+    ).not.toThrow();
     expect(filtrarPedidos([{ id: "X" }], { texto: "algo" })).toEqual([]);
   });
 });
@@ -85,9 +93,9 @@ describe("filtrarPedidos: estado y texto juntos", () => {
       ...LISTA,
       pedido("ORD-9", { estado: "pagado", buyer: { name: "Ana" } }),
     ];
-    expect(ids(filtrarPedidos(otros, { estado: "pagado", texto: "ana" }))).toEqual([
-      "ORD-9",
-    ]);
+    expect(
+      ids(filtrarPedidos(otros, { estado: "pagado", texto: "ana" })),
+    ).toEqual(["ORD-9"]);
   });
 });
 

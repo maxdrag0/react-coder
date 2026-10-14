@@ -18,7 +18,7 @@ function montar(props = {}) {
         message="Tu pedido está hecho."
         {...props}
       />
-    </>
+    </>,
   );
   return { onClose, onAccept };
 }
@@ -36,7 +36,9 @@ describe("Modal", () => {
 
   it("usa el título como nombre accesible", () => {
     montar();
-    expect(screen.getByRole("dialog", { name: /compra exitosa/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("dialog", { name: /compra exitosa/i }),
+    ).toBeInTheDocument();
   });
 
   it("cierra con Escape", async () => {

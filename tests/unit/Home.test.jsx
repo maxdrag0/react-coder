@@ -32,26 +32,32 @@ function montar(items) {
   render(
     <MemoryRouter>
       <Home />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
 const enGrilla = () =>
-  [...screen.getByTestId("grilla").querySelectorAll("li")].map((li) => li.textContent);
+  [...screen.getByTestId("grilla").querySelectorAll("li")].map(
+    (li) => li.textContent,
+  );
 
 describe("Home: destacados", () => {
   it("pide el catálogo completo, no una página", () => {
     // Pedir 8 y filtrar después deja la home vacía cuando esos 8 están
     // ocultos, y hace que "más vendidos" ordene sobre 8 productos al azar.
     montar([producto(1)]);
-    expect(useProductsMock).toHaveBeenCalledWith(undefined, { traerTodo: true });
+    expect(useProductsMock).toHaveBeenCalledWith(undefined, {
+      traerTodo: true,
+    });
   });
 
   it("muestra un producto activo aunque los primeros del catálogo estén ocultos", () => {
     // El bug real: 317 de 321 ocultos, los 4 activos en las posiciones 161 a
     // 177, y la home quedaba en blanco.
     const items = [
-      ...Array.from({ length: 20 }, (_, i) => producto(i, { estado: "oculto" })),
+      ...Array.from({ length: 20 }, (_, i) =>
+        producto(i, { estado: "oculto" }),
+      ),
       producto(99, { estado: "activo" }),
     ];
     montar(items);
@@ -59,7 +65,10 @@ describe("Home: destacados", () => {
   });
 
   it("no muestra ningún oculto", () => {
-    montar([producto(1, { estado: "oculto" }), producto(2, { estado: "activo" })]);
+    montar([
+      producto(1, { estado: "oculto" }),
+      producto(2, { estado: "activo" }),
+    ]);
     expect(enGrilla()).toEqual(["Producto 2"]);
   });
 
@@ -83,13 +92,15 @@ describe("Home: destacados", () => {
     // grilla): se apunta al de abajo de los productos, que es el que
     // reemplazo al \"Cargar mas\".
     expect(
-      screen.getByRole("link", { name: "Ver todo el catálogo" })
+      screen.getByRole("link", { name: "Ver todo el catálogo" }),
     ).toHaveAttribute("href", "/products");
   });
 
   it("no muestra la grilla vacía con un cartel de más vendidos si no hay nada", () => {
     montar([producto(1, { estado: "oculto" })]);
     expect(screen.queryByTestId("grilla")).toBeNull();
-    expect(screen.getByText(/todav[íi]a no hay productos/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/todav[íi]a no hay productos/i),
+    ).toBeInTheDocument();
   });
 });

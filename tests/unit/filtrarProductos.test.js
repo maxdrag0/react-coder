@@ -43,15 +43,22 @@ describe("filtrarProductos: por estado", () => {
   ];
 
   it("filtra activos, incluyendo los que no tienen el campo", () => {
-    expect(ids(filtrarProductos(lista, f({ estado: "activo" })))).toEqual(["A", "B"]);
+    expect(ids(filtrarProductos(lista, f({ estado: "activo" })))).toEqual([
+      "A",
+      "B",
+    ]);
   });
 
   it("filtra sin stock", () => {
-    expect(ids(filtrarProductos(lista, f({ estado: "sin_stock" })))).toEqual(["C"]);
+    expect(ids(filtrarProductos(lista, f({ estado: "sin_stock" })))).toEqual([
+      "C",
+    ]);
   });
 
   it("filtra ocultos", () => {
-    expect(ids(filtrarProductos(lista, f({ estado: "oculto" })))).toEqual(["D"]);
+    expect(ids(filtrarProductos(lista, f({ estado: "oculto" })))).toEqual([
+      "D",
+    ]);
   });
 });
 
@@ -59,22 +66,27 @@ describe("filtrarProductos: por categoría y marca", () => {
   const lista = [
     prod("A", { categoria: "Petardos", marca: "Punto Austral" }),
     prod("B", { categoria: "Tortas", marca: "Cienfuegos" }),
-    // Esquema viejo: `category` y sin marca. `categoria` va en undefined a
-    // propósito, porque un producto real tiene uno de los dos, no los dos.
-    prod("C", { categoria: undefined, category: "Tortas" }),
+    prod("C", { categoria: "Tortas" }),
   ];
 
-  it("filtra por categoría, leyendo los dos esquemas", () => {
-    expect(ids(filtrarProductos(lista, f({ categoria: "Tortas" })))).toEqual(["B", "C"]);
+  it("filtra por categoría", () => {
+    expect(ids(filtrarProductos(lista, f({ categoria: "Tortas" })))).toEqual([
+      "B",
+      "C",
+    ]);
   });
 
   it("filtra por marca", () => {
-    expect(ids(filtrarProductos(lista, f({ marca: "Cienfuegos" })))).toEqual(["B"]);
+    expect(ids(filtrarProductos(lista, f({ marca: "Cienfuegos" })))).toEqual([
+      "B",
+    ]);
   });
 
   it("filtra los que no tienen marca", () => {
     // 186 de 323 estan asi: el filtro sirve para ir completandolos.
-    expect(ids(filtrarProductos(lista, f({ marca: SIN_MARCA })))).toEqual(["C"]);
+    expect(ids(filtrarProductos(lista, f({ marca: SIN_MARCA })))).toEqual([
+      "C",
+    ]);
   });
 });
 
@@ -86,22 +98,28 @@ describe("filtrarProductos: por precio", () => {
   ];
 
   it("filtra con un piso", () => {
-    expect(ids(filtrarProductos(lista, f({ precioMin: 1000 })))).toEqual(["B", "C"]);
+    expect(ids(filtrarProductos(lista, f({ precioMin: 1000 })))).toEqual([
+      "B",
+      "C",
+    ]);
   });
 
   it("filtra con un techo", () => {
-    expect(ids(filtrarProductos(lista, f({ precioMax: 10000 })))).toEqual(["A", "B"]);
+    expect(ids(filtrarProductos(lista, f({ precioMax: 10000 })))).toEqual([
+      "A",
+      "B",
+    ]);
   });
 
   it("filtra con los dos", () => {
     expect(
-      ids(filtrarProductos(lista, f({ precioMin: 1000, precioMax: 10000 })))
+      ids(filtrarProductos(lista, f({ precioMin: 1000, precioMax: 10000 }))),
     ).toEqual(["B"]);
   });
 
   it("incluye los extremos", () => {
     expect(
-      ids(filtrarProductos(lista, f({ precioMin: 100, precioMax: 100 })))
+      ids(filtrarProductos(lista, f({ precioMin: 100, precioMax: 100 }))),
     ).toEqual(["A"]);
   });
 
@@ -109,7 +127,9 @@ describe("filtrarProductos: por precio", () => {
     // Al contrario de la tienda, que no los esconde. Aca el dueno esta
     // consultando por precio: algo sin precio no es una respuesta.
     const conSinPrecio = [...lista, prod("Z", { precioUnitario: 0 })];
-    expect(ids(filtrarProductos(conSinPrecio, f({ precioMin: 1 })))).not.toContain("Z");
+    expect(
+      ids(filtrarProductos(conSinPrecio, f({ precioMin: 1 }))),
+    ).not.toContain("Z");
   });
 
   it("los incluye si no hay ningun limite puesto", () => {
@@ -127,50 +147,73 @@ describe("filtrarProductos: sin foto", () => {
       prod("B", { fotoUrl: "" }),
       prod("C", { fotoUrl: null, image: "" }),
     ];
-    expect(ids(filtrarProductos(lista, f({ sinFoto: true })))).toEqual(["B", "C"]);
+    expect(ids(filtrarProductos(lista, f({ sinFoto: true })))).toEqual([
+      "B",
+      "C",
+    ]);
   });
 
-  it("acepta `image` del esquema nuevo como foto valida", () => {
+  it("NO acepta `image`: ese campo ya no existe en el catalogo", () => {
+    // Lo borro la migracion a un solo idioma. Seguir leyendolo haria que un
+    // producto sin foto no apareciera en el filtro de "sin foto".
     const lista = [prod("A", { fotoUrl: "", image: "https://x.test/i.jpg" })];
-    expect(filtrarProductos(lista, f({ sinFoto: true }))).toEqual([]);
+    expect(ids(filtrarProductos(lista, f({ sinFoto: true })))).toEqual(["A"]);
   });
 });
 
 describe("filtrarProductos: por texto", () => {
   it("busca por nombre y por codigo", () => {
     const lista = [prod("ABC"), prod("XYZ", { nombre: "Cohete grande" })];
-    expect(ids(filtrarProductos(lista, f({ texto: "cohete" })))).toEqual(["XYZ"]);
+    expect(ids(filtrarProductos(lista, f({ texto: "cohete" })))).toEqual([
+      "XYZ",
+    ]);
     expect(ids(filtrarProductos(lista, f({ texto: "abc" })))).toEqual(["ABC"]);
   });
 
   it("ignora mayusculas y espacios de sobra", () => {
-    expect(ids(filtrarProductos([prod("A")], f({ texto: "  PRODUCTO A " })))).toEqual([
-      "A",
-    ]);
+    expect(
+      ids(filtrarProductos([prod("A")], f({ texto: "  PRODUCTO A " }))),
+    ).toEqual(["A"]);
   });
 });
 
 describe("filtrarProductos: varios filtros juntos", () => {
   it("los aplica todos", () => {
     const lista = [
-      prod("A", { categoria: "Tortas", precioUnitario: 5000, estado: "activo" }),
-      prod("B", { categoria: "Tortas", precioUnitario: 90000, estado: "activo" }),
-      prod("C", { categoria: "Tortas", precioUnitario: 5000, estado: "oculto" }),
+      prod("A", {
+        categoria: "Tortas",
+        precioUnitario: 5000,
+        estado: "activo",
+      }),
+      prod("B", {
+        categoria: "Tortas",
+        precioUnitario: 90000,
+        estado: "activo",
+      }),
+      prod("C", {
+        categoria: "Tortas",
+        precioUnitario: 5000,
+        estado: "oculto",
+      }),
     ];
     expect(
       ids(
         filtrarProductos(
           lista,
-          f({ estado: "activo", categoria: "Tortas", precioMax: 10000 })
-        )
-      )
+          f({ estado: "activo", categoria: "Tortas", precioMax: 10000 }),
+        ),
+      ),
     ).toEqual(["A"]);
   });
 });
 
 describe("contarEstadosProducto", () => {
   it("cuenta cada estado y el total", () => {
-    const lista = [prod("A"), prod("B", { estado: "oculto" }), prod("C", { estado: "oculto" })];
+    const lista = [
+      prod("A"),
+      prod("B", { estado: "oculto" }),
+      prod("C", { estado: "oculto" }),
+    ];
     const cuenta = contarEstadosProducto(lista);
     expect(cuenta.activo).toBe(1);
     expect(cuenta.oculto).toBe(2);

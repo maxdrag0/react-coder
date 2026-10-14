@@ -1,4 +1,8 @@
-import { ESTADOS_PEDIDO, estadoDePedido, estaAbierto } from "@/constants/estadoPedido";
+import {
+  ESTADOS_PEDIDO,
+  estadoDePedido,
+  estaAbierto,
+} from "@/constants/estadoPedido";
 
 /*
   Filtro de la pestana de pedidos. Vive aparte del componente porque es la

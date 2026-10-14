@@ -18,7 +18,9 @@ let enMemoria = null;
 const ahora = () => Date.now();
 
 const vigente = (entrada) =>
-  entrada && Array.isArray(entrada.items) && ahora() - entrada.guardadoEn < VIDA_MS;
+  entrada &&
+  Array.isArray(entrada.items) &&
+  ahora() - entrada.guardadoEn < VIDA_MS;
 
 export const leerCatalogo = (categoria) => {
   const clave = categoria ?? "__todas__";

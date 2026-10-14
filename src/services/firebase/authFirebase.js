@@ -87,7 +87,8 @@ export const loginWithGoogle = async () => {
 
 export const logoutUser = () => signOut(auth);
 
-export const enviarResetPassword = (email) => sendPasswordResetEmail(auth, email);
+export const enviarResetPassword = (email) =>
+  sendPasswordResetEmail(auth, email);
 
 export const reenviarVerificacion = () => {
   if (!auth.currentUser) throw new Error("No hay sesión activa");

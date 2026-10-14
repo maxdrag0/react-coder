@@ -8,9 +8,8 @@ vi.mock("@/services/firebase/authFirebase", () => ({
   enviarResetPassword: (...args) => enviarResetPasswordMock(...args),
 }));
 
-const { default: PasswordResetLink } = await import(
-  "@/components/auth/PasswordResetLink/PasswordResetLink"
-);
+const { default: PasswordResetLink } =
+  await import("@/components/auth/PasswordResetLink/PasswordResetLink");
 
 // Qué mensaje corresponde a cada código de error se testea como función pura
 // en authErrors.test.js (mensajeDeErrorDeReset). Acá se cubre lo que solo se
@@ -19,7 +18,9 @@ const { default: PasswordResetLink } = await import(
 async function pedirReset(email) {
   const user = userEvent.setup();
   render(<PasswordResetLink />);
-  await user.click(screen.getByRole("button", { name: /olvidaste tu contraseña/i }));
+  await user.click(
+    screen.getByRole("button", { name: /olvidaste tu contraseña/i }),
+  );
 
   if (email) {
     await user.type(screen.getByLabelText(/email para restablecer/i), email);
@@ -62,7 +63,9 @@ describe("PasswordResetLink", () => {
     enviarResetPasswordMock.mockResolvedValue(undefined);
     await pedirReset("ana@mail.com");
 
-    expect(screen.getByText(/si ese email tiene una cuenta/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/si ese email tiene una cuenta/i),
+    ).toBeInTheDocument();
   });
 
   it("muestra la confirmación como aviso de éxito, no como error", async () => {

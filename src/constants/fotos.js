@@ -34,7 +34,7 @@ export const fotosDe = (item, modeloId = null) => {
 
   if (Array.isArray(item.fotos)) return limpiar(item.fotos);
 
-  return limpiar([item.fotoUrl, item.image]);
+  return limpiar([item.fotoUrl]);
 };
 
 /**

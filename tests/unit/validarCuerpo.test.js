@@ -40,7 +40,9 @@ describe("validarCuerpo: lo que acepta", () => {
 
   it("acepta las tres unidades", () => {
     for (const u of ["unitario", "display", "bulto"]) {
-      expect(validarCuerpo(cuerpo({ items: [item({ unidad: u })] })).ok).toBe(true);
+      expect(validarCuerpo(cuerpo({ items: [item({ unidad: u })] })).ok).toBe(
+        true,
+      );
     }
   });
 
@@ -64,17 +66,24 @@ describe("validarCuerpo: lo que rechaza", () => {
 
   it("un renglon que no es objeto", () => malo(cuerpo({ items: ["A12"] })));
   it("codigo vacio", () => malo(cuerpo({ items: [item({ codigo: "" })] })));
-  it("codigo que no es texto", () => malo(cuerpo({ items: [item({ codigo: 12 })] })));
+  it("codigo que no es texto", () =>
+    malo(cuerpo({ items: [item({ codigo: 12 })] })));
   it("codigo demasiado largo", () =>
     malo(cuerpo({ items: [item({ codigo: "x".repeat(101) })] })));
 
-  it("unidad desconocida", () => malo(cuerpo({ items: [item({ unidad: "caja" })] })));
-  it("unidad ausente", () => malo(cuerpo({ items: [item({ unidad: undefined })] })));
+  it("unidad desconocida", () =>
+    malo(cuerpo({ items: [item({ unidad: "caja" })] })));
+  it("unidad ausente", () =>
+    malo(cuerpo({ items: [item({ unidad: undefined })] })));
 
-  it("cantidad en cero", () => malo(cuerpo({ items: [item({ cantidad: 0 })] })));
-  it("cantidad negativa", () => malo(cuerpo({ items: [item({ cantidad: -1 })] })));
-  it("cantidad con decimales", () => malo(cuerpo({ items: [item({ cantidad: 1.5 })] })));
-  it("cantidad arriba de 999", () => malo(cuerpo({ items: [item({ cantidad: 1000 })] })));
+  it("cantidad en cero", () =>
+    malo(cuerpo({ items: [item({ cantidad: 0 })] })));
+  it("cantidad negativa", () =>
+    malo(cuerpo({ items: [item({ cantidad: -1 })] })));
+  it("cantidad con decimales", () =>
+    malo(cuerpo({ items: [item({ cantidad: 1.5 })] })));
+  it("cantidad arriba de 999", () =>
+    malo(cuerpo({ items: [item({ cantidad: 1000 })] })));
 
   it("cantidad como TEXTO, no se convierte en silencio", () => {
     // Review Focus 2: un cliente manipulado manda "2" y la coercion
@@ -86,11 +95,13 @@ describe("validarCuerpo: lo que rechaza", () => {
     malo(cuerpo({ items: [item({ precioVisto: "8000" })] })));
   it("precioVisto negativo", () =>
     malo(cuerpo({ items: [item({ precioVisto: -1 })] })));
-  it("precioVisto NaN", () => malo(cuerpo({ items: [item({ precioVisto: NaN })] })));
+  it("precioVisto NaN", () =>
+    malo(cuerpo({ items: [item({ precioVisto: NaN })] })));
   it("precioVisto ausente", () =>
     malo(cuerpo({ items: [item({ precioVisto: undefined })] })));
 
-  it("modelo que no es texto", () => malo(cuerpo({ items: [item({ modelo: 5 })] })));
+  it("modelo que no es texto", () =>
+    malo(cuerpo({ items: [item({ modelo: 5 })] })));
 
   it("dos renglones con el mismo codigo, unidad y modelo", () => {
     // El carrito del cliente nunca los genera: los suma. Que lleguen dos es
@@ -102,14 +113,16 @@ describe("validarCuerpo: lo que rechaza", () => {
 describe("validarCuerpo: duplicados que SI son validos", () => {
   it("el mismo producto en dos unidades distintas", () => {
     const r = validarCuerpo(
-      cuerpo({ items: [item({ unidad: "unitario" }), item({ unidad: "display" })] })
+      cuerpo({
+        items: [item({ unidad: "unitario" }), item({ unidad: "display" })],
+      }),
     );
     expect(r.ok).toBe(true);
   });
 
   it("el mismo producto en dos modelos distintos", () => {
     const r = validarCuerpo(
-      cuerpo({ items: [item({ modelo: "rojo" }), item({ modelo: "azul" })] })
+      cuerpo({ items: [item({ modelo: "rojo" }), item({ modelo: "azul" })] }),
     );
     expect(r.ok).toBe(true);
   });

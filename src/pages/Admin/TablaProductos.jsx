@@ -4,8 +4,8 @@ import { formatearPrecio } from "../../utils/formatearPrecio";
 import { rangoUnitario } from "../../constants/unidades";
 import { modelosDe } from "../../constants/modelos";
 
-const nombreDe = (p) => p.name || p.nombre || "";
-const fotoDe = (p) => p.image || p.fotoUrl || "";
+const nombreDe = (p) => p.nombre || "";
+const fotoDe = (p) => p.fotoUrl || "";
 /*
   Con modelos el producto no tiene precio propio, asi que la celda muestra el
   rango. Y se avisa cuantos modelos tiene: en una tabla de 300 filas, saber
@@ -17,7 +17,7 @@ const textoDePrecio = (p) => {
   if (rango.min === rango.max) return formatearPrecio(rango.min);
   return `${formatearPrecio(rango.min)} – ${formatearPrecio(rango.max)}`;
 };
-const categoriaDe = (p) => p.category || p.categoria || "";
+const categoriaDe = (p) => p.categoria || "";
 
 const EstadoBadge = ({ producto }) => {
   const estado = estadoDe(producto);

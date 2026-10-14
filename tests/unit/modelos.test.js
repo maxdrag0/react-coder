@@ -13,8 +13,11 @@ const CON_MODELOS = {
   modelos: [
     {
       id: "3-pulgadas",
-      etiqueta: '3 pulgadas',
-      presentaciones: { unitario: { precio: 8000 }, display: { precio: 15000, unidades: 5 } },
+      etiqueta: "3 pulgadas",
+      presentaciones: {
+        unitario: { precio: 8000 },
+        display: { precio: 15000, unidades: 5 },
+      },
     },
     {
       id: "4-pulgadas",
@@ -50,7 +53,11 @@ describe("modelosDe", () => {
     // puede elegir: mostrarlo seria ofrecer algo incomprable.
     const sucio = {
       modelos: [
-        { id: "ok", etiqueta: "Rojo", presentaciones: { unitario: { precio: 10 } } },
+        {
+          id: "ok",
+          etiqueta: "Rojo",
+          presentaciones: { unitario: { precio: 10 } },
+        },
         { etiqueta: "Sin id", presentaciones: {} },
         { id: "sin-etiqueta", presentaciones: {} },
       ],
@@ -61,7 +68,11 @@ describe("modelosDe", () => {
   it("descarta un modelo sin ningún precio", () => {
     const sucio = {
       modelos: [
-        { id: "a", etiqueta: "Rojo", presentaciones: { unitario: { precio: 10 } } },
+        {
+          id: "a",
+          etiqueta: "Rojo",
+          presentaciones: { unitario: { precio: 10 } },
+        },
         { id: "b", etiqueta: "Verde", presentaciones: {} },
       ],
     };
@@ -71,8 +82,16 @@ describe("modelosDe", () => {
   it("descarta ids repetidos, que romperían la clave del carrito", () => {
     const sucio = {
       modelos: [
-        { id: "x", etiqueta: "Uno", presentaciones: { unitario: { precio: 10 } } },
-        { id: "x", etiqueta: "Dos", presentaciones: { unitario: { precio: 20 } } },
+        {
+          id: "x",
+          etiqueta: "Uno",
+          presentaciones: { unitario: { precio: 10 } },
+        },
+        {
+          id: "x",
+          etiqueta: "Dos",
+          presentaciones: { unitario: { precio: 20 } },
+        },
       ],
     };
     expect(modelosDe(sucio)).toHaveLength(1);

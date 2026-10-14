@@ -58,15 +58,21 @@ describe("mensajeDeErrorDeReset", () => {
   it("SÍ avisa cuando el email tiene formato inválido", () => {
     // Important 4: tragarlo y decir "te enviamos un link" deja a la persona
     // esperando un mail que nunca se pidió.
-    expect(mensajeDeErrorDeReset("auth/invalid-email")).toMatch(/formato válido/i);
+    expect(mensajeDeErrorDeReset("auth/invalid-email")).toMatch(
+      /formato válido/i,
+    );
   });
 
   it("SÍ avisa cuando falta el email", () => {
-    expect(mensajeDeErrorDeReset("auth/missing-email")).toMatch(/escribí tu email/i);
+    expect(mensajeDeErrorDeReset("auth/missing-email")).toMatch(
+      /escribí tu email/i,
+    );
   });
 
   it("SÍ avisa cuando se cae la red", () => {
-    expect(mensajeDeErrorDeReset("auth/network-request-failed")).toMatch(/conexión/i);
+    expect(mensajeDeErrorDeReset("auth/network-request-failed")).toMatch(
+      /conexión/i,
+    );
   });
 
   it("SÍ avisa cuando hay demasiados intentos", () => {
@@ -75,11 +81,15 @@ describe("mensajeDeErrorDeReset", () => {
 
   it("ningún mensaje que devuelve menciona la existencia de la cuenta", () => {
     const codigos = [
-      "auth/invalid-email", "auth/missing-email",
-      "auth/network-request-failed", "auth/too-many-requests",
+      "auth/invalid-email",
+      "auth/missing-email",
+      "auth/network-request-failed",
+      "auth/too-many-requests",
     ];
     for (const c of codigos) {
-      expect(mensajeDeErrorDeReset(c)).not.toMatch(/no (existe|est[aá] registrad)/i);
+      expect(mensajeDeErrorDeReset(c)).not.toMatch(
+        /no (existe|est[aá] registrad)/i,
+      );
     }
   });
 });

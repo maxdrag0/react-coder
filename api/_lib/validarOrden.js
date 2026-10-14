@@ -16,7 +16,7 @@ import { tieneModelos, modeloPorId } from "../../src/constants/modelos.js";
   reintentar una vez por renglon.
 */
 
-const nombreDe = (p) => p?.nombre || p?.name || "";
+const nombreDe = (p) => p?.nombre || "";
 
 /*
   Todo problema viaja con la identidad del renglon que lo causo, que es la

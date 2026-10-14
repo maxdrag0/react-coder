@@ -84,9 +84,9 @@ function ItemDetails({ item }) {
     setCount(1);
   };
 
-  const nombre = item.nombre || item.name;
-  const categoria = item.categoria || item.category;
-  const descripcion = item.descripcion || item.description;
+  const nombre = item.nombre;
+  const categoria = item.categoria;
+  const descripcion = item.descripcion;
 
   const ficha = [
     ["Marca", item.marca],

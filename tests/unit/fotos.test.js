@@ -12,7 +12,10 @@ describe("fotosDe: esquema nuevo", () => {
 
   it("descarta las vacías y los duplicados", () => {
     // Una url repetida mostraria la misma foto dos veces en la galeria.
-    expect(fotosDe({ fotos: [URL_A, "", URL_A, null, URL_B] })).toEqual([URL_A, URL_B]);
+    expect(fotosDe({ fotos: [URL_A, "", URL_A, null, URL_B] })).toEqual([
+      URL_A,
+      URL_B,
+    ]);
   });
 
   it("descarta lo que no sea texto", () => {
@@ -26,13 +29,8 @@ describe("fotosDe: esquema viejo", () => {
     expect(fotosDe({ fotoUrl: URL_A })).toEqual([URL_A]);
   });
 
-  it("lee image", () => {
-    expect(fotosDe({ image: URL_A })).toEqual([URL_A]);
-  });
-
-  it("no duplica cuando fotoUrl e image son la misma", () => {
-    // El panel escribe las dos en paralelo con el mismo valor.
-    expect(fotosDe({ fotoUrl: URL_A, image: URL_A })).toEqual([URL_A]);
+  it("YA NO lee image: la migracion borro ese campo", () => {
+    expect(fotosDe({ image: URL_A })).toEqual([]);
   });
 
   it("prefiere la lista nueva si están las dos", () => {
@@ -93,7 +91,12 @@ describe("portadaDe", () => {
     const soloModelos = {
       modelos: [
         { id: "a", etiqueta: "A", presentaciones: { unitario: { precio: 1 } } },
-        { id: "b", etiqueta: "B", foto: URL_C, presentaciones: { unitario: { precio: 1 } } },
+        {
+          id: "b",
+          etiqueta: "B",
+          foto: URL_C,
+          presentaciones: { unitario: { precio: 1 } },
+        },
       ],
     };
     expect(portadaDe(soloModelos)).toBe(URL_C);

@@ -51,7 +51,7 @@ const filaDe = (producto, modelo = null) => {
   return [
     producto.codigo,
     modelo?.etiqueta ?? "",
-    producto.nombre ?? producto.name ?? "",
+    producto.nombre ?? "",
     p.unitario?.precio,
     p.display?.precio,
     p.display?.unidades,

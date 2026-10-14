@@ -1,4 +1,13 @@
-import { addDoc, collection, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  doc,
+  updateDoc,
+  deleteDoc,
+  query,
+  orderBy,
+} from "firebase/firestore";
 import { db } from "../../utils/firebase";
 
 export const crearContacto = async (contacto) => {
@@ -6,7 +15,7 @@ export const crearContacto = async (contacto) => {
     const docRef = await addDoc(collection(db, "mensajes"), {
       ...contacto,
       date: new Date().toISOString(),
-      leido: false
+      leido: false,
     });
     return docRef.id;
   } catch (error) {
@@ -19,9 +28,9 @@ export const obtenerMensajes = async () => {
   try {
     const q = query(collection(db, "mensajes"), orderBy("date", "desc"));
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({
+    return querySnapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
   } catch (error) {
     console.error("Error al obtener los mensajes:", error);

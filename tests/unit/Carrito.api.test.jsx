@@ -393,12 +393,16 @@ describe("Carrito: idempotencia por intento de compra", () => {
     const usuario = userEvent.setup();
     montar();
     await usuario.click(enviar());
-    await waitFor(() => expect(screen.getByText(/Cambió algo/)).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText(/Cambió algo/)).toBeInTheDocument(),
+    );
 
     await usuario.click(screen.getByRole("button", { name: /seguir/i }));
     await waitFor(() => expect(enviarOrden).toHaveBeenCalledTimes(2));
 
-    const [primero, segundo] = enviarOrden.mock.calls.map((c) => c[0].idempotencia);
+    const [primero, segundo] = enviarOrden.mock.calls.map(
+      (c) => c[0].idempotencia,
+    );
     expect(primero).toBeTruthy();
     expect(segundo).toBe(primero);
   });
@@ -415,7 +419,9 @@ describe("Carrito: idempotencia por intento de compra", () => {
     await usuario.click(enviar());
     await waitFor(() => expect(enviarOrden).toHaveBeenCalledTimes(2));
 
-    const [primero, segundo] = enviarOrden.mock.calls.map((c) => c[0].idempotencia);
+    const [primero, segundo] = enviarOrden.mock.calls.map(
+      (c) => c[0].idempotencia,
+    );
     expect(segundo).not.toBe(primero);
   });
 });

@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { aCsv, nombreDelArchivo } from "../../src/pages/Admin/exportarProductos";
+import {
+  aCsv,
+  nombreDelArchivo,
+} from "../../src/pages/Admin/exportarProductos";
 
 const producto = (extra = {}) => ({
   codigo: "A12",
@@ -9,7 +12,11 @@ const producto = (extra = {}) => ({
   ...extra,
 });
 
-const filas = (csv) => csv.replace(/^\uFEFF/, "").trim().split("\n");
+const filas = (csv) =>
+  csv
+    .replace(/^\uFEFF/, "")
+    .trim()
+    .split("\n");
 
 describe("aCsv: qué productos entran", () => {
   it("exporta los activos", () => {
@@ -46,9 +53,9 @@ describe("aCsv: formato que Excel abre bien", () => {
 
   it("arranca con BOM para que los acentos no se rompan en Excel", () => {
     // Sin BOM, "Cumpleaños" se abre como "CumpleaÃ±os".
-    expect(aCsv([producto({ nombre: "Bengala Cumpleaños" })]).startsWith("﻿")).toBe(
-      true
-    );
+    expect(
+      aCsv([producto({ nombre: "Bengala Cumpleaños" })]).startsWith("﻿"),
+    ).toBe(true);
   });
 
   it("entrecomilla un nombre que tiene punto y coma", () => {
@@ -72,7 +79,7 @@ describe("aCsv: formato que Excel abre bien", () => {
 describe("aCsv: las columnas", () => {
   it("tiene las siete en orden", () => {
     expect(filas(aCsv([]))[0]).toBe(
-      "Codigo;Modelo;Nombre;Precio unidad;Precio display;Unidades por display;Precio bulto;Unidades por bulto"
+      "Codigo;Modelo;Nombre;Precio unidad;Precio display;Unidades por display;Precio bulto;Unidades por bulto",
     );
   });
 
@@ -84,7 +91,9 @@ describe("aCsv: las columnas", () => {
         bulto: { precio: 140000, unidades: 50 },
       },
     });
-    expect(filas(aCsv([con]))[1]).toBe("A12;;Torta 100 tiros;8000;15000;5;140000;50");
+    expect(filas(aCsv([con]))[1]).toBe(
+      "A12;;Torta 100 tiros;8000;15000;5;140000;50",
+    );
   });
 
   it("deja la celda vacía donde el producto no se vende así", () => {
@@ -105,8 +114,9 @@ describe("aCsv: las columnas", () => {
     expect(filas(aCsv([repetido]))[1]).toBe("A12;;Torta 100 tiros;8000;;;;");
   });
 
-  it("acepta el esquema viejo con `name` y `price`", () => {
-    const antiguo = { codigo: "B1", name: "Petardo", price: 300 };
+  it("acepta el `price` del esquema viejo, que todavia no se migro", () => {
+    // `name` ya no: lo borro la migracion a un solo idioma.
+    const antiguo = { codigo: "B1", nombre: "Petardo", price: 300 };
     expect(filas(aCsv([antiguo]))[1]).toBe("B1;;Petardo;300;;;;");
   });
 });
@@ -114,7 +124,7 @@ describe("aCsv: las columnas", () => {
 describe("nombreDelArchivo", () => {
   it("lleva la fecha para no pisar la descarga anterior", () => {
     expect(nombreDelArchivo(new Date("2026-10-07T15:00:00"))).toBe(
-      "productos-activos-2026-10-07.csv"
+      "productos-activos-2026-10-07.csv",
     );
   });
 });

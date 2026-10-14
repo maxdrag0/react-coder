@@ -5,7 +5,12 @@ import {
 } from "./productosFirebase";
 
 import { obtenerTodasLasCompras } from "./comprasFirebase";
-import { crearContacto, obtenerMensajes, marcarMensajeComoLeido, eliminarMensaje } from "./contactoFirebase";
+import {
+  crearContacto,
+  obtenerMensajes,
+  marcarMensajeComoLeido,
+  eliminarMensaje,
+} from "./contactoFirebase";
 
 export const firebase = {
   obtenerTodasLasCompras,

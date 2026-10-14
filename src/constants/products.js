@@ -450,7 +450,8 @@ export const products = [
   {
     codigo: "654,1",
     nombre: "Bateria Interminable P.a. 1000 Tiros De Crackers Punto Austral",
-    descripcion: "Bateria Interminable P.a. 1000 Tiros De Crackers Punto Austral",
+    descripcion:
+      "Bateria Interminable P.a. 1000 Tiros De Crackers Punto Austral",
     categoria: "Baterias",
     subcategoria: "",
     duracion: null,

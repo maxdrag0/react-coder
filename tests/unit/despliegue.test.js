@@ -32,7 +32,9 @@ describe("rutas profundas en los dos hostings", () => {
   it("vercel.json manda lo que no es un archivo a index.html", () => {
     // Sin esto, entrar directo a /products/Cohetes da 404 en Vercel.
     const vercel = JSON.parse(leer("vercel.json"));
-    expect(vercel.rewrites.some((r) => r.destination === "/index.html")).toBe(true);
+    expect(vercel.rewrites.some((r) => r.destination === "/index.html")).toBe(
+      true,
+    );
   });
 
   it("no se vuelve a publicar en GitHub Pages desde npm", () => {

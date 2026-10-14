@@ -19,8 +19,8 @@ const coincideTexto = (item, busqueda) => {
   if (!busqueda) return true;
   const q = busqueda.toLowerCase();
   return (
-    (item.nombre || item.name || "").toLowerCase().includes(q) ||
-    (item.categoria || item.category || "").toLowerCase().includes(q) ||
+    (item.nombre || "").toLowerCase().includes(q) ||
+    (item.categoria || "").toLowerCase().includes(q) ||
     (item.marca || "").toLowerCase().includes(q)
   );
 };

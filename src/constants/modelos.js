@@ -47,7 +47,10 @@ export const idLibre = (etiqueta, ocupados = []) => {
 
 const tieneAlgunPrecio = (presentaciones) =>
   Object.values(presentaciones ?? {}).some(
-    (p) => typeof p?.precio === "number" && Number.isFinite(p.precio) && p.precio > 0
+    (p) =>
+      typeof p?.precio === "number" &&
+      Number.isFinite(p.precio) &&
+      p.precio > 0,
   );
 
 /**

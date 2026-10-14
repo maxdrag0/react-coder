@@ -36,7 +36,16 @@ function ItemDetails({ item }) {
   // El modelo se elige primero: de el dependen las presentaciones y los
   // precios. Si el producto tiene uno solo, se elige solo y no se muestra el
   // selector: elegir entre una opcion no es elegir.
-  const modelos = modelosDe(item);
+  /*
+    Alfabético y no en el orden en que el admin los cargó: ese orden no
+    significa nada para quien compra, y buscar "Verde" en una lista de diez
+    colores sin orden es leerlos todos.
+
+    Con numeric, "10 pulgadas" va después de "2 pulgadas" y no antes.
+  */
+  const modelos = [...modelosDe(item)].sort((a, b) =>
+    a.etiqueta.localeCompare(b.etiqueta, "es", { numeric: true }),
+  );
   const [modeloId, setModeloId] = useState(modelos[0]?.id ?? null);
   const modelo = modelos.find((m) => m.id === modeloId) ?? null;
 

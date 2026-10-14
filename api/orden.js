@@ -1,3 +1,4 @@
+import { FieldValue } from "firebase-admin/firestore";
 import { auth, db } from "./_lib/firebaseAdmin.js";
 import { validarCuerpo } from "./_lib/validarCuerpo.js";
 import { validarOrden } from "./_lib/validarOrden.js";
@@ -18,6 +19,34 @@ import { errorDeTelefono, soloDigitos } from "../src/utils/telefono.js";
 const tokenDe = (req) => {
   const cabecera = req.headers?.authorization ?? "";
   return cabecera.startsWith("Bearer ") ? cabecera.slice(7) : null;
+};
+
+/*
+  Suma uno a cada producto del pedido, que es lo que ordena "más vendidos" en
+  la portada. Hasta ahora ese campo no lo escribía nadie: valía 0 en todos los
+  productos, así que la sección mostraba los primeros doce en orden arbitrario
+  bajo un título que afirmaba otra cosa.
+
+  Se cuenta UN pedido por producto y no las unidades. Un mayorista que compra
+  diez bultos de lo mismo no tiene que decidir la portada para siempre, y "12
+  unidades" contra "1 bulto de 12" son la misma venta contada de dos maneras.
+
+  Un fallo acá NO voltea el pedido: ya está escrito y el dueño lo ve en el
+  panel. Devolver un 500 por un contador de portada le haría creer al cliente
+  que no se mandó, y lo volvería a mandar.
+*/
+const contar = async (codigos) => {
+  try {
+    const lote = db.batch();
+    for (const codigo of codigos) {
+      lote.update(db.collection("products").doc(codigo), {
+        compras: FieldValue.increment(1),
+      });
+    }
+    await lote.commit();
+  } catch (error) {
+    console.error("No se pudo actualizar el contador de compras:", error);
+  }
 };
 
 export default async function handler(req, res) {
@@ -96,6 +125,8 @@ export default async function handler(req, res) {
     };
 
     await db.collection("compras").doc(idempotencia).set(orden);
+
+    await contar(codigos);
 
     return res.status(201).json({ id: idempotencia, total });
   } catch (error) {

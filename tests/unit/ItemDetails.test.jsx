@@ -205,3 +205,70 @@ describe("ItemDetails: la descripcion que repite el nombre", () => {
     ).toBeInTheDocument();
   });
 });
+
+describe("ItemDetails: el orden de los modelos", () => {
+  const colores = {
+    codigo: "H02",
+    nombre: "Bengala de humo",
+    modelos: [
+      {
+        id: "verde",
+        etiqueta: "Verde",
+        presentaciones: { unitario: { precio: 8000 } },
+      },
+      {
+        id: "azul",
+        etiqueta: "Azul",
+        presentaciones: { unitario: { precio: 8000 } },
+      },
+      {
+        id: "rojo",
+        etiqueta: "Rojo",
+        presentaciones: { unitario: { precio: 8000 } },
+      },
+    ],
+  };
+
+  it("los lista alfabeticamente, no en el orden de carga", () => {
+    // El orden en que el admin los cargo no significa nada para el que
+    // compra: buscar "Verde" en una lista de diez colores sin orden es
+    // leerlos todos.
+    montar(colores);
+    const opciones = [...screen.getByLabelText(/elegí el modelo/i).options];
+    expect(opciones.map((o) => o.textContent)).toEqual([
+      "Azul",
+      "Rojo",
+      "Verde",
+    ]);
+  });
+
+  it("ordena los numeros como numeros, no como texto", () => {
+    // "10 pulgadas" tiene que ir despues de "2 pulgadas", no antes.
+    montar({
+      codigo: "M1",
+      nombre: "Mortero",
+      modelos: [
+        {
+          id: "diez",
+          etiqueta: "10 pulgadas",
+          presentaciones: { unitario: { precio: 1 } },
+        },
+        {
+          id: "dos",
+          etiqueta: "2 pulgadas",
+          presentaciones: { unitario: { precio: 1 } },
+        },
+      ],
+    });
+    const opciones = [...screen.getByLabelText(/elegí el modelo/i).options];
+    expect(opciones.map((o) => o.textContent)).toEqual([
+      "2 pulgadas",
+      "10 pulgadas",
+    ]);
+  });
+
+  it("arranca con el primero del orden nuevo", () => {
+    montar(colores);
+    expect(screen.getByLabelText(/elegí el modelo/i)).toHaveValue("azul");
+  });
+});

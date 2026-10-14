@@ -5,17 +5,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { obtenerComprasDeUsuario } from "@/services/firebase/comprasFirebase";
 import { estadoDePedido, etiquetaDePedido } from "@/constants/estadoPedido";
 import { formatearPrecio } from "@/utils/formatearPrecio";
+import { renglonDe } from "@/constants/renglon";
 import "./MisPedidos.css";
-
-const renglonDe = (item) => {
-  const nombre = item.nombre || item.name || "";
-  const extras = [
-    item.modeloEtiqueta,
-    item.unidad && item.unidad !== "unitario" ? item.unidad : null,
-  ].filter(Boolean);
-
-  return `${item.cantidad}x ${nombre}${extras.length ? ` (${extras.join(", ")})` : ""}`;
-};
 
 /**
  * Los pedidos del comprador, con su estado.
@@ -50,7 +41,11 @@ const MisPedidos = () => {
       <section className="mis-pedidos">
         <h3>Mis pedidos</h3>
         <div className="mis-pedidos-cargando">
-          <PuffLoader color="currentColor" size={32} aria-label="Cargando tus pedidos" />
+          <PuffLoader
+            color="currentColor"
+            size={32}
+            aria-label="Cargando tus pedidos"
+          />
         </div>
       </section>
     );

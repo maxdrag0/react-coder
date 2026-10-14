@@ -16,7 +16,9 @@ const onEstado = vi.fn();
 const onNota = vi.fn();
 
 const montar = (pedidos) =>
-  render(<TablaPedidos pedidos={pedidos} onEstado={onEstado} onNota={onNota} />);
+  render(
+    <TablaPedidos pedidos={pedidos} onEstado={onEstado} onNota={onNota} />,
+  );
 
 beforeEach(() => {
   onEstado.mockReset();
@@ -26,7 +28,9 @@ beforeEach(() => {
 describe("TablaPedidos: estado", () => {
   it("un pedido sin el campo arranca en Nuevo", () => {
     montar([PEDIDO]);
-    expect(screen.getByLabelText(/estado del pedido ORD-1/i)).toHaveValue("nuevo");
+    expect(screen.getByLabelText(/estado del pedido ORD-1/i)).toHaveValue(
+      "nuevo",
+    );
   });
 
   it("avisa el cambio de estado con el id del pedido", async () => {
@@ -34,14 +38,16 @@ describe("TablaPedidos: estado", () => {
     montar([PEDIDO]);
     await usuario.selectOptions(
       screen.getByLabelText(/estado del pedido ORD-1/i),
-      "pagado"
+      "pagado",
     );
     expect(onEstado).toHaveBeenCalledWith("ORD-1", "pagado");
   });
 
   it("marca la fila de un pedido nuevo para que salte a la vista", () => {
     const { container } = montar([PEDIDO]);
-    expect(container.querySelector("tr.admin-pedido-nuevo")).toBeInTheDocument();
+    expect(
+      container.querySelector("tr.admin-pedido-nuevo"),
+    ).toBeInTheDocument();
   });
 });
 
@@ -68,7 +74,7 @@ describe("TablaPedidos: nota", () => {
   it("muestra la nota que ya tenía el pedido", () => {
     montar([{ ...PEDIDO, nota: "transfirió el 50%" }]);
     expect(screen.getByLabelText(/nota del pedido ORD-1/i)).toHaveValue(
-      "transfirió el 50%"
+      "transfirió el 50%",
     );
   });
 });
@@ -78,7 +84,7 @@ describe("TablaPedidos: contacto", () => {
     montar([PEDIDO]);
     expect(screen.getByRole("link", { name: /1123456789/ })).toHaveAttribute(
       "href",
-      "https://wa.me/5491123456789"
+      "https://wa.me/5491123456789",
     );
   });
 
@@ -99,5 +105,47 @@ describe("TablaPedidos: vacío", () => {
   it("lo dice en vez de mostrar una tabla pelada", () => {
     montar([]);
     expect(screen.getByText(/no hay pedidos/i)).toBeInTheDocument();
+  });
+});
+
+describe("TablaPedidos: el renglon distingue un modelo de otro", () => {
+  /*
+    Max pidió tres bengalas de colores distintos y en el panel le salieron
+    tres "1x Bengala de humo" idénticos: no había forma de saber qué preparar.
+  */
+  const CON_MODELOS = {
+    ...PEDIDO,
+    items: [
+      {
+        cantidad: 1,
+        nombre: "Bengala de humo",
+        unidad: "unitario",
+        modeloEtiqueta: "Rojo",
+      },
+      {
+        cantidad: 1,
+        nombre: "Bengala de humo",
+        unidad: "unitario",
+        modeloEtiqueta: "Azul",
+      },
+    ],
+  };
+
+  it("nombra el modelo de cada renglon", () => {
+    montar([CON_MODELOS]);
+    expect(screen.getByText("1x Bengala de humo (Rojo)")).toBeInTheDocument();
+    expect(screen.getByText("1x Bengala de humo (Azul)")).toBeInTheDocument();
+  });
+
+  it("no deja dos renglones iguales cuando los modelos son distintos", () => {
+    montar([CON_MODELOS]);
+    expect(screen.queryAllByText("1x Bengala de humo")).toHaveLength(0);
+  });
+
+  it("sigue nombrando la unidad de un producto sin modelos", () => {
+    montar([PEDIDO]);
+    expect(
+      screen.getByText("2x Torta 100 tiros (display)"),
+    ).toBeInTheDocument();
   });
 });

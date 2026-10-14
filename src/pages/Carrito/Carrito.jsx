@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { CartContext } from "../../contexts/cart/CartContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { Button } from "../../components/common/Button/Button";
@@ -16,7 +16,11 @@ function Carrito() {
   const { removeList, cartList, total, actualizarPrecio, deleteItem } =
     useContext(CartContext);
   const { user } = useAuth();
-  const { perfil, cargando: cargandoPerfil, guardar: guardarPerfil } = usePerfil();
+  const {
+    perfil,
+    cargando: cargandoPerfil,
+    guardar: guardarPerfil,
+  } = usePerfil();
 
   // Los usuarios que ya existian no tienen telefono, y los que entran con
   // Google tampoco: ahi no hay formulario donde pedirlo. Si falta, se pide
@@ -31,11 +35,26 @@ function Carrito() {
   const [errorEnvio, setErrorEnvio] = useState("");
   const navigate = useNavigate();
 
-  // El renglón que el servidor identifica por código + modelo + unidad es el
-  // mismo que el carrito identifica por su clave.
+  /*
+    Un id por INTENTO DE COMPRA, no por request: el reintento despues de la
+    pantalla de cambios tiene que pisar el mismo documento. Se renueva cuando
+    el pedido entra, asi el siguiente no sobrescribe al anterior (el modal se
+    puede cerrar con Escape sin vaciar el carrito).
+  */
+  const idempotencia = useRef(null);
+
+  /*
+    El renglón que el servidor identifica por código + modelo + unidad es el
+    mismo que el carrito identifica por su clave. Los tres campos importan:
+    comparar solo código y modelo corrige el renglón equivocado cuando el
+    mismo producto está en el carrito en dos unidades distintas.
+  */
   const claveDe = (p) =>
     cartList.find(
-      (i) => i.codigo === p.codigo && (i.modelo ?? null) === (p.modelo ?? null)
+      (i) =>
+        i.codigo === p.codigo &&
+        (i.modelo ?? null) === (p.modelo ?? null) &&
+        i.unidad === p.unidad,
     )?.clave;
 
   /*
@@ -71,11 +90,15 @@ function Carrito() {
         precioVisto: i.precioElegido,
       }));
 
+      idempotencia.current ??= crypto.randomUUID();
+
       const { id } = await enviarOrden({
         items,
         telefono: perfil?.telefono ? undefined : telefono,
+        idempotencia: idempotencia.current,
       });
 
+      idempotencia.current = null;
       setOrderId(id);
       setShowModal(true);
     } catch (error) {
@@ -123,7 +146,9 @@ function Carrito() {
       {cartList.length === 0 ? (
         <div className="carrito-vacio">
           <h2>Todavía no agregaste productos</h2>
-          <p>Elegí lo que quieras del catálogo y volvé acá para enviar el pedido.</p>
+          <p>
+            Elegí lo que quieras del catálogo y volvé acá para enviar el pedido.
+          </p>
           <Link to="/products" className="boton boton-primario">
             Ver el catálogo
           </Link>
@@ -171,8 +196,11 @@ function Carrito() {
                   value={telefono}
                   onChange={(e) => setTelefono(e.target.value)}
                 />
-                <small className={errorTelefono ? "campo-error" : "campo-ayuda"}>
-                  {errorTelefono || "Es por donde te contactamos para coordinar."}
+                <small
+                  className={errorTelefono ? "campo-error" : "campo-ayuda"}
+                >
+                  {errorTelefono ||
+                    "Es por donde te contactamos para coordinar."}
                 </small>
               </div>
             )}
@@ -186,7 +214,8 @@ function Carrito() {
             </Button>
 
             <p className="carrito-aviso">
-              Te contactamos para coordinar el pago y el envío. No se cobra nada ahora.
+              Te contactamos para coordinar el pago y el envío. No se cobra nada
+              ahora.
             </p>
           </aside>
         </div>
@@ -209,7 +238,6 @@ function Carrito() {
       />
     </div>
   );
-
 }
 
 export default Carrito;

@@ -13,6 +13,9 @@ import { auth } from "@/utils/firebase";
 
 const RUTA = "/api/orden";
 
+const MENSAJE_SIN_RED =
+  "No pudimos conectarnos. Revisá tu conexión y volvé a intentar.";
+
 const errorCon = (code, mensaje, extra = {}) => {
   const e = new Error(mensaje);
   e.code = code;
@@ -20,38 +23,70 @@ const errorCon = (code, mensaje, extra = {}) => {
   return e;
 };
 
-export const enviarOrden = async ({ items, telefono }) => {
-  const token = await auth.currentUser?.getIdToken();
+export const enviarOrden = async ({ items, telefono, idempotencia }) => {
+  /*
+    La idempotencia la elige quien manda el pedido, no esta funcion. Generarla
+    aca daba una distinta por llamada, y entonces no deduplicaba nada: un
+    reintento despues de una respuesta perdida creaba un segundo pedido igual.
+  */
+  if (!idempotencia) {
+    throw errorCon("sin-idempotencia", "Falta el identificador del intento.");
+  }
+
+  let token;
+  try {
+    token = await auth.currentUser?.getIdToken();
+  } catch {
+    throw errorCon("sin-red", MENSAJE_SIN_RED);
+  }
   if (!token) throw errorCon("sin-sesion", "Tenes que iniciar sesion.");
 
-  const respuesta = await fetch(RUTA, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      // Un uuid por intento: si el cliente reintenta, el servidor sobrescribe
-      // el mismo documento en vez de crear dos pedidos iguales.
-      idempotencia: crypto.randomUUID(),
-      items,
-      ...(telefono ? { telefono } : {}),
-    }),
-  });
+  let respuesta;
+  try {
+    respuesta = await fetch(RUTA, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        idempotencia,
+        items,
+        ...(telefono ? { telefono } : {}),
+      }),
+    });
+  } catch {
+    /*
+      fetch solo rechaza cuando no hubo respuesta: sin red, DNS caido, o el
+      pedido cortado a mitad. El mensaje del navegador viene en ingles y es
+      tecnico, y el cliente no tiene por que leer "Failed to fetch".
+    */
+    throw errorCon("sin-red", MENSAJE_SIN_RED);
+  }
 
   const cuerpo = await respuesta.json().catch(() => ({}));
 
   if (respuesta.ok) return cuerpo;
 
   if (respuesta.status === 409) {
-    throw errorCon("carrito-desactualizado", "El carrito esta desactualizado.", {
-      problemas: cuerpo.problemas ?? [],
-    });
+    throw errorCon(
+      "carrito-desactualizado",
+      "El carrito esta desactualizado.",
+      {
+        problemas: cuerpo.problemas ?? [],
+      },
+    );
   }
 
   if (respuesta.status === 422) {
-    throw errorCon("sin_telefono", "Necesitamos tu telefono para coordinar el pedido.");
+    throw errorCon(
+      "sin_telefono",
+      "Necesitamos tu telefono para coordinar el pedido.",
+    );
   }
 
-  throw errorCon("error-servidor", cuerpo.error ?? "No se pudo registrar el pedido.");
+  throw errorCon(
+    "error-servidor",
+    cuerpo.error ?? "No se pudo registrar el pedido.",
+  );
 };

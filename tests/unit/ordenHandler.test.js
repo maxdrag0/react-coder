@@ -223,3 +223,38 @@ describe("api/orden: errores inesperados", () => {
     expect(JSON.stringify(res.cuerpo)).not.toMatch(/PERMISSION_DENIED/);
   });
 });
+
+describe("api/orden: un codigo repetido se pide una sola vez", () => {
+  const DOS_UNIDADES = {
+    ...PRODUCTO,
+    presentaciones: {
+      unitario: { precio: 8000 },
+      bulto: { precio: 90000, unidades: 12 },
+    },
+  };
+
+  const enDosUnidades = () =>
+    pedido({
+      items: [
+        { codigo: "A12", unidad: "unitario", modelo: null, cantidad: 1, precioVisto: 8000 },
+        { codigo: "A12", unidad: "bulto", modelo: null, cantidad: 1, precioVisto: 90000 },
+      ],
+    });
+
+  it("le pasa una sola referencia a getAll", async () => {
+    // Dos refs iguales son dos lecturas cobradas por el mismo documento, y el
+    // comportamiento de getAll con referencias repetidas no esta documentado.
+    getAll.mockResolvedValue([docDe(DOS_UNIDADES)]);
+    await handler(enDosUnidades(), respuesta());
+    expect(getAll.mock.calls[0]).toHaveLength(1);
+  });
+
+  it("cotiza los dos renglones igual", async () => {
+    getAll.mockResolvedValue([docDe(DOS_UNIDADES)]);
+    const res = respuesta();
+    await handler(enDosUnidades(), res);
+    expect(res.codigo).toBe(201);
+    expect(set.mock.calls[0][0].items).toHaveLength(2);
+    expect(set.mock.calls[0][0].total).toBe(98000);
+  });
+});

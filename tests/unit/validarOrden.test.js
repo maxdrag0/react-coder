@@ -16,8 +16,16 @@ const CON_MODELOS = {
   nombre: "Bengala de humo",
   estado: "activo",
   modelos: [
-    { id: "rojo", etiqueta: "Rojo", presentaciones: { unitario: { precio: 8000 } } },
-    { id: "azul", etiqueta: "Azul", presentaciones: { unitario: { precio: 9000 } } },
+    {
+      id: "rojo",
+      etiqueta: "Rojo",
+      presentaciones: { unitario: { precio: 8000 } },
+    },
+    {
+      id: "azul",
+      etiqueta: "Azul",
+      presentaciones: { unitario: { precio: 9000 } },
+    },
   ],
 };
 
@@ -51,7 +59,7 @@ describe("validarOrden: el camino feliz", () => {
         renglon({ cantidad: 2 }),
         renglon({ unidad: "display", cantidad: 1, precioVisto: 15000 }),
       ],
-      catalogo(SIMPLE)
+      catalogo(SIMPLE),
     );
     expect(r.total).toBe(16000 + 15000);
   });
@@ -63,7 +71,7 @@ describe("validarOrden: el camino feliz", () => {
         renglon({ unidad: "unitario", cantidad: 1, precioVisto: 8000 }),
         renglon({ unidad: "display", cantidad: 1, precioVisto: 15000 }),
       ],
-      catalogo(SIMPLE)
+      catalogo(SIMPLE),
     );
     expect(r.problemas).toEqual([]);
     expect(r.renglones).toHaveLength(2);
@@ -83,7 +91,7 @@ describe("validarOrden: el camino feliz", () => {
   it("guarda cuantas unidades trae el paquete", () => {
     const r = validarOrden(
       [renglon({ unidad: "display", precioVisto: 15000 })],
-      catalogo(SIMPLE)
+      catalogo(SIMPLE),
     );
     expect(r.renglones[0].unidadesPorPaquete).toBe(5);
   });
@@ -95,6 +103,8 @@ describe("validarOrden: los cuatro problemas", () => {
     expect(r.problemas).toEqual([
       {
         codigo: "A12",
+        modelo: null,
+        unidad: "unitario",
         nombre: "Torta 100 tiros",
         tipo: "precio_cambio",
         antes: 7000,
@@ -109,19 +119,25 @@ describe("validarOrden: los cuatro problemas", () => {
   });
 
   it("no_disponible con un producto oculto", () => {
-    const r = validarOrden([renglon()], catalogo({ ...SIMPLE, estado: "oculto" }));
+    const r = validarOrden(
+      [renglon()],
+      catalogo({ ...SIMPLE, estado: "oculto" }),
+    );
     expect(r.problemas[0].tipo).toBe("no_disponible");
   });
 
   it("no_disponible con un producto sin stock", () => {
-    const r = validarOrden([renglon()], catalogo({ ...SIMPLE, estado: "sin_stock" }));
+    const r = validarOrden(
+      [renglon()],
+      catalogo({ ...SIMPLE, estado: "sin_stock" }),
+    );
     expect(r.problemas[0].tipo).toBe("no_disponible");
   });
 
   it("sin_presentacion cuando esa unidad ya no se vende", () => {
     const r = validarOrden(
       [renglon({ unidad: "bulto", precioVisto: 140000 })],
-      catalogo(SIMPLE)
+      catalogo(SIMPLE),
     );
     expect(r.problemas[0].tipo).toBe("sin_presentacion");
   });
@@ -130,7 +146,7 @@ describe("validarOrden: los cuatro problemas", () => {
     // Devolverlos de a uno obligaria al cliente a reintentar por renglon.
     const r = validarOrden(
       [renglon({ precioVisto: 1 }), renglon({ codigo: "ZZZ" })],
-      catalogo(SIMPLE)
+      catalogo(SIMPLE),
     );
     expect(r.problemas).toHaveLength(2);
   });
@@ -147,7 +163,7 @@ describe("validarOrden: modelos", () => {
   it("cotiza el modelo pedido", () => {
     const r = validarOrden(
       [renglon({ codigo: "H02", modelo: "azul", precioVisto: 9000 })],
-      catalogo(CON_MODELOS)
+      catalogo(CON_MODELOS),
     );
     expect(r.problemas).toEqual([]);
     expect(r.total).toBe(9000);
@@ -156,7 +172,7 @@ describe("validarOrden: modelos", () => {
   it("copia la etiqueta del modelo al renglon", () => {
     const r = validarOrden(
       [renglon({ codigo: "H02", modelo: "azul", precioVisto: 9000 })],
-      catalogo(CON_MODELOS)
+      catalogo(CON_MODELOS),
     );
     expect(r.renglones[0].modeloEtiqueta).toBe("Azul");
     expect(r.renglones[0].modelo).toBe("azul");
@@ -167,7 +183,7 @@ describe("validarOrden: modelos", () => {
     // precio inventado.
     const r = validarOrden(
       [renglon({ codigo: "H02", modelo: null, precioVisto: 8000 })],
-      catalogo(CON_MODELOS)
+      catalogo(CON_MODELOS),
     );
     expect(r.problemas[0].tipo).toBe("sin_presentacion");
   });
@@ -175,7 +191,7 @@ describe("validarOrden: modelos", () => {
   it("sin_presentacion si el modelo ya no existe", () => {
     const r = validarOrden(
       [renglon({ codigo: "H02", modelo: "borrado", precioVisto: 8000 })],
-      catalogo(CON_MODELOS)
+      catalogo(CON_MODELOS),
     );
     expect(r.problemas[0].tipo).toBe("sin_presentacion");
   });
@@ -183,7 +199,7 @@ describe("validarOrden: modelos", () => {
   it("detecta el cambio de precio DEL MODELO", () => {
     const r = validarOrden(
       [renglon({ codigo: "H02", modelo: "rojo", precioVisto: 5000 })],
-      catalogo(CON_MODELOS)
+      catalogo(CON_MODELOS),
     );
     expect(r.problemas[0]).toMatchObject({
       tipo: "precio_cambio",
@@ -198,7 +214,7 @@ describe("validarOrden: modelos", () => {
         renglon({ codigo: "H02", modelo: "rojo", precioVisto: 8000 }),
         renglon({ codigo: "H02", modelo: "azul", precioVisto: 9000 }),
       ],
-      catalogo(CON_MODELOS)
+      catalogo(CON_MODELOS),
     );
     expect(r.problemas).toEqual([]);
     expect(r.total).toBe(17000);
@@ -211,7 +227,7 @@ describe("validarOrden: esquema viejo", () => {
   it("cotiza un producto con precioUnitario", () => {
     const r = validarOrden(
       [renglon({ codigo: "B1", precioVisto: 300 })],
-      catalogo(VIEJO)
+      catalogo(VIEJO),
     );
     expect(r.total).toBe(300);
   });
@@ -219,7 +235,7 @@ describe("validarOrden: esquema viejo", () => {
   it("un producto sin estado cuenta como activo", () => {
     const r = validarOrden(
       [renglon({ codigo: "B1", precioVisto: 300 })],
-      catalogo(VIEJO)
+      catalogo(VIEJO),
     );
     expect(r.problemas).toEqual([]);
   });
@@ -229,7 +245,7 @@ describe("validarOrden: esquema viejo", () => {
     const repetido = { ...VIEJO, precioDisplay: 300 };
     const r = validarOrden(
       [renglon({ codigo: "B1", unidad: "display", precioVisto: 300 })],
-      catalogo(repetido)
+      catalogo(repetido),
     );
     expect(r.problemas[0].tipo).toBe("sin_presentacion");
   });
@@ -238,8 +254,74 @@ describe("validarOrden: esquema viejo", () => {
     const conDisplay = { ...VIEJO, precioDisplay: 2700 };
     const r = validarOrden(
       [renglon({ codigo: "B1", unidad: "display", precioVisto: 2700 })],
-      catalogo(conDisplay)
+      catalogo(conDisplay),
     );
     expect(r.renglones[0].unidadesPorPaquete).toBeNull();
+  });
+});
+
+describe("validarOrden: cada problema identifica SU renglon", () => {
+  /*
+    El cliente tiene que poder mapear cada problema al renglon exacto del
+    carrito, y el carrito identifica un renglon por codigo + modelo + unidad.
+    Un problema que solo trae el codigo deja al cliente adivinando: con dos
+    unidades del mismo producto corrige la equivocada, y con modelos no
+    encuentra ninguna y el pedido no se puede mandar nunca.
+  */
+  const identidad = ({ codigo, modelo, unidad }) => ({
+    codigo,
+    modelo,
+    unidad,
+  });
+
+  it("precio_cambio trae modelo y unidad", () => {
+    const r = validarOrden(
+      [renglon({ codigo: "H02", modelo: "azul", precioVisto: 1 })],
+      catalogo(CON_MODELOS),
+    );
+    expect(identidad(r.problemas[0])).toEqual({
+      codigo: "H02",
+      modelo: "azul",
+      unidad: "unitario",
+    });
+  });
+
+  it("distingue las dos unidades del mismo producto", () => {
+    const r = validarOrden(
+      [
+        renglon({ unidad: "unitario", precioVisto: 8000 }),
+        renglon({ unidad: "display", precioVisto: 1 }),
+      ],
+      catalogo(SIMPLE),
+    );
+    expect(r.problemas).toHaveLength(1);
+    expect(identidad(r.problemas[0])).toEqual({
+      codigo: "A12",
+      modelo: null,
+      unidad: "display",
+    });
+  });
+
+  it("los cuatro tipos traen la identidad del renglon", () => {
+    const r = validarOrden(
+      [
+        renglon({ codigo: "NO-ESTA" }),
+        renglon({ codigo: "H02", modelo: null }),
+        renglon({ unidad: "bulto" }),
+        renglon({ precioVisto: 1 }),
+      ],
+      catalogo(SIMPLE, CON_MODELOS),
+    );
+    expect(r.problemas.map((p) => p.tipo)).toEqual([
+      "inexistente",
+      "sin_presentacion",
+      "sin_presentacion",
+      "precio_cambio",
+    ]);
+    for (const p of r.problemas) {
+      expect(p.codigo).toBeTruthy();
+      expect(p.unidad).toBeTruthy();
+      expect("modelo" in p).toBe(true);
+    }
   });
 });

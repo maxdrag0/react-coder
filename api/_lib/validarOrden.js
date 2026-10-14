@@ -18,6 +18,19 @@ import { tieneModelos, modeloPorId } from "../../src/constants/modelos.js";
 
 const nombreDe = (p) => p?.nombre || p?.name || "";
 
+/*
+  Todo problema viaja con la identidad del renglon que lo causo, que es la
+  misma con la que el carrito identifica sus renglones: codigo + modelo +
+  unidad. Con solo el codigo el cliente no puede saber a cual corregir: con
+  el mismo producto en dos unidades arregla la equivocada, y con modelos no
+  encuentra ninguna y el pedido no se puede mandar nunca.
+*/
+const identidad = (item) => ({
+  codigo: item.codigo,
+  modelo: item.modelo ?? null,
+  unidad: item.unidad,
+});
+
 export const validarOrden = (items, productosPorCodigo) => {
   const problemas = [];
   const renglones = [];
@@ -27,12 +40,12 @@ export const validarOrden = (items, productosPorCodigo) => {
     const nombre = nombreDe(producto);
 
     if (!producto) {
-      problemas.push({ codigo: item.codigo, nombre: "", tipo: "inexistente" });
+      problemas.push({ ...identidad(item), nombre: "", tipo: "inexistente" });
       continue;
     }
 
     if (!sePuedeComprar(producto)) {
-      problemas.push({ codigo: item.codigo, nombre, tipo: "no_disponible" });
+      problemas.push({ ...identidad(item), nombre, tipo: "no_disponible" });
       continue;
     }
 
@@ -44,19 +57,19 @@ export const validarOrden = (items, productosPorCodigo) => {
     */
     const modelo = modeloPorId(producto, item.modelo);
     if (tieneModelos(producto) && !modelo) {
-      problemas.push({ codigo: item.codigo, nombre, tipo: "sin_presentacion" });
+      problemas.push({ ...identidad(item), nombre, tipo: "sin_presentacion" });
       continue;
     }
 
     const precio = precioDe(producto, item.unidad, item.modelo);
     if (precio === null) {
-      problemas.push({ codigo: item.codigo, nombre, tipo: "sin_presentacion" });
+      problemas.push({ ...identidad(item), nombre, tipo: "sin_presentacion" });
       continue;
     }
 
     if (precio !== item.precioVisto) {
       problemas.push({
-        codigo: item.codigo,
+        ...identidad(item),
         nombre,
         tipo: "precio_cambio",
         antes: item.precioVisto,

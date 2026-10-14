@@ -58,8 +58,16 @@ export default async function handler(req, res) {
       await perfilRef.set({ telefono: telefonoFinal }, { merge: true });
     }
 
-    // 4. Los productos, en un solo viaje.
-    const refs = items.map((i) => db.collection("products").doc(i.codigo));
+    /*
+      4. Los productos, en un solo viaje.
+
+      El mismo producto puede venir en dos renglones (una unidad suelta y un
+      bulto). Se pide una sola vez: dos refs iguales serian dos lecturas
+      cobradas por el mismo documento, y el comportamiento de getAll con
+      referencias repetidas no esta documentado.
+    */
+    const codigos = [...new Set(items.map((i) => i.codigo))];
+    const refs = codigos.map((c) => db.collection("products").doc(c));
     const docs = await db.getAll(...refs);
 
     const porCodigo = new Map();

@@ -11,9 +11,9 @@ vi.mock("@/contexts/AuthContext", () => ({ useAuth: () => useAuthMock() }));
 const usePerfilMock = vi.fn();
 vi.mock("@/hooks/usePerfil", () => ({ usePerfil: () => usePerfilMock() }));
 
-const crearCompraMock = vi.fn();
-vi.mock("@/services", () => ({
-  services: { firebase: { crearCompra: (...a) => crearCompraMock(...a) } },
+const enviarOrdenMock = vi.fn();
+vi.mock("@/services/api/ordenes", () => ({
+  enviarOrden: (...a) => enviarOrdenMock(...a),
 }));
 
 vi.mock("@/components/CarritoCard/CarritoCard", () => ({
@@ -22,7 +22,15 @@ vi.mock("@/components/CarritoCard/CarritoCard", () => ({
 
 const { default: Carrito } = await import("@/pages/Carrito/Carrito");
 
-const ITEM = { clave: "A1__unitario", nombre: "Torta 100 tiros", precioElegido: 5000, cantidad: 1 };
+const ITEM = {
+  clave: "A1__unitario",
+  codigo: "A1",
+  nombre: "Torta 100 tiros",
+  unidad: "unitario",
+  modelo: null,
+  precioElegido: 5000,
+  cantidad: 1,
+};
 
 const guardarPerfilMock = vi.fn();
 
@@ -41,7 +49,14 @@ function montar({ telefono = null } = {}) {
   render(
     <MemoryRouter>
       <CartContext.Provider
-        value={{ cartList: [ITEM], total: 5000, removeList: vi.fn(), cantidadItems: 1 }}
+        value={{
+          cartList: [ITEM],
+          total: 5000,
+          removeList: vi.fn(),
+          cantidadItems: 1,
+          actualizarPrecio: vi.fn(),
+          deleteItem: vi.fn(),
+        }}
       >
         <Carrito />
       </CartContext.Provider>
@@ -53,8 +68,8 @@ const enviar = () => screen.getByRole("button", { name: /enviar pedido/i });
 const campoTelefono = () => screen.queryByLabelText(/tu tel[eé]fono/i);
 
 beforeEach(() => {
-  crearCompraMock.mockReset();
-  crearCompraMock.mockResolvedValue("ORD-1");
+  enviarOrdenMock.mockReset();
+  enviarOrdenMock.mockResolvedValue({ id: "ORD-1", total: 5000 });
   guardarPerfilMock.mockReset();
   guardarPerfilMock.mockResolvedValue(undefined);
 });
@@ -72,54 +87,59 @@ describe("Carrito: el teléfono es obligatorio para mandar el pedido", () => {
     expect(campoTelefono()).toBeInTheDocument();
   });
 
-  it("copia el teléfono del perfil al pedido", async () => {
+  it("si el perfil lo tiene, no lo manda: el servidor lo lee del perfil", async () => {
+    // El teléfono del pedido lo pone el servidor leyendo el perfil, igual que
+    // el uid y el email salen del token. Mandarlo desde acá sería darle al
+    // cliente un campo del pedido que no le corresponde.
     const usuario = userEvent.setup();
     montar({ telefono: "1123456789" });
     await usuario.click(enviar());
 
-    await waitFor(() => expect(crearCompraMock).toHaveBeenCalled());
-    expect(crearCompraMock.mock.calls[0][0].buyer.telefono).toBe("1123456789");
+    await waitFor(() => expect(enviarOrdenMock).toHaveBeenCalled());
+    expect(enviarOrdenMock.mock.calls[0][0].telefono).toBeUndefined();
   });
 
-  it("NO crea el pedido si falta el teléfono", async () => {
+  it("NO manda el pedido si falta el teléfono", async () => {
     // Un pedido sin teléfono no se puede atender: el negocio es llamar al
     // cliente. Dejarlo entrar seria guardar algo inservible.
     const usuario = userEvent.setup();
     montar();
     await usuario.click(enviar());
 
-    expect(crearCompraMock).not.toHaveBeenCalled();
+    expect(enviarOrdenMock).not.toHaveBeenCalled();
     expect(screen.getByText(/necesitamos tu tel[eé]fono/i)).toBeInTheDocument();
   });
 
-  it("NO crea el pedido con un teléfono incompleto", async () => {
+  it("NO manda el pedido con un teléfono incompleto", async () => {
     const usuario = userEvent.setup();
     montar();
     await usuario.type(campoTelefono(), "123");
     await usuario.click(enviar());
 
-    expect(crearCompraMock).not.toHaveBeenCalled();
+    expect(enviarOrdenMock).not.toHaveBeenCalled();
     expect(screen.getByText(/incompleto/i)).toBeInTheDocument();
   });
 
-  it("acepta el teléfono escrito en el carrito y lo manda normalizado", async () => {
+  it("manda el teléfono que escribió el cliente cuando el perfil no tiene", async () => {
+    // Va tal cual se escribió: normalizarlo es trabajo del servidor, que es
+    // el que decide qué queda guardado en el pedido.
     const usuario = userEvent.setup();
     montar();
     await usuario.type(campoTelefono(), "11 2345-6789");
     await usuario.click(enviar());
 
-    await waitFor(() => expect(crearCompraMock).toHaveBeenCalled());
-    expect(crearCompraMock.mock.calls[0][0].buyer.telefono).toBe("1123456789");
+    await waitFor(() => expect(enviarOrdenMock).toHaveBeenCalled());
+    expect(enviarOrdenMock.mock.calls[0][0].telefono).toBe("11 2345-6789");
   });
 
-  it("lo guarda en el perfil para no pedirlo de nuevo", async () => {
+  it("lo guarda en el perfil, normalizado, para no pedirlo de nuevo", async () => {
     const usuario = userEvent.setup();
     montar();
     await usuario.type(campoTelefono(), "11 2345-6789");
     await usuario.click(enviar());
 
-    await waitFor(() => expect(guardarPerfilMock).toHaveBeenCalledWith({
-      telefono: "1123456789",
-    }));
+    await waitFor(() =>
+      expect(guardarPerfilMock).toHaveBeenCalledWith({ telefono: "1123456789" })
+    );
   });
 });

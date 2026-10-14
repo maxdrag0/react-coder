@@ -15,18 +15,30 @@ const PRODUCTO = {
 };
 
 function Sonda() {
-  const { cartList, total, cantidadItems, addToCart, deleteItem, updateQuantity } =
-    useContext(CartContext);
+  const {
+    cartList,
+    total,
+    cantidadItems,
+    addToCart,
+    deleteItem,
+    updateQuantity,
+    actualizarPrecio,
+  } = useContext(CartContext);
 
   return (
     <div>
       <p data-testid="renglones">{cartList.length}</p>
       <p data-testid="total">{total}</p>
       <p data-testid="cantidad">{cantidadItems}</p>
+      <p data-testid="precio-primero">{cartList[0]?.precioElegido}</p>
       <button onClick={() => addToCart(PRODUCTO, 1, "unitario")}>+unidad</button>
       <button onClick={() => addToCart(PRODUCTO, 1, "bulto")}>+bulto</button>
       <button onClick={() => updateQuantity(cartList[0]?.clave, 5)}>poner 5</button>
       <button onClick={() => deleteItem(cartList[0]?.clave)}>borrar primero</button>
+      <button onClick={() => actualizarPrecio(cartList[0]?.clave, 9000)}>
+        precio 9000
+      </button>
+      <button onClick={() => actualizarPrecio("no-existe", 1)}>precio fantasma</button>
     </div>
   );
 }
@@ -86,6 +98,28 @@ describe("CartContext", () => {
 
     expect(screen.getByTestId("renglones")).toHaveTextContent("1");
     expect(screen.getByTestId("total")).toHaveTextContent("390000");
+  });
+
+  it("actualizarPrecio cambia el precio de un renglón y recalcula el total", async () => {
+    // Es lo que hace la reconciliación cuando el servidor avisa que el precio
+    // cambió: el renglón se queda, con el precio nuevo.
+    const user = userEvent.setup();
+    montar();
+    await user.click(screen.getByText("+unidad"));
+    await user.click(screen.getByText("+unidad"));
+    await user.click(screen.getByText("precio 9000"));
+
+    expect(screen.getByTestId("precio-primero")).toHaveTextContent("9000");
+    expect(screen.getByTestId("total")).toHaveTextContent("18000");
+  });
+
+  it("actualizarPrecio ignora una clave que no está", async () => {
+    const user = userEvent.setup();
+    montar();
+    await user.click(screen.getByText("+unidad"));
+    await user.click(screen.getByText("precio fantasma"));
+
+    expect(screen.getByTestId("precio-primero")).toHaveTextContent("4500");
   });
 });
 

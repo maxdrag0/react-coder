@@ -97,29 +97,29 @@ function ItemDetails({ item }) {
           </dl>
         )}
 
-        {modelos.length > 1 && (
-          <fieldset className="detalle-unidades">
-            <legend>Elegí el modelo</legend>
+        {/* Un select y no una lista de opciones: un producto con diez
+            colores llenaba la pantalla y empujaba el precio y el boton de
+            comprar abajo del todo.
 
-            {modelos.map((m) => (
-              <label
-                key={m.id}
-                className={`unidad ${modeloId === m.id ? "unidad-elegida" : ""}`}
-              >
-                <input
-                  type="radio"
-                  name="modelo"
-                  value={m.id}
-                  checked={modeloId === m.id}
-                  onChange={() => elegirModelo(m.id)}
-                />
-                <span className="unidad-nombre">{m.etiqueta}</span>
-                <span className="unidad-precio">
-                  {formatearPrecio(precioDe(item, "unitario", m.id))}
-                </span>
-              </label>
-            ))}
-          </fieldset>
+            El precio NO va al lado de cada modelo: vive en el selector de
+            unidad, que es donde se decide cuanto se paga. Repetirlo en los
+            dos lugares hacia dudar de cual manda. */}
+        {modelos.length > 1 && (
+          <div className="campo detalle-modelo">
+            <label htmlFor="detalle-modelo">Elegí el modelo</label>
+            <select
+              id="detalle-modelo"
+              className="campo-control"
+              value={modeloId ?? ""}
+              onChange={(e) => elegirModelo(e.target.value)}
+            >
+              {modelos.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.etiqueta}
+                </option>
+              ))}
+            </select>
+          </div>
         )}
 
         {unidades.length > 0 && (

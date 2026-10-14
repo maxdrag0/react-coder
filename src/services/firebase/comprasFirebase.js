@@ -1,5 +1,4 @@
 import {
-  addDoc,
   collection,
   getDocs,
   query,
@@ -10,16 +9,11 @@ import {
 } from "firebase/firestore";
 import { db } from "../../utils/firebase";
 
-export const crearCompra = async (compra) => {
-  try {
-    const docRef = await addDoc(collection(db, "compras"), compra);
-
-    return docRef.id;
-  } catch (error) {
-    console.error("Error al crear la compra:", error);
-    throw error;
-  }
-};
+/*
+  `crearCompra` se fue: las ordenes las crea api/orden.js con el Admin SDK.
+  Las reglas pasaron `compras.create` a false, asi que una escritura desde el
+  cliente ahora falla, y dejar la funcion invitaria a volver a usarla.
+*/
 
 export const obtenerTodasLasCompras = async () => {
   try {

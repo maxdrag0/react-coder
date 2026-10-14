@@ -1,6 +1,14 @@
 import { readFileSync } from "node:fs";
 import { initializeTestEnvironment } from "@firebase/rules-unit-testing";
 
+/*
+  Puertos fuera del rango disputado: 8080 lo toman Docker, Tomcat y casi
+  cualquier dev server, y el emulador no arranca con un "port taken" que no
+  tiene nada que ver con los tests. Tienen que coincidir con firebase.json.
+*/
+const PUERTO_FIRESTORE = 8571;
+const PUERTO_STORAGE = 9571;
+
 export const PROJECT_ID = "demo-lavadero";
 
 export async function montarEntorno() {
@@ -9,7 +17,7 @@ export async function montarEntorno() {
     firestore: {
       rules: readFileSync("firestore.rules", "utf8"),
       host: "127.0.0.1",
-      port: 8080,
+      port: PUERTO_FIRESTORE,
     },
   });
 }
@@ -24,7 +32,7 @@ export async function montarEntornoStorage() {
     storage: {
       rules: readFileSync("storage.rules", "utf8"),
       host: "127.0.0.1",
-      port: 9199,
+      port: PUERTO_STORAGE,
     },
   });
 }

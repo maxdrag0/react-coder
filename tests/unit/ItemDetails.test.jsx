@@ -44,6 +44,7 @@ const montar = (item) =>
 
 const sumar = () => screen.getByRole("button", { name: "+" });
 const agregar = () => screen.getByRole("button", { name: /agregar al carrito/i });
+const selectorModelo = () => screen.getByRole("combobox", { name: /modelo/i });
 
 beforeEach(() => addToCart.mockReset());
 
@@ -90,16 +91,45 @@ describe("ItemDetails: el cartel dice la cantidad que se agregó", () => {
   });
 });
 
-describe("ItemDetails: modelos", () => {
-  it("empieza con el primer modelo elegido", () => {
+describe("ItemDetails: el selector de modelo", () => {
+  it("es un select y no una lista de opciones", () => {
+    // Un producto con diez colores llenaba la pantalla con radios y empujaba
+    // el precio y el boton de comprar abajo del todo.
     montar(CON_MODELOS);
-    expect(screen.getByRole("radio", { name: /3 pulgadas/ })).toBeChecked();
+    expect(selectorModelo()).toBeInTheDocument();
+    expect(screen.queryAllByRole("radio", { name: /pulgadas/ })).toHaveLength(0);
+  });
+
+  it("arranca con el primer modelo elegido", () => {
+    montar(CON_MODELOS);
+    expect(selectorModelo()).toHaveValue("tres");
+  });
+
+  it("NO muestra el precio al lado de cada modelo", () => {
+    // El precio vive en el selector de unidad, que es donde se decide cuanto
+    // se paga. Repetirlo en los dos lugares hacia dudar de cual manda.
+    montar(CON_MODELOS);
+    within(selectorModelo())
+      .getAllByRole("option")
+      .forEach((o) => expect(o.textContent).not.toMatch(/\$/));
+  });
+
+  it("con un solo modelo no muestra el selector", () => {
+    // Elegir entre una opcion no es elegir.
+    montar({
+      codigo: "X1",
+      nombre: "Bengala",
+      modelos: [
+        { id: "rojo", etiqueta: "Rojo", presentaciones: { unitario: { precio: 100 } } },
+      ],
+    });
+    expect(screen.queryByRole("combobox", { name: /modelo/i })).toBeNull();
   });
 
   it("al cambiar de modelo manda ese modelo al carrito", async () => {
     const usuario = userEvent.setup();
     montar(CON_MODELOS);
-    await usuario.click(screen.getByRole("radio", { name: /5 pulgadas/ }));
+    await usuario.selectOptions(selectorModelo(), "cinco");
     await usuario.click(agregar());
 
     expect(addToCart).toHaveBeenCalledWith(
@@ -113,10 +143,10 @@ describe("ItemDetails: modelos", () => {
   it("el cartel nombra el modelo agregado", async () => {
     const usuario = userEvent.setup();
     montar(CON_MODELOS);
-    await usuario.click(screen.getByRole("radio", { name: /5 pulgadas/ }));
+    await usuario.selectOptions(selectorModelo(), "cinco");
     await usuario.click(agregar());
 
-    // Acotado al modal: "5 pulgadas" también está en el selector de modelo.
+    // Acotado al modal: "5 pulgadas" tambien esta en el selector.
     const cartel = screen.getByRole("dialog");
     expect(within(cartel).getByText(/5 pulgadas/)).toBeInTheDocument();
   });
@@ -127,9 +157,9 @@ describe("ItemDetails: modelos", () => {
     const usuario = userEvent.setup();
     montar(CON_MODELOS);
 
-    await usuario.click(screen.getByRole("radio", { name: /5 pulgadas/ }));
+    await usuario.selectOptions(selectorModelo(), "cinco");
     await usuario.click(screen.getByRole("radio", { name: /Bulto/ }));
-    await usuario.click(screen.getByRole("radio", { name: /3 pulgadas/ }));
+    await usuario.selectOptions(selectorModelo(), "tres");
     await usuario.click(agregar());
 
     expect(addToCart).toHaveBeenCalledWith(

@@ -17,6 +17,11 @@ export default defineConfig({
     // El emulador es un recurso compartido: en paralelo los tests se pisan.
     fileParallelism: false,
     testTimeout: 15000,
+    // initializeTestEnvironment() del beforeAll de los tests de reglas sube
+    // las reglas al emulador por HTTP. Con los 10s que trae vitest, en una
+    // maquina cargada el hook se corta y la suite entera queda "skipped":
+    // un rojo que no dice nada del codigo.
+    hookTimeout: 60000,
     setupFiles: ["./tests/setup.js"],
   },
   resolve: {

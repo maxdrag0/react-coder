@@ -1,5 +1,17 @@
 import { db } from "./firebaseAdmin.mjs";
 import { products } from "../src/constants/products.js";
+import { aplicarPlan, planDe } from "./precios.mjs";
+
+/*
+  El archivo semilla es la importacion cruda: trae los precios en los campos
+  sueltos del esquema viejo (precioUnitario, precioDisplay, precioBulto). La
+  coleccion habla un solo esquema, asi que cada producto pasa por el mismo
+  plan que uso la migracion antes de escribirse.
+
+  Antes esto escribia ademas `category` en lugar de `categoria`: sembrar
+  revertia la unificacion de nombres y dejaba el catalogo sin categorias.
+*/
+const canonico = (producto) => aplicarPlan(producto, planDe(producto));
 
 const LOTE = 400; // Firestore admite 500 operaciones por batch; margen de seguridad.
 
@@ -18,12 +30,9 @@ for (let i = 0; i < products.length; i += LOTE) {
   const batch = db.batch();
 
   for (const producto of products.slice(i, i + LOTE)) {
-    const adaptado = { ...producto, category: producto.categoria };
-    delete adaptado.categoria;
-
     // Las '/' no son válidas en un ID de documento de Firestore.
     const idSeguro = String(producto.codigo).replace(/\//g, "-");
-    batch.set(db.collection("products").doc(idSeguro), adaptado);
+    batch.set(db.collection("products").doc(idSeguro), canonico(producto));
     escritos++;
   }
 

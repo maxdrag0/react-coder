@@ -22,6 +22,12 @@ import { fotosDe } from "@/constants/fotos";
 
 const OPCIONALES = UNIDADES.filter((u) => u.clave !== "unitario");
 
+/*
+  Un producto con modelos no tiene precio propio: vive en cada modelo. Las tres
+  claves viajan en null y no omitidas, por el merge profundo de Firestore.
+*/
+const SIN_PRECIO = Object.fromEntries(UNIDADES.map((u) => [u.clave, null]));
+
 export const PRODUCTO_VACIO = {
   codigo: "",
   name: "",
@@ -89,30 +95,41 @@ const modelosAlFormulario = (p) =>
   });
 
 /*
-  El catálogo convive con dos esquemas: los productos sembrados usan
-  nombre/precioUnitario/fotoUrl/categoria y los creados desde acá usan
-  name/price/image/category. Leer solo uno dejaba el formulario vacío en todo
-  producto existente, y guardar una foto borraba el precio.
+  Los nombres del formulario siguen en inglés (name, category, description):
+  son los del modal, no los de Firestore. La lectura conserva el fallback al
+  esquema viejo porque un producto cargado antes de la unificación todavía
+  puede tener `name` en lugar de `nombre`, y leer solo el canónico dejaba el
+  formulario vacío: guardar desde ahí borraba el dato.
 */
-export const aFormulario = (p) => ({
-  ...p,
-  // Se guarda el original para poder detectar el cambio al guardar.
-  codigoOriginal: p.codigo,
-  name: p.nombre ?? p.name ?? "",
-  price: p.price ?? p.precioUnitario ?? "",
-  presentaciones: presentacionesAlFormulario(presentacionesDe(p)),
-  fotos: fotosDe(p),
-  archivosNuevos: [],
-  conModelos: modelosDe(p).length > 0,
-  modelos: modelosAlFormulario(p),
-  category: p.categoria ?? p.category ?? "",
-  description: p.descripcion ?? p.description ?? "",
-  image: p.fotoUrl ?? p.image ?? "",
-  videoUrl: p.videoUrl ?? "",
-  marca: p.marca ?? "",
-  subcategoria: p.subcategoria ?? "",
-  duracion: p.duracion ?? "",
-});
+export const aFormulario = (p) => {
+  /*
+    El precio unitario sale del mapa, igual que las opcionales. Leerlo de
+    `precioUnitario` dejaba el campo vacio en todo producto migrado, y guardar
+    desde ahi escribia Number("") en la presentacion unitaria: el producto
+    perdia el precio en silencio, justo al tocarlo desde el panel.
+  */
+  const pres = presentacionesDe(p);
+
+  return {
+    ...p,
+    // Se guarda el original para poder detectar el cambio al guardar.
+    codigoOriginal: p.codigo,
+    name: p.nombre ?? p.name ?? "",
+    price: pres.unitario?.precio ?? "",
+    presentaciones: presentacionesAlFormulario(pres),
+    fotos: fotosDe(p),
+    archivosNuevos: [],
+    conModelos: modelosDe(p).length > 0,
+    modelos: modelosAlFormulario(p),
+    category: p.categoria ?? p.category ?? "",
+    description: p.descripcion ?? p.description ?? "",
+    image: p.fotoUrl ?? p.image ?? "",
+    videoUrl: p.videoUrl ?? "",
+    marca: p.marca ?? "",
+    subcategoria: p.subcategoria ?? "",
+    duracion: p.duracion ?? "",
+  };
+};
 
 // ---------------------------------------------------------------------------
 // Del formulario a Firestore
@@ -176,26 +193,21 @@ const modelosDeFormulario = (form) => {
  * @param {object} form el formulario, con las fotos ya resueltas a urls
  */
 export const aFirestore = (form) => {
-  const presentaciones = presentacionesDeFormulario(
-    form.presentaciones,
-    Number(form.price),
-  );
   const modelos = form.conModelos ? modelosDeFormulario(form) : [];
-  const conModelos = modelos.length > 0;
 
   return {
     nombre: form.name,
-    presentaciones,
-    modelos,
     /*
-      Con modelos el precio del producto no significa nada: el precio vive en
-      cada modelo. Van en null para que ningún lector del esquema viejo
-      muestre un precio que no existe.
+      Un solo esquema de precios. El panel escribia ademas los cuatro campos
+      sueltos (price, precioUnitario, precioDisplay, precioBulto), y con la
+      migracion corrida eso la revertia de a un producto por vez, en silencio
+      y justo sobre los que mas se tocan desde el panel.
     */
-    price: conModelos ? null : Number(form.price),
-    precioUnitario: conModelos ? null : Number(form.price),
-    precioDisplay: conModelos ? null : (presentaciones.display?.precio ?? null),
-    precioBulto: conModelos ? null : (presentaciones.bulto?.precio ?? null),
+    presentaciones:
+      modelos.length > 0
+        ? SIN_PRECIO
+        : presentacionesDeFormulario(form.presentaciones, Number(form.price)),
+    modelos,
     categoria: form.category,
     descripcion: form.description ?? "",
     marca: textoOpcional(form.marca),

@@ -1,4 +1,5 @@
 import { db } from "./firebaseAdmin.mjs";
+import { presentacionesDe } from "../src/constants/unidades.js";
 
 /*
   Solo lee. Busca "familias": productos cuyo nombre es el mismo salvo una
@@ -50,11 +51,17 @@ snap.forEach((doc) => {
 
   const clave = raiz(nombre);
   if (!familias.has(clave)) familias.set(clave, []);
+  /*
+    Lee las presentaciones y no los campos sueltos, que ya no existen: con la
+    migracion corrida, leerlos reportaba todo el catalogo sin display ni
+    bulto. Un analisis que miente es peor que no tenerlo.
+  */
+  const pres = presentacionesDe(d);
   familias.get(clave).push({
     nombre,
-    precio: d.precioUnitario ?? d.price,
-    display: d.precioDisplay ?? null,
-    bulto: d.precioBulto ?? null,
+    precio: pres.unitario?.precio ?? null,
+    display: pres.display?.precio ?? null,
+    bulto: pres.bulto?.precio ?? null,
   });
 });
 
@@ -78,15 +85,18 @@ for (const [clave, miembros] of conVarios.slice(0, 12)) {
       m.bulto ? "bulto" : null,
     ].filter(Boolean);
     console.log(
-      `        ${m.nombre}  ->  ${m.precio}${extras.length ? ` (+${extras.join(", ")})` : ""}`
+      `        ${m.nombre}  ->  ${m.precio}${extras.length ? ` (+${extras.join(", ")})` : ""}`,
     );
   });
-  if (miembros.length > 4) console.log(`        ... y ${miembros.length - 4} mas`);
+  if (miembros.length > 4)
+    console.log(`        ... y ${miembros.length - 4} mas`);
 }
 
 // Nombres exactamente repetidos: son duplicados de carga, no modelos.
 const repetidos = [...porNombre.entries()].filter(([, n]) => n > 1);
-console.log(`\nNombres EXACTAMENTE repetidos (duplicados de carga): ${repetidos.length}`);
+console.log(
+  `\nNombres EXACTAMENTE repetidos (duplicados de carga): ${repetidos.length}`,
+);
 repetidos.slice(0, 10).forEach(([n, c]) => console.log(`  ${c}x  ${n}`));
 
 // Cuantos usan hoy display y bulto.
@@ -94,8 +104,9 @@ let conDisplay = 0;
 let conBulto = 0;
 snap.forEach((doc) => {
   const d = doc.data();
-  if (typeof d.precioDisplay === "number" && d.precioDisplay > 0) conDisplay++;
-  if (typeof d.precioBulto === "number" && d.precioBulto > 0) conBulto++;
+  const pres = presentacionesDe(d);
+  if (pres.display) conDisplay++;
+  if (pres.bulto) conBulto++;
 });
 console.log(`\nCon precio de display cargado: ${conDisplay} de ${snap.size}`);
 console.log(`Con precio de bulto cargado:   ${conBulto} de ${snap.size}`);

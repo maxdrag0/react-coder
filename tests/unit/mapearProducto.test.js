@@ -55,13 +55,6 @@ describe("aFirestore: borrar una presentación", () => {
     expect(datos.presentaciones.bulto).toBeNull();
   });
 
-  it("deja el campo viejo en null también", () => {
-    const sinBulto = form({
-      presentaciones: { bulto: { activa: false, precio: "", unidades: "" } },
-    });
-    expect(aFirestore(sinBulto).precioBulto).toBeNull();
-  });
-
   it("una presentación tildada pero sin precio cuenta como no vendida", () => {
     const vacia = form({
       presentaciones: { display: { activa: true, precio: "", unidades: "" } },
@@ -84,13 +77,8 @@ describe("aFirestore: lo que sí se guarda", () => {
     });
   });
 
-  it("escribe el nombre canonico y los precios del esquema viejo", () => {
-    // Los precios sueltos siguen: son otro par legado, de antes de las
-    // presentaciones, y todavia no se migraron.
-    const datos = aFirestore(conDisplayYBulto);
-    expect(datos.nombre).toBe("Torta 100 tiros");
-    expect(datos.precioUnitario).toBe(8000);
-    expect(datos.precioDisplay).toBe(15000);
+  it("escribe el nombre canonico", () => {
+    expect(aFirestore(conDisplayYBulto).nombre).toBe("Torta 100 tiros");
   });
 
   it("la cantidad vacía queda en null, no en cero", () => {
@@ -155,11 +143,18 @@ describe("aFirestore: modelos", () => {
     expect(aFirestore(sucio).modelos.map((m) => m.etiqueta)).toEqual(["Verde"]);
   });
 
-  it("con modelos, los precios del producto van en null", () => {
+  it("con modelos, el producto no tiene precio propio", () => {
+    /*
+      El precio vive en cada modelo. Las tres claves viajan EXPLICITAMENTE
+      en null: en null para que nadie muestre un precio que no se puede
+      comprar, y explicitas por el merge profundo de Firestore.
+    */
     const datos = aFirestore(conModelos);
-    expect(datos.precioUnitario).toBeNull();
-    expect(datos.precioDisplay).toBeNull();
-    expect(datos.price).toBeNull();
+    expect(datos.presentaciones).toEqual({
+      unitario: null,
+      display: null,
+      bulto: null,
+    });
   });
 
   it("destildar 'por modelo' vacía la lista, no la deja escondida", () => {
@@ -349,5 +344,79 @@ describe("aFirestore: un solo idioma", () => {
     expect(g.categoria).toBe("Tortas");
     expect(g.descripcion).toBe("Cien tiros");
     expect(g.fotoUrl).toBe("https://x/f.jpg");
+  });
+});
+
+describe("aFormulario: el precio unitario sale de las presentaciones", () => {
+  /*
+    Leerlo de `precioUnitario` dejaba el campo vacio en todo producto migrado,
+    y guardar desde ahi escribia Number("") en la presentacion unitaria: el
+    producto perdia el precio en silencio, justo al tocarlo desde el panel.
+  */
+  it("lo lee del mapa de presentaciones", () => {
+    const migrado = {
+      codigo: "D1",
+      nombre: "Torta 100 tiros",
+      presentaciones: { unitario: { precio: 8000 } },
+    };
+    expect(aFormulario(migrado).price).toBe(8000);
+  });
+
+  it("abrir y guardar un producto migrado no le toca los precios", () => {
+    const migrado = {
+      codigo: "D1",
+      nombre: "Torta 100 tiros",
+      categoria: "Tortas",
+      presentaciones: {
+        unitario: { precio: 8000 },
+        display: { precio: 15000, unidades: 5 },
+      },
+    };
+    const datos = aFirestore(aFormulario(migrado));
+    expect(datos.presentaciones.unitario).toEqual({ precio: 8000 });
+    expect(datos.presentaciones.display).toEqual({
+      precio: 15000,
+      unidades: 5,
+    });
+  });
+
+  it("un producto con modelos no muestra precio de producto", () => {
+    const deModelos = {
+      codigo: "D2",
+      nombre: "Mortero",
+      modelos: [
+        {
+          id: "3",
+          etiqueta: "3 pulgadas",
+          presentaciones: { unitario: { precio: 7690 } },
+        },
+      ],
+    };
+    expect(aFormulario(deModelos).price).toBe("");
+  });
+});
+
+describe("aFirestore: un solo esquema de precios", () => {
+  /*
+    El panel escribia los cuatro campos sueltos ADEMAS de las presentaciones.
+    Con la migracion corrida eso la revierte de a un producto por vez, en
+    silencio y justo sobre los que mas se tocan desde el panel.
+  */
+  const guardado = () => aFirestore(conDisplayYBulto);
+
+  it("no escribe price", () => {
+    expect("price" in guardado()).toBe(false);
+  });
+
+  it("no escribe precioUnitario", () => {
+    expect("precioUnitario" in guardado()).toBe(false);
+  });
+
+  it("no escribe precioDisplay", () => {
+    expect("precioDisplay" in guardado()).toBe(false);
+  });
+
+  it("no escribe precioBulto", () => {
+    expect("precioBulto" in guardado()).toBe(false);
   });
 });

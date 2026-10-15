@@ -44,3 +44,7 @@ serviceAccount.json
 # instrucciones de consola y de infraestructura, no documentacion del codigo.
 # Viven solo en la maquina de desarrollo.
 docs/
+
+# Pendientes operativos: misma razon que docs/. Instrucciones de consola
+# para una sola persona, no documentacion del codigo.
+PENDIENTES.md

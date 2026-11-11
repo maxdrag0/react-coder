@@ -48,3 +48,12 @@ docs/
 # Pendientes operativos: misma razon que docs/. Instrucciones de consola
 # para una sola persona, no documentacion del codigo.
 PENDIENTES.md
+
+# Seleccion del tablero de la lista de precios: archivo de trabajo con
+# precios de proveedor. Lo genero yo y lo consume npm run aplicar-lista.
+seleccion.json
+
+# Listas de precios del proveedor. Son precios de costo y no son mios para
+# publicarlos: no van a un repo, ni aunque sea privado.
+LISTA DE PRECIOS*.pdf
+*.pdf

@@ -22,6 +22,8 @@
     "aplicar-lista": "node scripts/aplicar-lista.mjs",
     "separar-bengalas": "node scripts/separar-bengalas.mjs",
     "activar-ocultos": "node scripts/activar-ocultos.mjs",
+    "rules": "firebase deploy --only firestore:rules",
+    "rules:storage": "firebase deploy --only storage:rules",
     "diagnostico": "node scripts/diagnostico-tienda.mjs"
   },
   "dependencies": {

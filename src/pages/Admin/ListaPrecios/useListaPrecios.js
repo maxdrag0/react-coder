@@ -97,7 +97,11 @@ export const useListaPrecios = (publicados, { alTerminar } = {}) => {
 
   const publicadosPorId = useMemo(() => {
     const mapa = new Map();
-    for (const doc of publicados ?? []) mapa.set(doc.codigo ?? doc._id, doc);
+    // Por el ID DEL DOCUMENTO, no por el campo `codigo`: "2302/AR" vive en
+    // el documento "2302-AR" porque la barra no es valida en un id.
+    for (const doc of publicados ?? []) {
+      mapa.set(idDeCodigo(doc.codigo ?? doc._id), doc);
+    }
     return mapa;
   }, [publicados]);
 

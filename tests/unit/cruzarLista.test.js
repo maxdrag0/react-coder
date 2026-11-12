@@ -141,6 +141,35 @@ describe("cruzarConCatalogo: encontrar lo que ya existe", () => {
     expect(filas[1].web.id).toBe("237,1");
   });
 
+  it("el id del documento manda, aunque el campo código tenga barra", () => {
+    /*
+      La barra no es válida en un id de documento, así que "2302/AR" vive en
+      el documento "2302-AR" y el campo `codigo` conserva la barra. Cuatro
+      productos están así.
+
+      Si la ficha se quedara con la barra, la acción se calcularía contra un
+      id que no existe y diría "crear": se escribiría un documento nuevo
+      encima del que ya estaba, sin sus fotos, su descripción ni su contador
+      de ventas.
+    */
+    /*
+      Así es como llega de verdad: obtenerProductos arma
+      `{codigo: doc.id, ...doc.data()}`, y el `codigo` de los datos pisa al
+      id del documento. O sea que el objeto trae la barra y no trae el id.
+    */
+    const comoLlegaAlPanel = {
+      codigo: "2302/AR",
+      nombre: "Torta Artemisa",
+      presentaciones: { unitario: { precio: 13900 } },
+    };
+
+    const { filas } = cruzarConCatalogo(
+      [deLaLista({ codigo: "2302/AR", nombre: "TORTA ARTEMISA 16 T" })],
+      [comoLlegaAlPanel],
+    );
+    expect(filas[0].web.id).toBe("2302-AR");
+  });
+
   it("no inventa cruces con nombres cortos", () => {
     const { filas } = cruzarConCatalogo(
       [deLaLista({ codigo: "Z", nombre: "CAÑA ROJA" })],
@@ -231,6 +260,21 @@ describe("accionDe", () => {
         publicadosPorId,
       ),
     ).toBe("renombrar");
+  });
+
+  it("un código con barra actualiza el documento con guion", () => {
+    /*
+      El panel entrega el producto con `codigo: "2302/AR"` y el documento se
+      llama "2302-AR". Buscando por el código crudo no lo encuentra y dice
+      "crear": escribiría un documento nuevo encima del que ya estaba,
+      perdiéndole las fotos y la descripción. La comparación va siempre
+      contra el id del documento.
+    */
+    const conBarra = new Map([["2302-AR", { id: "2302-AR" }]]);
+    const fila = { web: { id: "2302-AR" } };
+    expect(
+      accionDe(fila, { ...nada, unidad: true, codigo: "2302/AR" }, conBarra),
+    ).toBe("actualizar");
   });
 
   it("escribirle el código de uno que existe lo convierte en actualización", () => {

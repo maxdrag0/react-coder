@@ -70,7 +70,18 @@ export const presentacionesVivas = (doc) => {
 };
 
 const fichaDe = (doc) => ({
-  id: doc._id ?? doc.codigo,
+  /*
+    SIEMPRE el id del documento, que es lo unico que sirve para leerlo y
+    escribirlo. El campo `codigo` no alcanza: la barra no es valida en un id,
+    asi que "2302/AR" vive en el documento "2302-AR" y el campo conserva la
+    barra. Y obtenerProductos arma `{codigo: doc.id, ...doc.data()}`, donde
+    el codigo de los datos pisa al id.
+
+    Tomando el codigo crudo, la accion se calculaba contra un id que no
+    existe y daba "crear": se escribia un documento nuevo encima del que ya
+    estaba, sin sus fotos, su descripcion ni su contador de ventas.
+  */
+  id: idDeCodigo(doc._id ?? doc.codigo),
   nombre: doc.nombre ?? doc.name ?? "",
   categoria: doc.categoria ?? doc.category ?? null,
   marca: doc.marca ?? null,

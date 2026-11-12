@@ -4,7 +4,7 @@ import {
   aActualizacion,
   modelosActualizados,
   planDeAplicacion,
-} from "../../scripts/desdeLista.mjs";
+} from "@/constants/desdeLista";
 
 /*
   El tablero de la lista de precios decide qué productos subir; esto traduce

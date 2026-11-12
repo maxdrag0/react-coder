@@ -1,0 +1,474 @@
+/* --- pantalla inicial, antes de elegir el archivo --- */
+
+.lp-vacio {
+  max-width: 44rem;
+  margin: var(--e-6) auto;
+  padding: var(--e-6);
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--linea);
+  border-radius: var(--r-card);
+}
+
+.lp-vacio h3 {
+  margin: 0 0 var(--e-3);
+}
+
+.lp-vacio p {
+  margin: 0 auto var(--e-5);
+  max-width: 34rem;
+  color: var(--text-suave);
+  line-height: 1.6;
+}
+
+.lp-subir {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  cursor: pointer;
+}
+
+.lp-nota {
+  margin: var(--e-4) 0 0;
+  font-size: var(--t-sm);
+  color: var(--text-suave);
+}
+
+.lp-error {
+  margin: var(--e-4) 0 0;
+  color: var(--peligro, #e07a5f);
+}
+
+/* --- barra --- */
+
+.lp-barra {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+  padding: var(--e-4) 0;
+  background: var(--bg);
+  border-bottom: 1px solid var(--linea);
+}
+
+.lp-barra-alto {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--e-4);
+  flex-wrap: wrap;
+}
+
+.lp-barra-alto h3 {
+  margin: 0;
+}
+
+.lp-barra-alto p {
+  margin: 0;
+  font-size: var(--t-sm);
+  color: var(--text-suave);
+}
+
+.lp-marcador {
+  display: flex;
+  border: 1px solid var(--linea);
+  border-radius: var(--r-card);
+  overflow: hidden;
+  background: var(--surface-alto);
+}
+
+.lp-marcador div {
+  display: flex;
+  flex-direction: column;
+  padding: var(--e-2) var(--e-4);
+  min-width: 5rem;
+}
+
+.lp-marcador div + div {
+  border-left: 1px solid var(--linea);
+}
+
+.lp-marcador b {
+  font-size: var(--t-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+.lp-marcador span {
+  font-size: var(--t-xs);
+  color: var(--text-suave);
+}
+
+.lp-controles {
+  display: flex;
+  gap: var(--e-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.lp-controles input[type="search"] {
+  flex: 1 1 14rem;
+  min-width: 9rem;
+  padding: var(--e-2) var(--e-3);
+  color: var(--text);
+  background: var(--surface-alto);
+  border: 1px solid var(--linea);
+  border-radius: var(--r-input, 6px);
+}
+
+.lp-chip {
+  font: inherit;
+  font-size: var(--t-sm);
+  color: var(--text-suave);
+  background: none;
+  border: 1px solid var(--linea);
+  border-radius: var(--r-pill);
+  padding: 2px var(--e-3);
+  cursor: pointer;
+}
+
+.lp-chip[aria-pressed="true"] {
+  background: var(--accion);
+  border-color: var(--accion);
+  color: var(--sobre-accion);
+  font-weight: 600;
+}
+
+.lp-activos {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+  font-size: var(--t-sm);
+  color: var(--text-suave);
+}
+
+/* --- avisos --- */
+
+.lp-aviso {
+  margin: var(--e-3) 0 0;
+  padding: var(--e-3) var(--e-4);
+  font-size: var(--t-sm);
+  line-height: 1.5;
+  color: var(--text-suave);
+  background: var(--surface);
+  border: 1px solid var(--linea);
+  border-left: 3px solid var(--accion);
+  border-radius: var(--r-card);
+}
+
+.lp-aviso strong {
+  color: var(--text);
+}
+
+.lp-aviso-malo {
+  border-left-color: var(--peligro, #e07a5f);
+}
+
+.lp-aviso-bien {
+  border-left-color: var(--exito, #4fb286);
+}
+
+/* --- filas --- */
+
+.lp-filas {
+  margin-top: var(--e-4);
+  background: var(--surface);
+  border: 1px solid var(--linea);
+  border-radius: var(--r-card);
+  overflow: hidden;
+}
+
+.lp-fila {
+  display: grid;
+  grid-template-columns: 1.5rem 6rem minmax(0, 1fr) auto;
+  grid-template-areas:
+    "chk cod nom pre"
+    "chk cod met pre"
+    "chk cod web pre";
+  gap: 2px var(--e-3);
+  align-items: center;
+  padding: var(--e-3);
+  border-bottom: 1px solid var(--linea);
+  border-left: 3px solid transparent;
+}
+
+.lp-fila:last-child {
+  border-bottom: none;
+}
+
+.lp-fila[data-elegida="si"] {
+  border-left-color: var(--accion);
+  background: color-mix(in srgb, var(--accion) 7%, transparent);
+}
+
+.lp-fila[data-atencion="si"] {
+  background: color-mix(in srgb, var(--peligro, #e07a5f) 8%, transparent);
+}
+
+.lp-check {
+  grid-area: chk;
+  justify-self: center;
+}
+
+.lp-check input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--accion);
+  cursor: pointer;
+}
+
+.lp-campo-codigo {
+  grid-area: cod;
+}
+
+.lp-campo-nombre {
+  grid-area: nom;
+  font-weight: 500;
+}
+
+.lp-meta {
+  grid-area: met;
+  display: flex;
+  gap: var(--e-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.lp-web {
+  grid-area: web;
+}
+
+.lp-precios {
+  grid-area: pre;
+  display: grid;
+  grid-template-columns: repeat(3, 7rem);
+  gap: var(--e-2);
+}
+
+/* Campos editables: texto hasta que los tocás. */
+.lp-campo {
+  width: 100%;
+  min-width: 0;
+  font: inherit;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  padding: 2px var(--e-2);
+}
+
+.lp-campo:hover {
+  border-color: var(--linea);
+}
+
+.lp-campo:focus {
+  border-color: var(--accion);
+  background: var(--surface-alto);
+  outline: none;
+}
+
+.lp-campo-codigo,
+.lp-campo-marca {
+  font-size: var(--t-sm);
+  color: var(--text-suave);
+  font-variant-numeric: tabular-nums;
+}
+
+.lp-campo-marca {
+  width: 9rem;
+  flex: none;
+}
+
+.lp-meta select {
+  width: auto;
+  font-size: var(--t-xs);
+  color: var(--text-suave);
+}
+
+.lp-dato {
+  font-size: var(--t-xs);
+  color: var(--text-tenue, var(--text-suave));
+}
+
+/* --- acción, el dato más importante de la fila --- */
+
+.lp-accion {
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 1px var(--e-2);
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.lp-accion-nada {
+  background: var(--surface-alto);
+  color: var(--text-suave);
+}
+
+.lp-accion-crear {
+  background: var(--exito, #4fb286);
+  color: var(--surface);
+}
+
+.lp-accion-actualizar {
+  background: var(--accion);
+  color: var(--sobre-accion);
+}
+
+.lp-accion-renombrar {
+  background: var(--gold, #e6b32e);
+  color: #1a1403;
+}
+
+.lp-accion-borrar {
+  background: var(--peligro, #e07a5f);
+  color: var(--surface);
+}
+
+/* --- sellos --- */
+
+.lp-sello {
+  font-size: var(--t-xs);
+  font-weight: 600;
+  padding: 1px var(--e-2);
+  border-radius: var(--r-pill);
+  border: 1px solid currentColor;
+  white-space: nowrap;
+}
+
+.lp-sello-repe {
+  color: var(--gold, #e6b32e);
+}
+
+.lp-sello-aviso {
+  color: var(--peligro, #e07a5f);
+}
+
+.lp-borrar {
+  font: inherit;
+  font-size: var(--t-xs);
+  color: var(--text-suave);
+  background: none;
+  border: 1px solid var(--linea);
+  border-radius: 3px;
+  padding: 1px var(--e-2);
+  cursor: pointer;
+}
+
+.lp-borrar:hover {
+  border-color: var(--peligro, #e07a5f);
+  color: var(--peligro, #e07a5f);
+}
+
+.lp-borrar[aria-pressed="true"] {
+  background: var(--peligro, #e07a5f);
+  border-color: var(--peligro, #e07a5f);
+  color: var(--surface);
+  font-weight: 600;
+}
+
+/* --- la comparación con lo publicado --- */
+
+.lp-web {
+  display: flex;
+  gap: 2px var(--e-3);
+  align-items: baseline;
+  flex-wrap: wrap;
+  padding: 2px var(--e-2);
+  font-size: var(--t-xs);
+  color: var(--text-suave);
+  background: var(--surface-alto);
+  border-left: 2px solid var(--accion);
+  border-radius: 3px;
+}
+
+.lp-web-rotulo {
+  font-weight: 600;
+  color: var(--accion);
+}
+
+.lp-web-nombre,
+.lp-web-lista {
+  font-style: italic;
+}
+
+.lp-delta {
+  font-variant-numeric: tabular-nums;
+}
+
+.lp-delta b {
+  color: var(--gold, #e6b32e);
+}
+
+/* --- precios --- */
+
+.lp-precio {
+  font: inherit;
+  display: grid;
+  text-align: right;
+  padding: var(--e-2);
+  color: var(--text);
+  background: var(--surface-alto);
+  border: 1px solid var(--linea);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.lp-precio:hover:not(:disabled) {
+  border-color: var(--accion);
+}
+
+.lp-precio[aria-pressed="true"] {
+  background: var(--accion);
+  border-color: var(--accion);
+  color: var(--sobre-accion);
+}
+
+.lp-precio:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.lp-precio-rotulo {
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  opacity: 0.75;
+}
+
+.lp-precio-monto {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.lp-precio-cant {
+  font-size: 0.65rem;
+  opacity: 0.75;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 760px) {
+  .lp-fila {
+    grid-template-columns: 1.5rem minmax(0, 1fr);
+    grid-template-areas:
+      "chk cod"
+      "chk nom"
+      "chk met"
+      "web web"
+      "pre pre";
+    align-items: start;
+  }
+
+  .lp-precios {
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: var(--e-2);
+  }
+
+  .lp-campo-marca {
+    width: auto;
+    flex: 1 1 7rem;
+  }
+}

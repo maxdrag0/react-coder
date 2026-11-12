@@ -6,7 +6,7 @@ import {
   aActualizacion,
   modelosActualizados,
   planDeAplicacion,
-} from "./desdeLista.mjs";
+} from "../src/constants/desdeLista.js";
 
 /*
   Crea, actualiza, renombra y borra productos según la selección del tablero

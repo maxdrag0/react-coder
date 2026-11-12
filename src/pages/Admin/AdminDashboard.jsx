@@ -33,6 +33,7 @@ import TablaProductos from "./TablaProductos";
 import TablaPedidos from "./TablaPedidos";
 import TablaMensajes from "./TablaMensajes";
 import RecargoEditor from "./RecargoEditor";
+import ListaPreciosPanel from "./ListaPrecios/ListaPreciosPanel";
 import BarraSeleccion from "./BarraSeleccion";
 import FiltrosPedidos from "./FiltrosPedidos";
 import Confirmar from "../../components/common/Confirmar/Confirmar";
@@ -54,6 +55,7 @@ const PESTANAS = [
   { clave: "pedidos", etiqueta: "Pedidos" },
   { clave: "mensajes", etiqueta: "Mensajes" },
   { clave: "precios", etiqueta: "Precios" },
+  { clave: "lista", etiqueta: "Subir lista" },
 ];
 
 const AdminDashboard = () => {
@@ -612,6 +614,18 @@ const AdminDashboard = () => {
       )}
 
       {pestana === "precios" && <RecargoEditor />}
+
+      {pestana === "lista" && (
+        <ListaPreciosPanel
+          productos={productos}
+          onAplicado={() => {
+            // El catalogo de la tienda queda cacheado media hora: sin esto,
+            // los precios nuevos no se verian hasta que venza.
+            invalidarCatalogo();
+            cargar();
+          }}
+        />
+      )}
 
       <Confirmar
         abierto={Boolean(confirmacion.pedido)}

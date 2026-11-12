@@ -1,5 +1,5 @@
-import { ACTIVO, OCULTO } from "../src/constants/estadoProducto.js";
-import { idLibre } from "../src/constants/modelos.js";
+import { ACTIVO, OCULTO } from "./estadoProducto.js";
+import { idLibre } from "./modelos.js";
 
 /*
   Traduce la selección del tablero de la lista de precios a documentos de

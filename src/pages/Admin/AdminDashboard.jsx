@@ -32,6 +32,7 @@ import ProductoModal from "./ProductoModal";
 import TablaProductos from "./TablaProductos";
 import TablaPedidos from "./TablaPedidos";
 import TablaMensajes from "./TablaMensajes";
+import RecargoEditor from "./RecargoEditor";
 import BarraSeleccion from "./BarraSeleccion";
 import FiltrosPedidos from "./FiltrosPedidos";
 import Confirmar from "../../components/common/Confirmar/Confirmar";
@@ -52,6 +53,7 @@ const PESTANAS = [
   { clave: "productos", etiqueta: "Productos" },
   { clave: "pedidos", etiqueta: "Pedidos" },
   { clave: "mensajes", etiqueta: "Mensajes" },
+  { clave: "precios", etiqueta: "Precios" },
 ];
 
 const AdminDashboard = () => {
@@ -608,6 +610,8 @@ const AdminDashboard = () => {
           />
         </div>
       )}
+
+      {pestana === "precios" && <RecargoEditor />}
 
       <Confirmar
         abierto={Boolean(confirmacion.pedido)}

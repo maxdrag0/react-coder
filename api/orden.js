@@ -3,6 +3,11 @@ import { auth, db } from "./_lib/firebaseAdmin.js";
 import { validarCuerpo } from "./_lib/validarCuerpo.js";
 import { validarOrden } from "./_lib/validarOrden.js";
 import { errorDeTelefono, soloDigitos } from "../src/utils/telefono.js";
+import {
+  SIN_RECARGO,
+  conRecargo,
+  recargoValido,
+} from "../src/constants/recargo.js";
 
 /*
   Crea una orden.
@@ -97,11 +102,30 @@ export default async function handler(req, res) {
     */
     const codigos = [...new Set(items.map((i) => i.codigo))];
     const refs = codigos.map((c) => db.collection("products").doc(c));
-    const docs = await db.getAll(...refs);
+    /*
+      El recargo se lee aparte y no adentro del getAll: ese getAll recibe una
+      referencia por producto y hay un test que lo cuida, porque dos refs
+      iguales serian dos lecturas cobradas por el mismo documento.
+
+      El servidor TIENE que aplicar el mismo recargo que la tienda: si
+      cotizara los precios de lista mientras el cliente ve los de venta,
+      todos los pedidos volverian con 409 y nadie podria comprar. Por eso si
+      esta lectura falla, falla el pedido: cobrar el precio equivocado es
+      peor que pedirle a la persona que lo mande de nuevo.
+    */
+    const [docs, config] = await Promise.all([
+      db.getAll(...refs),
+      db.collection("config").doc("precios").get(),
+    ]);
+    const recargo = config?.exists
+      ? recargoValido(config.data()?.recargo)
+      : SIN_RECARGO;
 
     const porCodigo = new Map();
     for (const d of docs) {
-      if (d.exists) porCodigo.set(d.id, { codigo: d.id, ...d.data() });
+      if (d.exists) {
+        porCodigo.set(d.id, conRecargo({ codigo: d.id, ...d.data() }, recargo));
+      }
     }
 
     // 5. Validacion y cotizacion.

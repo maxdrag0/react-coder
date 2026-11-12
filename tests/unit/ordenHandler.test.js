@@ -4,6 +4,7 @@ const verifyIdToken = vi.fn();
 const getAll = vi.fn();
 const set = vi.fn();
 const getPerfil = vi.fn();
+const getConfig = vi.fn();
 const update = vi.fn();
 const commit = vi.fn();
 
@@ -19,11 +20,14 @@ vi.mock("../../api/_lib/firebaseAdmin.js", () => ({
       update: (...a) => update(...a),
       commit: (...a) => commit(...a),
     }),
-    collection: () => ({
+    // La coleccion importa: config/precios y users/<uid> son dos lecturas
+    // distintas y el handler hace las dos.
+    collection: (nombre) => ({
       doc: (id) => ({
         id,
         set: (...a) => set(...a),
-        get: (...a) => getPerfil(...a),
+        get: (...a) =>
+          nombre === "config" ? getConfig(...a) : getPerfil(...a),
       }),
     }),
   },
@@ -84,6 +88,58 @@ beforeEach(() => {
   getPerfil.mockReset().mockResolvedValue({
     exists: true,
     data: () => ({ telefono: "1123456789" }),
+  });
+  // Sin documento de configuracion el recargo es cero: la tienda muestra el
+  // precio de lista. Es el estado antes de que nadie toque el panel.
+  getConfig.mockReset().mockResolvedValue({ exists: false });
+});
+
+describe("api/orden: el recargo", () => {
+  /*
+    La tienda muestra el precio de lista mas un recargo, y el servidor cotiza
+    con el MISMO. Si cotizara sin el, todos los pedidos volverian con 409
+    "tu carrito esta desactualizado" y la tienda no podria vender.
+  */
+  it("cotiza con el recargo guardado", async () => {
+    getConfig.mockResolvedValue({
+      exists: true,
+      data: () => ({ recargo: 100 }),
+    });
+    const res = respuesta();
+    await handler(
+      pedido({
+        items: [
+          {
+            codigo: "A12",
+            unidad: "unitario",
+            modelo: null,
+            cantidad: 1,
+            precioVisto: 16000,
+          },
+        ],
+      }),
+      res,
+    );
+    expect(res.codigo).toBe(201);
+    expect(res.cuerpo.total).toBe(16000);
+  });
+
+  it("rechaza el carrito que trae el precio de lista sin recargo", async () => {
+    getConfig.mockResolvedValue({
+      exists: true,
+      data: () => ({ recargo: 100 }),
+    });
+    const res = respuesta();
+    await handler(pedido(), res);
+    expect(res.codigo).toBe(409);
+    expect(set).not.toHaveBeenCalled();
+  });
+
+  it("sin configuracion cotiza el precio de lista", async () => {
+    const res = respuesta();
+    await handler(pedido(), res);
+    expect(res.codigo).toBe(201);
+    expect(res.cuerpo.total).toBe(8000);
   });
 });
 

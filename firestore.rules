@@ -12,6 +12,20 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    /*
+      Configuracion de la tienda: hoy, el recargo que se le suma a los precios
+      de lista. Lectura PUBLICA porque la tienda tiene que mostrar el precio
+      antes de que nadie inicie sesion, y ademas api/orden.js lo lee para
+      cotizar: si el servidor no pudiera leerlo cotizaria distinto de lo que
+      ve el cliente y ningun pedido pasaria.
+
+      No hay nada secreto aca: el precio con recargo ya esta a la vista.
+    */
+    match /config/{id} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
     // Promociones: mismo criterio que el catalogo.
     match /promociones/{id} {
       allow read:  if true;

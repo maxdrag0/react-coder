@@ -1,0 +1,114 @@
+.recargo {
+  display: grid;
+  gap: var(--e-5);
+  max-width: 40rem;
+  padding: var(--e-5);
+  background: var(--surface);
+  border: 1px solid var(--linea);
+  border-radius: var(--r-card);
+}
+
+.recargo-cargando {
+  padding: var(--e-5);
+  color: var(--text-suave);
+}
+
+.recargo-campo label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: var(--e-2);
+}
+
+.recargo-entrada {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+}
+
+/* Ancho fijo: es un número de hasta cuatro dígitos, no un campo de texto. */
+.recargo-entrada input {
+  width: 7rem;
+  font-size: var(--t-lg);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  padding: var(--e-2) var(--e-3);
+  color: var(--text);
+  background: var(--surface-alto);
+  border: 1px solid var(--linea);
+  border-radius: var(--r-input, 6px);
+}
+
+.recargo-entrada input:focus-visible {
+  outline: 2px solid var(--accion);
+  outline-offset: 1px;
+}
+
+.recargo-entrada span {
+  font-size: var(--t-lg);
+  font-weight: 600;
+  color: var(--text-suave);
+}
+
+.recargo-ayuda {
+  margin: var(--e-2) 0 0;
+  font-size: var(--t-sm);
+  line-height: 1.5;
+  color: var(--text-suave);
+}
+
+.recargo-previa {
+  padding: var(--e-4);
+  background: var(--surface-alto);
+  border-radius: var(--r-card);
+}
+
+.recargo-previa h3 {
+  margin: 0 0 var(--e-3);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--text-suave);
+}
+
+.recargo-previa ul {
+  display: grid;
+  gap: var(--e-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recargo-previa li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--e-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.recargo-de {
+  color: var(--text-suave);
+  min-width: 6rem;
+}
+
+.recargo-previa strong {
+  color: var(--accion);
+  font-size: var(--t-md);
+}
+
+.recargo-acciones {
+  display: flex;
+  align-items: center;
+  gap: var(--e-3);
+  flex-wrap: wrap;
+}
+
+.recargo-estado {
+  font-size: var(--t-sm);
+}
+
+.recargo-estado-ok {
+  color: var(--exito, #4fb286);
+}
+
+.recargo-estado-error {
+  color: var(--peligro, #e07a5f);
+}

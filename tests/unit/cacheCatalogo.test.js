@@ -61,6 +61,28 @@ describe("cacheCatalogo", () => {
     expect(leerCatalogo("Tortas")).toBeNull();
   });
 
+  it("no guarda un catálogo vacío", () => {
+    /*
+      EL BUG QUE CUBRE: la consulta por categoría filtraba por un campo
+      borrado y devolvía cero productos. Eso se guardaba en el caché, así que
+      aun después de arreglar la consulta la categoría seguía viéndose vacía
+      media hora más, y una recarga no alcanzaba porque el caché vive en
+      sessionStorage.
+
+      Vacío nunca es una respuesta que valga la pena recordar: o es un error
+      que ya se arregló, o es una categoría sin nada, y volver a preguntar
+      cuesta una lectura.
+    */
+    guardarCatalogo("Tortas", []);
+    expect(leerCatalogo("Tortas")).toBeNull();
+  });
+
+  it("un vacío no pisa lo que ya había", () => {
+    guardarCatalogo("Tortas", PRODUCTOS);
+    guardarCatalogo("Tortas", []);
+    expect(leerCatalogo("Tortas")).toEqual(PRODUCTOS);
+  });
+
   it("ignora un caché corrupto en vez de romper", () => {
     sessionStorage.setItem("catalogo:__todas__", "no es json");
     expect(leerCatalogo(null)).toBeNull();

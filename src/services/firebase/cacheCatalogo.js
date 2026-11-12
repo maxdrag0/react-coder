@@ -43,6 +43,19 @@ export const leerCatalogo = (categoria) => {
 };
 
 export const guardarCatalogo = (categoria, items) => {
+  /*
+    Un catálogo vacío no se guarda. Vacío no es una respuesta que valga la
+    pena recordar: o es un error que se va a arreglar, o es una categoría sin
+    nada, y volver a preguntar cuesta una lectura.
+
+    El bug que esto evita ya pasó: la consulta por categoría filtraba por un
+    campo que la migración había borrado y devolvía cero productos. Eso
+    quedaba cacheado, así que después de arreglar la consulta la categoría se
+    seguía viendo vacía media hora, y recargar no alcanzaba porque el caché
+    vive en sessionStorage.
+  */
+  if (!Array.isArray(items) || items.length === 0) return;
+
   const clave = categoria ?? "__todas__";
   const entrada = { items, guardadoEn: ahora() };
 

@@ -29,9 +29,17 @@ export const obtenerProductos = async (
     const productsRef = collection(db, "products");
     let queryConstraints = [];
 
+    /*
+      `categoria`, no `category`. La unificacion de nombres borro el campo
+      en ingles de los documentos y esta consulta se quedo filtrando por el:
+      entrar a cualquier categoria devolvia CERO productos, y sin error a la
+      vista, porque una consulta contra un campo que no existe no falla,
+      devuelve vacio. Solo se salvaban las dos categorias de los productos
+      que todavia conservaban el campo viejo.
+    */
     if (categoria) {
       queryConstraints.push(
-        where("category", "in", [categoria, categoria.toUpperCase()]),
+        where("categoria", "in", [categoria, categoria.toUpperCase()]),
       );
     }
 

@@ -1,9 +1,24 @@
+/*
+  Esto es una planilla de triage de 291 filas: se escanea y se opera, no se
+  lee. La escala del sitio arranca en 16px para el cuerpo y 25px para un
+  numero destacado, que acá es demasiado: cada fila ocupaba media pantalla y
+  obligaba a scrollear para comparar dos productos.
+
+  El componente define su propia escala, mas chica y con tres tamaños nada
+  mas: la fila, los datos de apoyo y los rotulos.
+*/
+.lp {
+  --lp-fila: 0.8125rem; /* 13px: el nombre y los precios */
+  --lp-dato: 0.6875rem; /* 11px: marca, categoría, comparación */
+  --lp-rotulo: 0.625rem; /* 10px: sellos y rótulos */
+}
+
 /* --- pantalla inicial, antes de elegir el archivo --- */
 
 .lp-vacio {
-  max-width: 44rem;
-  margin: var(--e-6) auto;
-  padding: var(--e-6);
+  max-width: 42rem;
+  margin: var(--e-5) auto;
+  padding: var(--e-5);
   text-align: center;
   background: var(--surface);
   border: 1px solid var(--linea);
@@ -11,12 +26,14 @@
 }
 
 .lp-vacio h3 {
-  margin: 0 0 var(--e-3);
+  margin: 0 0 var(--e-2);
+  font-size: var(--t-base);
 }
 
 .lp-vacio p {
-  margin: 0 auto var(--e-5);
-  max-width: 34rem;
+  margin: 0 auto var(--e-4);
+  max-width: 32rem;
+  font-size: var(--t-sm);
   color: var(--text-suave);
   line-height: 1.6;
 }
@@ -29,30 +46,27 @@
 }
 
 .lp-nota {
-  margin: var(--e-4) 0 0;
-  font-size: var(--t-sm);
+  margin: var(--e-3) 0 0;
+  font-size: var(--lp-dato);
   color: var(--text-suave);
 }
 
 .lp-error {
-  margin: var(--e-4) 0 0;
+  margin: var(--e-3) 0 0;
+  font-size: var(--t-sm);
   color: var(--danger);
 }
 
 /* --- barra --- */
 
 /*
-  La barra se queda arriba mientras se recorren 291 filas, porque ahí viven
-  el buscador, los filtros y el botón de aplicar.
+  Se queda arriba mientras se recorren las 291 filas, porque ahí viven el
+  buscador, los filtros y el botón de aplicar.
 
-  Dos cosas que la rompían:
-
-  - El fondo salía de `var(--bg)`, que NO EXISTE en el sistema de tokens. Una
-    variable inventada no es un error: es `transparent`. La barra quedaba
-    traslúcida y las filas pasaban por abajo.
-
-  - Se pegaba en `top: 0`, el mismo lugar donde ya está pegado el NavBar, así
-    que se superponían. Arranca debajo.
+  Dos cosas que la rompían: el fondo salía de `var(--bg)`, un token que no
+  existe —y una variable inventada no da error, resuelve a nada, o sea
+  transparente—; y se pegaba en `top: 0`, el mismo lugar donde ya está pegado
+  el NavBar.
 */
 .lp-barra {
   position: sticky;
@@ -60,11 +74,11 @@
   z-index: 5;
   display: flex;
   flex-direction: column;
-  gap: var(--e-3);
-  /* Los costados compensan el padding del contenedor del panel, para que el
-     fondo llegue de borde a borde y no se vea una franja por los lados. */
+  gap: var(--e-2);
+  /* Compensa el padding del contenedor del panel, para que el fondo llegue
+     de borde a borde y no quede una franja por los lados. */
   margin-inline: calc(var(--e-4) * -1);
-  padding: var(--e-4);
+  padding: var(--e-3) var(--e-4);
   background: var(--ground);
   border-bottom: 1px solid var(--linea);
   box-shadow: var(--elev-1);
@@ -72,26 +86,28 @@
 
 .lp-barra-alto {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  gap: var(--e-4);
+  gap: var(--e-3);
   flex-wrap: wrap;
 }
 
 .lp-barra-alto h3 {
   margin: 0;
+  font-size: var(--t-sm);
+  font-weight: 600;
 }
 
 .lp-barra-alto p {
-  margin: 0;
-  font-size: var(--t-sm);
+  margin: 1px 0 0;
+  font-size: var(--lp-dato);
   color: var(--text-suave);
 }
 
 .lp-marcador {
   display: flex;
   border: 1px solid var(--linea);
-  border-radius: var(--r-card);
+  border-radius: var(--r-control);
   overflow: hidden;
   background: var(--surface-alto);
 }
@@ -99,8 +115,8 @@
 .lp-marcador div {
   display: flex;
   flex-direction: column;
-  padding: var(--e-2) var(--e-4);
-  min-width: 5rem;
+  padding: 2px var(--e-3);
+  min-width: 4.25rem;
 }
 
 .lp-marcador div + div {
@@ -108,12 +124,13 @@
 }
 
 .lp-marcador b {
-  font-size: var(--t-lg);
+  font-size: var(--t-base);
+  line-height: 1.2;
   font-variant-numeric: tabular-nums;
 }
 
 .lp-marcador span {
-  font-size: var(--t-xs);
+  font-size: var(--lp-rotulo);
   color: var(--text-suave);
 }
 
@@ -125,18 +142,26 @@
 }
 
 .lp-controles input[type="search"] {
-  flex: 1 1 14rem;
-  min-width: 9rem;
-  padding: var(--e-2) var(--e-3);
+  flex: 1 1 12rem;
+  min-width: 8rem;
+  font: inherit;
+  font-size: var(--t-sm);
+  padding: 3px var(--e-2);
   color: var(--text);
   background: var(--surface-alto);
   border: 1px solid var(--linea);
   border-radius: var(--r-control);
 }
 
+/* Los botones del sistema son de tamaño táctil; acá conviven con filtros. */
+.lp-controles .boton {
+  font-size: var(--t-sm);
+  padding: 4px var(--e-3);
+}
+
 .lp-chip {
   font: inherit;
-  font-size: var(--t-sm);
+  font-size: var(--lp-dato);
   color: var(--text-suave);
   background: none;
   border: 1px solid var(--linea);
@@ -155,23 +180,23 @@
 .lp-activos {
   display: flex;
   align-items: center;
-  gap: var(--e-2);
-  font-size: var(--t-sm);
+  gap: var(--e-1);
+  font-size: var(--lp-dato);
   color: var(--text-suave);
 }
 
 /* --- avisos --- */
 
 .lp-aviso {
-  margin: var(--e-3) 0 0;
-  padding: var(--e-3) var(--e-4);
-  font-size: var(--t-sm);
+  margin: var(--e-2) 0 0;
+  padding: var(--e-2) var(--e-3);
+  font-size: var(--lp-dato);
   line-height: 1.5;
   color: var(--text-suave);
   background: var(--surface);
   border: 1px solid var(--linea);
-  border-left: 3px solid var(--accion);
-  border-radius: var(--r-card);
+  border-left: 2px solid var(--accion);
+  border-radius: var(--r-control);
 }
 
 .lp-aviso strong {
@@ -189,25 +214,26 @@
 /* --- filas --- */
 
 .lp-filas {
-  margin-top: var(--e-4);
+  margin-top: var(--e-3);
   background: var(--surface);
   border: 1px solid var(--linea);
-  border-radius: var(--r-card);
+  border-radius: var(--r-control);
   overflow: hidden;
 }
 
 .lp-fila {
   display: grid;
-  grid-template-columns: 1.5rem 6rem minmax(0, 1fr) auto;
+  grid-template-columns: 1.25rem 4.5rem minmax(0, 1fr) auto;
   grid-template-areas:
     "chk cod nom pre"
     "chk cod met pre"
     "chk cod web pre";
-  gap: 2px var(--e-3);
+  gap: 1px var(--e-2);
   align-items: center;
-  padding: var(--e-3);
+  padding: 5px var(--e-2);
+  font-size: var(--lp-fila);
   border-bottom: 1px solid var(--linea);
-  border-left: 3px solid transparent;
+  border-left: 2px solid transparent;
 }
 
 .lp-fila:last-child {
@@ -216,11 +242,11 @@
 
 .lp-fila[data-elegida="si"] {
   border-left-color: var(--accion);
-  background: color-mix(in srgb, var(--accion) 7%, transparent);
+  background: color-mix(in srgb, var(--accion) 6%, transparent);
 }
 
 .lp-fila[data-atencion="si"] {
-  background: color-mix(in srgb, var(--danger) 8%, transparent);
+  background: color-mix(in srgb, var(--danger) 7%, transparent);
 }
 
 .lp-check {
@@ -229,8 +255,8 @@
 }
 
 .lp-check input {
-  width: 1rem;
-  height: 1rem;
+  width: 0.875rem;
+  height: 0.875rem;
   accent-color: var(--accion);
   cursor: pointer;
 }
@@ -247,7 +273,7 @@
 .lp-meta {
   grid-area: met;
   display: flex;
-  gap: var(--e-2);
+  gap: var(--e-1);
   align-items: center;
   flex-wrap: wrap;
 }
@@ -259,8 +285,8 @@
 .lp-precios {
   grid-area: pre;
   display: grid;
-  grid-template-columns: repeat(3, 7rem);
-  gap: var(--e-2);
+  grid-template-columns: repeat(3, 5.5rem);
+  gap: var(--e-1);
 }
 
 /* Campos editables: texto hasta que los tocás. */
@@ -268,11 +294,12 @@
   width: 100%;
   min-width: 0;
   font: inherit;
+  font-size: var(--lp-fila);
   color: var(--text);
   background: transparent;
   border: 1px solid transparent;
   border-radius: 3px;
-  padding: 2px var(--e-2);
+  padding: 1px 4px;
 }
 
 .lp-campo:hover {
@@ -287,42 +314,48 @@
 
 .lp-campo-codigo,
 .lp-campo-marca {
-  font-size: var(--t-sm);
+  font-size: var(--lp-dato);
   color: var(--text-suave);
   font-variant-numeric: tabular-nums;
 }
 
 .lp-campo-marca {
-  width: 9rem;
+  width: 7.5rem;
   flex: none;
 }
 
 .lp-meta select {
   width: auto;
-  font-size: var(--t-xs);
+  font-size: var(--lp-dato);
   color: var(--text-suave);
+  padding: 0 var(--e-1);
 }
 
 .lp-dato {
-  font-size: var(--t-xs);
+  font-size: var(--lp-dato);
   color: var(--text-tenue);
 }
 
-/* --- acción, el dato más importante de la fila --- */
+.lp-dato-gemela {
+  color: var(--gold);
+  font-style: italic;
+}
+
+/* --- acción: el dato más importante de la fila --- */
 
 .lp-accion {
-  font-size: var(--t-xs);
+  font-size: var(--lp-rotulo);
   font-weight: 700;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  padding: 1px var(--e-2);
+  padding: 0 var(--e-1);
   border-radius: 3px;
   white-space: nowrap;
 }
 
 .lp-accion-nada {
   background: var(--surface-alto);
-  color: var(--text-suave);
+  color: var(--text-tenue);
 }
 
 .lp-accion-crear {
@@ -337,7 +370,7 @@
 
 .lp-accion-renombrar {
   background: var(--gold);
-  color: #1a1403;
+  color: var(--sobre-gold);
 }
 
 .lp-accion-borrar {
@@ -348,9 +381,9 @@
 /* --- sellos --- */
 
 .lp-sello {
-  font-size: var(--t-xs);
+  font-size: var(--lp-rotulo);
   font-weight: 600;
-  padding: 1px var(--e-2);
+  padding: 0 var(--e-1);
   border-radius: var(--r-pill);
   border: 1px solid currentColor;
   white-space: nowrap;
@@ -366,12 +399,12 @@
 
 .lp-borrar {
   font: inherit;
-  font-size: var(--t-xs);
+  font-size: var(--lp-rotulo);
   color: var(--text-suave);
   background: none;
   border: 1px solid var(--linea);
   border-radius: 3px;
-  padding: 1px var(--e-2);
+  padding: 0 var(--e-1);
   cursor: pointer;
 }
 
@@ -391,15 +424,13 @@
 
 .lp-web {
   display: flex;
-  gap: 2px var(--e-3);
+  gap: 0 var(--e-2);
   align-items: baseline;
   flex-wrap: wrap;
-  padding: 2px var(--e-2);
-  font-size: var(--t-xs);
+  padding: 0 var(--e-1);
+  font-size: var(--lp-dato);
   color: var(--text-suave);
-  background: var(--surface-alto);
   border-left: 2px solid var(--accion);
-  border-radius: 3px;
 }
 
 .lp-web-rotulo {
@@ -426,7 +457,7 @@
   font: inherit;
   display: grid;
   text-align: right;
-  padding: var(--e-2);
+  padding: 2px var(--e-2) 3px;
   color: var(--text);
   background: var(--surface-alto);
   border: 1px solid var(--linea);
@@ -450,26 +481,39 @@
 }
 
 .lp-precio-rotulo {
-  font-size: 0.65rem;
-  letter-spacing: 0.04em;
-  opacity: 0.75;
+  font-size: var(--lp-rotulo);
+  letter-spacing: 0.03em;
+  opacity: 0.7;
+  line-height: 1.3;
 }
 
 .lp-precio-monto {
+  font-size: var(--lp-fila);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 .lp-precio-cant {
-  font-size: 0.65rem;
-  opacity: 0.75;
+  font-size: var(--lp-rotulo);
+  opacity: 0.7;
   font-variant-numeric: tabular-nums;
+  line-height: 1.3;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 860px) {
+  .lp-precios {
+    grid-template-columns: repeat(3, 4.75rem);
+  }
+
+  .lp-campo-marca {
+    width: 6rem;
+  }
+}
+
+@media (max-width: 700px) {
   .lp-fila {
-    grid-template-columns: 1.5rem minmax(0, 1fr);
+    grid-template-columns: 1.25rem minmax(0, 1fr);
     grid-template-areas:
       "chk cod"
       "chk nom"
@@ -481,16 +525,16 @@
 
   .lp-precios {
     grid-template-columns: repeat(3, 1fr);
-    margin-top: var(--e-2);
+    margin-top: var(--e-1);
   }
 
   .lp-campo-marca {
     width: auto;
-    flex: 1 1 7rem;
+    flex: 1 1 6rem;
   }
-}
 
-.lp-dato-gemela {
-  color: var(--gold);
-  font-style: italic;
+  .lp-marcador div {
+    min-width: 3.5rem;
+    padding: 2px var(--e-2);
+  }
 }

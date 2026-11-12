@@ -182,9 +182,17 @@ function FilaLista({
         {fila.repetido && (
           <span
             className="lp-sello lp-sello-repe"
-            title={`La lista trae el código ${fila.codigo} ${fila.repetido} veces. Son dos documentos con el mismo id: si subís los dos, el segundo pisa al primero.`}
+            title={`La lista trae el código ${fila.codigo} ${fila.repetido} veces. Es un solo producto en la tienda: si subís los dos, el segundo pisa al primero.`}
           >
             código {fila.codigo} ×{fila.repetido}
+          </span>
+        )}
+
+        {/* Esta fila arrancó apagada porque otra con el mismo código coincide
+            mejor con lo que ya vende el producto. */}
+        {fila.duplicada && (
+          <span className="lp-dato lp-dato-gemela">
+            apagada: gana la otra fila con este código
           </span>
         )}
 

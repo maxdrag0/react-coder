@@ -166,6 +166,8 @@ export const cruzarConCatalogo = (deLaLista, publicados) => {
     };
   });
 
+  desempatar(filas);
+
   /*
     Lo publicado que la lista no trae. Puede ser de otro proveedor, o que el
     proveedor lo discontinuo. No se toca: se avisa.
@@ -176,6 +178,46 @@ export const cruzarConCatalogo = (deLaLista, publicados) => {
     .filter((f) => !cruzados.has(f.id));
 
   return { filas, sinCruce };
+};
+
+/*
+  Cuando dos filas de la lista apuntan al MISMO producto publicado, solo una
+  puede arrancar marcada: las dos escribirian el mismo documento y la segunda
+  pisaria a la primera.
+
+  Pasa 34 veces en la lista, y casi siempre es el mismo producto en dos
+  tamaños de display: la candela 1605 esta una vez con display de 6 y otra con
+  display de 12. Ahi el desempate es obvio y no hace falta molestar a nadie:
+  gana la que coincide con el display que el producto YA vende.
+
+  Cuando ninguna coincide —dos productos distintos que comparten codigo— no
+  hay forma de adivinar: queda marcada la primera y la otra apagada, para que
+  una persona elija.
+*/
+const desempatar = (filas) => {
+  const porProducto = new Map();
+
+  for (const fila of filas) {
+    if (!fila.web) continue;
+    if (!porProducto.has(fila.web.id)) porProducto.set(fila.web.id, []);
+    porProducto.get(fila.web.id).push(fila);
+  }
+
+  for (const grupo of porProducto.values()) {
+    if (grupo.length < 2) continue;
+
+    const unidadesPublicadas = grupo[0].web.vende.display?.unidades ?? null;
+    const gana =
+      (unidadesPublicadas !== null &&
+        grupo.find((f) => f.porDisplay === unidadesPublicadas)) ||
+      grupo[0];
+
+    for (const fila of grupo) {
+      if (fila === gana) continue;
+      fila.pre = { unidad: false, display: false, bulto: false };
+      fila.duplicada = gana.codigo;
+    }
+  }
 };
 
 /**

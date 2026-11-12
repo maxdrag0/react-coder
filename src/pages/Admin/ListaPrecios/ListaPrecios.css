@@ -36,21 +36,38 @@
 
 .lp-error {
   margin: var(--e-4) 0 0;
-  color: var(--peligro, #e07a5f);
+  color: var(--danger);
 }
 
 /* --- barra --- */
 
+/*
+  La barra se queda arriba mientras se recorren 291 filas, porque ahí viven
+  el buscador, los filtros y el botón de aplicar.
+
+  Dos cosas que la rompían:
+
+  - El fondo salía de `var(--bg)`, que NO EXISTE en el sistema de tokens. Una
+    variable inventada no es un error: es `transparent`. La barra quedaba
+    traslúcida y las filas pasaban por abajo.
+
+  - Se pegaba en `top: 0`, el mismo lugar donde ya está pegado el NavBar, así
+    que se superponían. Arranca debajo.
+*/
 .lp-barra {
   position: sticky;
-  top: 0;
+  top: var(--alto-nav);
   z-index: 5;
   display: flex;
   flex-direction: column;
   gap: var(--e-3);
-  padding: var(--e-4) 0;
-  background: var(--bg);
+  /* Los costados compensan el padding del contenedor del panel, para que el
+     fondo llegue de borde a borde y no se vea una franja por los lados. */
+  margin-inline: calc(var(--e-4) * -1);
+  padding: var(--e-4);
+  background: var(--ground);
   border-bottom: 1px solid var(--linea);
+  box-shadow: var(--elev-1);
 }
 
 .lp-barra-alto {
@@ -114,7 +131,7 @@
   color: var(--text);
   background: var(--surface-alto);
   border: 1px solid var(--linea);
-  border-radius: var(--r-input, 6px);
+  border-radius: var(--r-control);
 }
 
 .lp-chip {
@@ -162,11 +179,11 @@
 }
 
 .lp-aviso-malo {
-  border-left-color: var(--peligro, #e07a5f);
+  border-left-color: var(--danger);
 }
 
 .lp-aviso-bien {
-  border-left-color: var(--exito, #4fb286);
+  border-left-color: var(--exito);
 }
 
 /* --- filas --- */
@@ -203,7 +220,7 @@
 }
 
 .lp-fila[data-atencion="si"] {
-  background: color-mix(in srgb, var(--peligro, #e07a5f) 8%, transparent);
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
 }
 
 .lp-check {
@@ -288,7 +305,7 @@
 
 .lp-dato {
   font-size: var(--t-xs);
-  color: var(--text-tenue, var(--text-suave));
+  color: var(--text-tenue);
 }
 
 /* --- acción, el dato más importante de la fila --- */
@@ -309,7 +326,7 @@
 }
 
 .lp-accion-crear {
-  background: var(--exito, #4fb286);
+  background: var(--exito);
   color: var(--surface);
 }
 
@@ -319,12 +336,12 @@
 }
 
 .lp-accion-renombrar {
-  background: var(--gold, #e6b32e);
+  background: var(--gold);
   color: #1a1403;
 }
 
 .lp-accion-borrar {
-  background: var(--peligro, #e07a5f);
+  background: var(--danger);
   color: var(--surface);
 }
 
@@ -340,11 +357,11 @@
 }
 
 .lp-sello-repe {
-  color: var(--gold, #e6b32e);
+  color: var(--gold);
 }
 
 .lp-sello-aviso {
-  color: var(--peligro, #e07a5f);
+  color: var(--danger);
 }
 
 .lp-borrar {
@@ -359,13 +376,13 @@
 }
 
 .lp-borrar:hover {
-  border-color: var(--peligro, #e07a5f);
-  color: var(--peligro, #e07a5f);
+  border-color: var(--danger);
+  color: var(--danger);
 }
 
 .lp-borrar[aria-pressed="true"] {
-  background: var(--peligro, #e07a5f);
-  border-color: var(--peligro, #e07a5f);
+  background: var(--danger);
+  border-color: var(--danger);
   color: var(--surface);
   font-weight: 600;
 }
@@ -400,7 +417,7 @@
 }
 
 .lp-delta b {
-  color: var(--gold, #e6b32e);
+  color: var(--gold);
 }
 
 /* --- precios --- */
@@ -471,4 +488,9 @@
     width: auto;
     flex: 1 1 7rem;
   }
+}
+
+.lp-dato-gemela {
+  color: var(--gold);
+  font-style: italic;
 }

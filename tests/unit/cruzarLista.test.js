@@ -208,6 +208,58 @@ describe("cruzarConCatalogo: lo que arranca marcado", () => {
   });
 });
 
+describe("dos filas que apuntan al mismo producto publicado", () => {
+  /*
+    Las dos escribirían el mismo documento y la segunda pisaría a la primera.
+    Solo una puede arrancar marcada.
+  */
+  it("gana la que coincide con el display que ya vende", () => {
+    // La candela 1605 está en la lista con display de 6 y con display de 12,
+    // y el producto publicado vende el de 6.
+    const { filas } = cruzarConCatalogo(
+      [
+        deLaLista({ porDisplay: 12, pDisplay: 4560 }),
+        deLaLista({ porDisplay: 6, pDisplay: 2280 }),
+      ],
+      [publicado()],
+    );
+    expect(filas[0].pre.display).toBe(false);
+    expect(filas[1].pre.display).toBe(true);
+  });
+
+  it("la perdedora queda apagada del todo", () => {
+    const { filas } = cruzarConCatalogo(
+      [
+        deLaLista({ porDisplay: 12, pDisplay: 4560 }),
+        deLaLista({ porDisplay: 6, pDisplay: 2280 }),
+      ],
+      [publicado()],
+    );
+    expect(filas[0].pre).toEqual({
+      unidad: false,
+      display: false,
+      bulto: false,
+    });
+  });
+
+  it("si ninguna coincide, queda marcada la primera y nada más", () => {
+    /*
+      Dos productos distintos que comparten código: no hay forma de
+      adivinar cuál es. Elige una persona.
+    */
+    const { filas } = cruzarConCatalogo(
+      [
+        deLaLista({ nombre: "TORTA ZONDA 16 T", porDisplay: 1 }),
+        deLaLista({ nombre: "TORTA ZONDA MAX 16 T", porDisplay: 1 }),
+      ],
+      [publicado({ presentaciones: { unitario: { precio: 22900 } } })],
+    );
+    expect(filas[0].pre.unidad).toBe(true);
+    expect(filas[1].pre.unidad).toBe(false);
+    expect(filas[1].duplicada).toBe(filas[0].codigo);
+  });
+});
+
 describe("cruzarConCatalogo: lo publicado que la lista no trae", () => {
   it("lo devuelve aparte en vez de ignorarlo", () => {
     const { sinCruce } = cruzarConCatalogo(

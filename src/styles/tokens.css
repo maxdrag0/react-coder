@@ -86,6 +86,9 @@
 
   /* Alto de la barra inferior de celular. Lo referencian el carrito y la
      barra de seleccion del panel, que tambien estan fijos abajo. */
+  /* El NavBar es sticky arriba de todo. Cualquier otra barra pegajosa
+     tiene que arrancar debajo, o se superponen. */
+  --alto-nav: 3.5rem;
   --alto-nav-abajo: 4.25rem;
   --medida: 72ch;
 }

@@ -35,7 +35,7 @@
   color: var(--text);
   background: var(--surface-alto);
   border: 1px solid var(--linea);
-  border-radius: var(--r-input, 6px);
+  border-radius: var(--r-control);
 }
 
 .recargo-entrada input:focus-visible {
@@ -106,9 +106,9 @@
 }
 
 .recargo-estado-ok {
-  color: var(--exito, #4fb286);
+  color: var(--exito);
 }
 
 .recargo-estado-error {
-  color: var(--peligro, #e07a5f);
+  color: var(--danger);
 }

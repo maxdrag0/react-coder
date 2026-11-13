@@ -78,6 +78,13 @@ export const enviarOrden = async ({ items, telefono, idempotencia }) => {
     );
   }
 
+  if (respuesta.status === 403) {
+    throw errorCon(
+      "mail_sin_verificar",
+      "Verificá tu email para poder enviar el pedido. Te mandamos un correo cuando te registraste.",
+    );
+  }
+
   if (respuesta.status === 422) {
     throw errorCon(
       "sin_telefono",

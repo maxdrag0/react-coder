@@ -36,7 +36,12 @@ const guardarPerfilMock = vi.fn();
 
 function montar({ telefono = null } = {}) {
   useAuthMock.mockReturnValue({
-    user: { uid: "u1", email: "cliente@test.com", displayName: "Cliente" },
+    user: {
+      uid: "u1",
+      email: "cliente@test.com",
+      displayName: "Cliente",
+      emailVerified: true,
+    },
     isAdmin: false,
     loading: false,
   });

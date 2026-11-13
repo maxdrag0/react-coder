@@ -71,7 +71,24 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "La sesion no es valida." });
   }
 
-  // 2. Forma del cuerpo, antes de tocar la base.
+  /*
+    2. El mail verificado.
+
+    Se exige ACA y no en el cliente porque es el unico lugar que no se puede
+    saltear: el dato viaja dentro del token que Firebase firma, asi que el
+    navegador no lo puede inventar. El cliente avisa antes para que nadie
+    llene un carrito al pedo, pero quien decide es esto.
+
+    Sin el dato tampoco pasa. Firebase siempre lo incluye, pero ante la duda
+    la respuesta segura es pedir que verifiquen: es molesto y reversible,
+    contra aceptar un pedido de un mail que no sabemos si existe y quedarnos
+    sin forma de avisarle a esa persona que su pedido esta listo.
+  */
+  if (usuario.email_verified !== true) {
+    return res.status(403).json({ error: "mail_sin_verificar" });
+  }
+
+  // 3. Forma del cuerpo, antes de tocar la base.
   const forma = validarCuerpo(req.body);
   if (!forma.ok) return res.status(400).json({ error: forma.error });
 

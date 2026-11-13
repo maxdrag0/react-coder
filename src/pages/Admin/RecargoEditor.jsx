@@ -94,8 +94,8 @@ function RecargoEditor() {
           ))}
         </ul>
         <p className="recargo-ayuda">
-          Los precios se redondean para arriba a los $10, así nunca aparecen
-          centavos.
+          El precio final se redondea para arriba al múltiplo de $100, igual que{" "}
+          <code>MULTIPLO.SUPERIOR(precio × factor; 100)</code> en la planilla.
         </p>
       </div>
 

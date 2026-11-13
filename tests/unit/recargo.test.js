@@ -39,14 +39,25 @@ describe("precioConRecargo", () => {
     expect(precioConRecargo(1310, SIN_RECARGO)).toBe(1310);
   });
 
-  it("redondea para arriba a los diez pesos", () => {
+  it("redondea para arriba al múltiplo de cien", () => {
     /*
-      Un 35% sobre 1310 da 1768,50. Mostrar centavos en una tienda de
-      pirotecnia no tiene sentido, y redondear para abajo sería regalar
-      plata en cada venta.
+      Es la misma cuenta que la planilla del dueño:
+      =MULTIPLO.SUPERIOR(precio * factor; 100)
+
+      Un 35% sobre 1310 da 1768,50. Redondear para abajo sería regalar plata
+      en cada venta, y a los $10 deja precios como $1.770, que en una lista
+      de pirotecnia se leen como un error de carga.
     */
-    expect(precioConRecargo(1310, 35)).toBe(1770);
-    expect(precioConRecargo(999, 1)).toBe(1010);
+    expect(precioConRecargo(1310, 35)).toBe(1800);
+    expect(precioConRecargo(999, 1)).toBe(1100);
+    expect(precioConRecargo(380, 120)).toBe(900);
+  });
+
+  it("deja quieto lo que ya es múltiplo de cien", () => {
+    // Los ejemplos del dueño: 1000 al 100%, 5000 al 50%, 10000 al 10%.
+    expect(precioConRecargo(1000, 100)).toBe(2000);
+    expect(precioConRecargo(5000, 50)).toBe(7500);
+    expect(precioConRecargo(10000, 10)).toBe(11000);
   });
 
   it("no inventa precio donde no hay", () => {

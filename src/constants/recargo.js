@@ -46,11 +46,16 @@ export const recargoValido = (valor) => {
 };
 
 /*
-  Para arriba y a los diez pesos. Un 35% sobre $1.310 da $1.768,50: mostrar
-  centavos en una tienda de pirotecnia no tiene sentido, y redondear para
-  abajo sería regalar plata en cada venta.
+  Para arriba y al múltiplo de cien. Es la misma cuenta que la planilla del
+  dueño: =MULTIPLO.SUPERIOR(precio * factor; 100).
+
+  Un 35% sobre $1.310 da $1.768,50. Redondear para abajo sería regalar plata
+  en cada venta, y a los diez pesos deja precios como $1.770, que en una
+  lista de pirotecnia se leen como un error de carga.
 */
-const redondear = (n) => Math.ceil(n / 10) * 10;
+const MULTIPLO = 100;
+
+const redondear = (n) => Math.ceil(n / MULTIPLO) * MULTIPLO;
 
 /**
  * Un precio con el recargo puesto, o null si no había precio.

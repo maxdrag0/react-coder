@@ -12,7 +12,12 @@ vi.mock("@/services/api/ordenes", () => ({
 
 vi.mock("@/contexts/auth/useAuth", () => ({
   useAuth: () => ({
-    user: { uid: "ana", email: "ana@mail.com", displayName: "Ana" },
+    user: {
+      uid: "ana",
+      email: "ana@mail.com",
+      displayName: "Ana",
+      emailVerified: true,
+    },
     loading: false,
   }),
 }));

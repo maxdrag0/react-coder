@@ -11,6 +11,7 @@ import Reconciliar from "./Reconciliar";
 import { usePerfil } from "@/hooks/usePerfil";
 import { errorDeTelefono, soloDigitos } from "@/utils/telefono";
 import { formatearTotal } from "@/utils/formatearPrecio";
+import VerificacionPendiente from "@/components/auth/VerificacionPendiente/VerificacionPendiente";
 
 function Carrito() {
   const { removeList, cartList, total, actualizarPrecio, deleteItem } =
@@ -31,6 +32,10 @@ function Carrito() {
   const [showModal, setShowModal] = useState(false);
   const [orderId, setOrderId] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Sin sesion el boton manda al login, asi que esto solo frena a quien ya
+  // entro y todavia no abrio el correo.
+  const sinVerificar = Boolean(user) && !user.emailVerified;
   const [problemas, setProblemas] = useState([]);
   const [errorEnvio, setErrorEnvio] = useState("");
   const navigate = useNavigate();
@@ -205,10 +210,16 @@ function Carrito() {
               </div>
             )}
 
+            {/* El servidor rechaza el pedido sin el mail verificado, y hace
+                bien: es el único que no se puede saltear. Pero enterarse
+                recién al apretar, con el carrito lleno, es maltrato. Acá se
+                avisa antes, con el botón para reenviar el correo. */}
+            {user && !user.emailVerified && <VerificacionPendiente />}
+
             <Button
               callback={handleProcesarCompra}
               className="boton-ancho"
-              disabled={isProcessing || cargandoPerfil}
+              disabled={isProcessing || cargandoPerfil || sinVerificar}
             >
               {isProcessing ? "Procesando..." : "Enviar pedido"}
             </Button>

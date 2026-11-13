@@ -80,6 +80,7 @@ beforeEach(() => {
     uid: "ana",
     email: "ana@mail.com",
     name: "Ana",
+    email_verified: true,
   });
   getAll.mockReset().mockResolvedValue([docDe(PRODUCTO)]);
   set.mockReset().mockResolvedValue(undefined);
@@ -92,6 +93,56 @@ beforeEach(() => {
   // Sin documento de configuracion el recargo es cero: la tienda muestra el
   // precio de lista. Es el estado antes de que nadie toque el panel.
   getConfig.mockReset().mockResolvedValue({ exists: false });
+});
+
+describe("api/orden: el mail verificado", () => {
+  /*
+    Hasta ahora el mail de verificacion se mandaba y nadie lo exigia: el
+    cartel del perfil decia "vas a necesitarlo para enviar un pedido" y era
+    mentira. Se podia pedir sin verificar nada.
+
+    Se exige del lado del SERVIDOR porque es el unico que no se puede
+    saltear: el dato viaja en el token que Firebase firma, asi que el
+    navegador no lo puede inventar.
+  */
+  it("403 si el mail no esta verificado, y no escribe nada", async () => {
+    verifyIdToken.mockResolvedValue({
+      uid: "ana",
+      email: "ana@mail.com",
+      name: "Ana",
+      email_verified: false,
+    });
+    const res = respuesta();
+    await handler(pedido(), res);
+    expect(res.codigo).toBe(403);
+    expect(res.cuerpo.error).toBe("mail_sin_verificar");
+    expect(set).not.toHaveBeenCalled();
+  });
+
+  it("deja pasar con el mail verificado", async () => {
+    verifyIdToken.mockResolvedValue({
+      uid: "ana",
+      email: "ana@mail.com",
+      name: "Ana",
+      email_verified: true,
+    });
+    const res = respuesta();
+    await handler(pedido(), res);
+    expect(res.codigo).toBe(201);
+  });
+
+  it("un token sin el dato no pasa", async () => {
+    /*
+      Firebase siempre lo incluye, pero si alguna vez faltara, la respuesta
+      segura es NO dejar pasar: ante la duda se pide verificar, que es
+      molesto y reversible, en vez de aceptar un pedido de un mail que no
+      sabemos si existe.
+    */
+    verifyIdToken.mockResolvedValue({ uid: "ana", email: "ana@mail.com" });
+    const res = respuesta();
+    await handler(pedido(), res);
+    expect(res.codigo).toBe(403);
+  });
 });
 
 describe("api/orden: el recargo", () => {

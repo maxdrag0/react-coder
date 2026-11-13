@@ -14,8 +14,96 @@
   box-shadow: var(--elev-1);
 }
 
-.profile-card h2 {
-  font-size: var(--t-xl);
+/* --- quién sos, arriba de todo --- */
+
+.perfil-cabecera {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--e-3) var(--e-4);
+  padding-bottom: var(--e-4);
+  border-bottom: 1px solid var(--gold-linea);
+}
+
+/* La inicial: no hay fotos de perfil en esta tienda, y un ícono genérico de
+   persona no distingue una cuenta de otra. */
+.perfil-avatar {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: var(--surface-alto);
+  border: 1px solid var(--gold-linea);
+  color: var(--accion);
+  font-size: var(--t-md);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.perfil-identidad {
+  display: grid;
+  gap: 2px;
+  justify-items: start;
+}
+
+.perfil-identidad h2 {
+  margin: 0;
+  font-size: var(--t-md);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.perfil-email {
+  margin: 0;
+  font-size: var(--t-sm);
+  color: var(--text-suave);
+  overflow-wrap: anywhere;
+}
+
+.perfil-rol {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-1);
+  margin-top: var(--e-1);
+  padding: 1px var(--e-2);
+  border-radius: var(--r-pill);
+  border: 1px solid var(--gold-linea);
+  background: var(--surface-alto);
+  color: var(--gold);
+  font-size: var(--t-xs);
+  font-weight: 600;
+}
+
+.perfil-al-panel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  grid-column: 1 / -1;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .perfil-al-panel {
+    grid-column: auto;
+    justify-self: end;
+  }
+}
+
+/* --- secciones --- */
+
+.perfil-seccion {
+  display: grid;
+  gap: var(--e-2);
+}
+
+.perfil-seccion h3 {
+  margin: 0;
+  font-size: var(--t-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tenue);
 }
 
 .profile-info {
@@ -58,23 +146,37 @@
   color: var(--text);
 }
 
+/*
+  La salida, al pie y sin peso. Antes era un bloque rojo a ancho completo que
+  competia con los pedidos y con el panel: es lo ultimo que alguien viene a
+  hacer a su perfil, no lo primero.
+*/
+.perfil-pie {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--e-4);
+  border-top: 1px solid var(--gold-linea);
+}
+
 .logout-btn {
   min-height: 44px;
-  padding: var(--e-3) var(--e-5);
-  border: 1px solid var(--danger);
+  padding: var(--e-2) var(--e-4);
+  border: 1px solid transparent;
   border-radius: var(--r-control);
-  background: var(--danger-fondo);
-  color: var(--danger);
+  background: none;
+  color: var(--text-suave);
   font-size: var(--t-sm);
   font-weight: 500;
   transition:
     background-color var(--mov-rapido),
+    border-color var(--mov-rapido),
     color var(--mov-rapido);
 }
 
 .logout-btn:hover {
-  background: var(--danger);
-  color: var(--ground);
+  border-color: var(--danger);
+  background: var(--danger-fondo);
+  color: var(--danger);
 }
 
 @media (min-width: 640px) {

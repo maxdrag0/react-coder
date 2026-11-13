@@ -6,13 +6,14 @@ import { errorDeTelefono, soloDigitos } from "@/utils/telefono";
 import { logoutUser } from "@/services/firebase/authFirebase";
 import { useTheme } from "@/contexts/theme/useTheme";
 import VerificacionPendiente from "@/components/auth/VerificacionPendiente/VerificacionPendiente";
+import CabeceraPerfil from "./CabeceraPerfil";
 import MisPedidos from "./MisPedidos";
 import "./Profile.css";
 
 const Profile = () => {
   // ProtectedRoute garantiza que hay sesion: aca no hace falta chequearlo
   // ni redirigir, que es lo que hacia este componente durante el render.
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { themeMode, setThemeMode } = useTheme();
   const { perfil, cargando, guardar } = usePerfil();
   const navigate = useNavigate();
@@ -54,82 +55,97 @@ const Profile = () => {
   return (
     <div className="profile-container">
       <div className="profile-card">
-        <h2>Mi Perfil</h2>
+        <CabeceraPerfil user={user} isAdmin={isAdmin} />
 
         <VerificacionPendiente />
 
-        <div className="profile-info">
-          <div className="info-group">
-            <span className="info-label">Nombre:</span>
-            <span className="info-value">
-              {user.displayName || "Sin nombre"}
-            </span>
-          </div>
-          <div className="info-group">
-            <span className="info-label">Email:</span>
-            <span className="info-value">{user.email}</span>
-          </div>
-          <form className="info-group info-editable" onSubmit={guardarTelefono}>
-            <label className="info-label" htmlFor="perfil-telefono">
-              Teléfono:
-            </label>
-            <div className="info-value perfil-telefono">
-              <input
-                id="perfil-telefono"
-                className="campo-control"
-                type="tel"
-                autoComplete="tel"
-                placeholder={cargando ? "Cargando..." : "11 2345-6789"}
-                value={telefono}
-                onChange={(e) => {
-                  setTelefono(e.target.value);
-                  setEstado({ error: "", listo: false });
-                }}
-                disabled={cargando}
-              />
-              <button
-                type="submit"
-                className="boton boton-secundario"
-                disabled={guardando || cargando}
-              >
-                {guardando ? "Guardando..." : "Guardar"}
-              </button>
+        <section className="perfil-seccion">
+          <h3>Tus datos</h3>
+          <div className="profile-info">
+            <div className="info-group">
+              <span className="info-label">Nombre:</span>
+              <span className="info-value">
+                {user.displayName || "Sin nombre"}
+              </span>
             </div>
-            {estado.error && (
-              <small className="campo-error">{estado.error}</small>
-            )}
-            {estado.listo && (
-              <small className="campo-ok">Teléfono guardado.</small>
-            )}
-            {!estado.error && !estado.listo && (
-              <small className="campo-ayuda">
-                Es por donde te contactamos cuando hacés un pedido.
-              </small>
-            )}
-          </form>
+            <div className="info-group">
+              <span className="info-label">Email:</span>
+              <span className="info-value">{user.email}</span>
+            </div>
+            <form
+              className="info-group info-editable"
+              onSubmit={guardarTelefono}
+            >
+              <label className="info-label" htmlFor="perfil-telefono">
+                Teléfono:
+              </label>
+              <div className="info-value perfil-telefono">
+                <input
+                  id="perfil-telefono"
+                  className="campo-control"
+                  type="tel"
+                  autoComplete="tel"
+                  placeholder={cargando ? "Cargando..." : "11 2345-6789"}
+                  value={telefono}
+                  onChange={(e) => {
+                    setTelefono(e.target.value);
+                    setEstado({ error: "", listo: false });
+                  }}
+                  disabled={cargando}
+                />
+                <button
+                  type="submit"
+                  className="boton boton-secundario"
+                  disabled={guardando || cargando}
+                >
+                  {guardando ? "Guardando..." : "Guardar"}
+                </button>
+              </div>
+              {estado.error && (
+                <small className="campo-error">{estado.error}</small>
+              )}
+              {estado.listo && (
+                <small className="campo-ok">Teléfono guardado.</small>
+              )}
+              {!estado.error && !estado.listo && (
+                <small className="campo-ayuda">
+                  Es por donde te contactamos cuando hacés un pedido.
+                </small>
+              )}
+            </form>
+          </div>
+        </section>
 
-          <div className="info-group">
-            <span className="info-label">Tema:</span>
-            <div className="info-value">
-              <select
-                value={themeMode}
-                onChange={(e) => setThemeMode(e.target.value)}
-                className="theme-select"
-                aria-label="Tema de la interfaz"
-              >
-                <option value="system">Sistema (Automático)</option>
-                <option value="light">Claro</option>
-                <option value="dark">Oscuro</option>
-              </select>
+        <section className="perfil-seccion">
+          <h3>Preferencias</h3>
+          <div className="profile-info">
+            <div className="info-group">
+              <span className="info-label">Tema:</span>
+              <div className="info-value">
+                <select
+                  value={themeMode}
+                  onChange={(e) => setThemeMode(e.target.value)}
+                  className="theme-select"
+                  aria-label="Tema de la interfaz"
+                >
+                  <option value="system">Sistema (Automático)</option>
+                  <option value="light">Claro</option>
+                  <option value="dark">Oscuro</option>
+                </select>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
 
         <MisPedidos />
 
-        <button className="logout-btn" onClick={salir}>
-          Cerrar Sesión
-        </button>
+        {/* La salida va al pie y sin peso visual: es lo último que alguien
+            viene a hacer acá, y antes competía con todo lo demás. */}
+        <footer className="perfil-pie">
+          <button type="button" className="logout-btn" onClick={salir}>
+            Cerrar sesión
+          </button>
+        </footer>
       </div>
     </div>
   );

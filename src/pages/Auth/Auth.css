@@ -17,8 +17,11 @@
   box-shadow: var(--elev-1);
 }
 
+/* --t-xl son 31px: en una tarjeta de 24rem el título pesaba más que el
+   formulario, que es a lo que la persona viene. */
 .auth-card h2 {
-  font-size: var(--t-xl);
+  font-size: var(--t-lg);
+  line-height: 1.15;
 }
 
 .auth-form {
@@ -49,25 +52,42 @@
   margin: 0;
 }
 
-/* En escritorio la tarjeta deja de flotar sin anclaje: un costado con el
-   degradado de marca le da peso. */
+/*
+  En escritorio la tarjeta deja de flotar sin anclaje: un costado le da peso.
+
+  El degradado era un círculo centrado, que es el fondo que aparece en
+  cualquier login. Acá es un resplandor dorado bajo y ancho, como la luz que
+  deja un disparo contra el cielo: la única cosa que podría ser de esta
+  tienda y de ninguna otra.
+*/
 @media (min-width: 900px) {
   .auth {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     justify-items: stretch;
     padding: 0;
   }
+
   .auth::before {
     content: "";
-    background: radial-gradient(
-      circle at 60% 40%,
-      var(--surface-alto),
-      var(--ground) 70%
-    );
+    background:
+      radial-gradient(
+        120% 60% at 50% 115%,
+        color-mix(in srgb, var(--gold) 22%, transparent),
+        transparent 70%
+      ),
+      var(--ground);
     border-right: 1px solid var(--gold-linea);
   }
+
   .auth-card {
     justify-self: center;
     align-self: center;
+    box-shadow: var(--elev-2);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .auth::before {
+    background: var(--ground);
   }
 }

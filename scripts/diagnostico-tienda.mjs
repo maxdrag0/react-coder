@@ -15,7 +15,10 @@ import { estadoDe } from "../src/constants/estadoProducto.js";
 */
 
 const snap = await db.collection("products").get();
-const productos = snap.docs.map((d) => ({ codigo: d.id, ...d.data() }));
+// El id DESPUES del spread: el campo `codigo` puede traer una barra y
+// pisaba al id, asi que el reporte imprimia un codigo que el panel no lista
+// ni su buscador encuentra.
+const productos = snap.docs.map((d) => ({ ...d.data(), codigo: d.id }));
 
 const porEstado = {};
 const sinPrecio = [];
@@ -43,7 +46,11 @@ for (const p of productos) {
 
   const faltan = modelos.filter((m) => !m.foto);
   if (modelos.length > 0 && faltan.length > 0) {
-    modelosSinFoto.push({ nombre, faltan: faltan.length, total: modelos.length });
+    modelosSinFoto.push({
+      nombre,
+      faltan: faltan.length,
+      total: modelos.length,
+    });
   }
 }
 
@@ -59,7 +66,9 @@ for (const [k, n] of Object.entries(porEstado).sort((a, b) => b[1] - a[1])) {
 }
 
 if (estadosRaros.length) {
-  console.log(`\n!! Estados que el codigo no reconoce (se tratan como activo):`);
+  console.log(
+    `\n!! Estados que el codigo no reconoce (se tratan como activo):`,
+  );
   estadosRaros.forEach((p) => console.log(`     ${p.nombre} -> ${p.estado}`));
 }
 
@@ -70,14 +79,20 @@ console.log(linea(60));
 if (conModelos.length === 0) {
   console.log("\nNingun producto usa modelos.");
 } else {
-  console.log(`\nCon modelos (el precio vive en cada modelo): ${conModelos.length}`);
-  conModelos.forEach((p) => console.log(`     ${p.cuantos} modelos  ${p.nombre}`));
+  console.log(
+    `\nCon modelos (el precio vive en cada modelo): ${conModelos.length}`,
+  );
+  conModelos.forEach((p) =>
+    console.log(`     ${p.cuantos} modelos  ${p.nombre}`),
+  );
 }
 
 if (sinPrecio.length === 0) {
   console.log("\nTodos tienen precio. Bien.");
 } else {
-  console.log(`\n!! SIN NINGUN PRECIO (no se pueden comprar): ${sinPrecio.length}`);
+  console.log(
+    `\n!! SIN NINGUN PRECIO (no se pueden comprar): ${sinPrecio.length}`,
+  );
   sinPrecio.forEach((p) => console.log(`     ${p.nombre}  (${p.codigo})`));
 }
 
@@ -89,15 +104,19 @@ if (sinFoto.length === 0) {
   console.log("\nTodos tienen al menos una foto. Bien.");
 } else {
   console.log(`\nSin ninguna foto: ${sinFoto.length} de ${productos.length}`);
-  sinFoto.slice(0, 20).forEach((p) => console.log(`     ${p.nombre}  (${p.codigo})`));
+  sinFoto
+    .slice(0, 20)
+    .forEach((p) => console.log(`     ${p.nombre}  (${p.codigo})`));
   if (sinFoto.length > 20) console.log(`     ... y ${sinFoto.length - 20} mas`);
   console.log("\n  En el panel: filtro 'Sin foto' para verlos todos juntos.");
 }
 
 if (modelosSinFoto.length > 0) {
-  console.log(`\nProductos con modelos sin foto propia: ${modelosSinFoto.length}`);
+  console.log(
+    `\nProductos con modelos sin foto propia: ${modelosSinFoto.length}`,
+  );
   modelosSinFoto.forEach((p) =>
-    console.log(`     ${p.faltan} de ${p.total} modelos  ${p.nombre}`)
+    console.log(`     ${p.faltan} de ${p.total} modelos  ${p.nombre}`),
   );
   console.log("\n  Esos modelos muestran la foto general del producto.");
 }

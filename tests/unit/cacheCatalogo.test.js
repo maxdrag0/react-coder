@@ -83,6 +83,36 @@ describe("cacheCatalogo", () => {
     expect(leerCatalogo("Tortas")).toEqual(PRODUCTOS);
   });
 
+  it("ignora una entrada guardada con un formato anterior", () => {
+    /*
+      EL BUG QUE CUBRE, y ya pasó dos veces: el caché vive en sessionStorage
+      y sobrevive al deploy. Cuando se arregló la consulta por categoría, la
+      categoría se siguió viendo vacía media hora. Y cuando el catálogo
+      empezó a entregar el id del documento, las entradas viejas siguieron
+      devolviendo el código con barra, así que la Torta Minerva siguió
+      cayendo en "esta página no existe" aunque el arreglo ya estuviera
+      cargado — y recargar no alcanzaba.
+
+      Una entrada sin versión es de antes de esta regla: se descarta.
+    */
+    sessionStorage.setItem(
+      "catalogo:__todas__",
+      JSON.stringify({
+        items: [{ codigo: "2302/MI" }],
+        guardadoEn: Date.now(),
+      }),
+    );
+    expect(leerCatalogo(null)).toBeNull();
+  });
+
+  it("lo que guarda hoy se puede volver a leer", () => {
+    // La versión no puede invalidar lo que el propio código acaba de escribir.
+    guardarCatalogo(null, PRODUCTOS);
+    const crudo = JSON.parse(sessionStorage.getItem("catalogo:__todas__"));
+    expect(crudo.version).toBeTypeOf("number");
+    expect(leerCatalogo(null)).toEqual(PRODUCTOS);
+  });
+
   it("ignora un caché corrupto en vez de romper", () => {
     sessionStorage.setItem("catalogo:__todas__", "no es json");
     expect(leerCatalogo(null)).toBeNull();

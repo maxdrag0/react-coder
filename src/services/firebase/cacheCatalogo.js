@@ -12,6 +12,18 @@
 const CLAVE = "catalogo";
 const VIDA_MS = 30 * 60 * 1000; // media hora
 
+/*
+  La forma de lo que se guarda. SUBIRLA cada vez que cambie la forma de un
+  producto, porque el cache vive en sessionStorage y sobrevive al deploy.
+
+  Ya paso dos veces que un arreglo no se vio: la consulta por categoria
+  devolvia vacio y se cacheaba, y despues el catalogo entregaba el codigo con
+  barra y se cacheaba igual. En los dos casos el JS nuevo seguia leyendo
+  datos viejos hasta media hora, recargar no alcanzaba, y parecia que el
+  arreglo no servia.
+*/
+const VERSION = 2;
+
 // En memoria: sobrevive a la navegación entre páginas sin tocar el disco.
 let enMemoria = null;
 
@@ -19,6 +31,7 @@ const ahora = () => Date.now();
 
 const vigente = (entrada) =>
   entrada &&
+  entrada.version === VERSION &&
   Array.isArray(entrada.items) &&
   ahora() - entrada.guardadoEn < VIDA_MS;
 
@@ -57,7 +70,7 @@ export const guardarCatalogo = (categoria, items) => {
   if (!Array.isArray(items) || items.length === 0) return;
 
   const clave = categoria ?? "__todas__";
-  const entrada = { items, guardadoEn: ahora() };
+  const entrada = { version: VERSION, items, guardadoEn: ahora() };
 
   enMemoria = { clave, ...entrada };
 

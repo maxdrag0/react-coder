@@ -9,12 +9,14 @@
 */
 
 import { ACTIVO } from "./estadoProducto.js";
+import { idDeCodigo } from "./codigoProducto.js";
 
-/** Los IDs de Firestore no admiten "/", y varios codigos del catalogo lo traen. */
-export const idDeCodigo = (codigo) =>
-  String(codigo ?? "")
-    .trim()
-    .replace(/\//g, "-");
+/*
+  Se reexporta para no romper a quien ya lo importaba de acá, pero la regla
+  vive en codigoProducto.js: tenerla escrita en cada archivo es lo que la
+  hizo divergir.
+*/
+export { idDeCodigo } from "./codigoProducto.js";
 
 const sinTildes = (s) =>
   String(s ?? "")

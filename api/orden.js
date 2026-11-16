@@ -8,6 +8,7 @@ import {
   conRecargo,
   recargoValido,
 } from "../src/constants/recargo.js";
+import { idDeCodigo } from "../src/constants/codigoProducto.js";
 
 /*
   Crea una orden.
@@ -92,7 +93,28 @@ export default async function handler(req, res) {
   const forma = validarCuerpo(req.body);
   if (!forma.ok) return res.status(400).json({ error: forma.error });
 
-  const { idempotencia, items, telefono } = forma.datos;
+  const { idempotencia, telefono } = forma.datos;
+
+  /*
+    Los codigos se normalizan APENAS ENTRAN, antes de cualquier otra cosa.
+
+    El carrito vive en localStorage: alguien que lo armo antes de que el
+    catalogo empezara a entregar el id del documento tiene guardado "2302/MI"
+    y lo manda tal cual. Con esa barra, db.collection("products").doc(c) TIRA
+    —una ruta de documento necesita una cantidad par de segmentos y
+    "products/2302/MI" son tres— y como eso pasa adentro del try grande, se
+    voltea el PEDIDO ENTERO, con los demas productos adentro, y la persona
+    recibe un 500 que no dice cual fue.
+
+    Y se normaliza el renglon completo, no solo la referencia: el Map se
+    indexa por el id del documento y validarOrden busca por item.codigo. Si
+    solo se saneara la referencia, los dos lados dejarian de coincidir y el
+    producto figuraria como inexistente.
+  */
+  const items = forma.datos.items.map((item) => ({
+    ...item,
+    codigo: idDeCodigo(item.codigo),
+  }));
 
   try {
     // 3. Telefono: el del perfil manda, y si no hay se acepta el del cuerpo.

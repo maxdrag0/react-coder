@@ -58,19 +58,6 @@ function Home() {
         Lo que queda responde las dos preguntas que tiene alguien que entra por
         primera vez y no ve un botón de pagar.
       */}
-      <section className="home-como" aria-label="Cómo se compra">
-        <div>
-          <h2>Precio por bulto y por unidad</h2>
-          <p>
-            Mayorista y minorista. Cada presentación muestra su precio, sin
-            pedir cotización.
-          </p>
-        </div>
-        <div>
-          <h2>No se paga nada online</h2>
-          <p>Mandás el pedido, te llamamos y arreglamos pago y entrega.</p>
-        </div>
-      </section>
 
       <section className="home-shows">
         <div className="home-shows-texto">

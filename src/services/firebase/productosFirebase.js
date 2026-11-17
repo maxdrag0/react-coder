@@ -83,7 +83,17 @@ export const obtenerProductos = async (
     return { items, lastVisibleDoc };
   } catch (error) {
     console.error("Error al obtener productos:", error);
-    return { items: [], lastVisibleDoc: null };
+    /*
+      `fallo` y no solo la lista vacia: vacio es EXACTAMENTE lo que devuelve
+      la ultima pagina de un catalogo que se termino, asi que quien pagina no
+      podia distinguir "no hay mas" de "se corto la consulta". El barrido del
+      catalogo cortaba con lo que tenia y lo guardaba en el cache como si
+      fuera todo, media hora, sin un error a la vista.
+
+      Se sigue devolviendo la forma de siempre para no romper a quien no lo
+      mire; quien pagina ahora si lo mira.
+    */
+    return { items: [], lastVisibleDoc: null, fallo: true };
   }
 };
 

@@ -1,11 +1,8 @@
 import { useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
-import { CATEGORIES } from "@/constants/categories";
 import { formatearPrecio } from "@/utils/formatearPrecio";
 import { SIN_MARCA } from "@/constants/marcas";
 import "./FiltrosProductos.css";
-
-const CATEGORIAS = Object.values(CATEGORIES).sort((a, b) => a.localeCompare(b));
 
 const porcentaje = (valor, min, max) =>
   max > min ? `${((valor - min) / (max - min)) * 100}%` : "100%";
@@ -16,6 +13,7 @@ const porcentaje = (valor, min, max) =>
  * teléfono y evita comerle la mitad del alto al listado.
  */
 const FiltrosProductos = ({
+  categorias = [],
   categoria,
   onCategoria,
   marcas,
@@ -70,33 +68,44 @@ const FiltrosProductos = ({
           </button>
         </div>
 
-        <fieldset className="filtro-grupo">
-          <legend>Categoría</legend>
-          <ul className="filtro-lista">
-            <li>
-              <button
-                type="button"
-                className={`filtro-opcion ${!categoria ? "activa" : ""}`}
-                onClick={() => elegirCategoria(null)}
-                aria-pressed={!categoria}
-              >
-                Todas
-              </button>
-            </li>
-            {CATEGORIAS.map((c) => (
-              <li key={c}>
+        {/*
+          Las categorías las pone la página, y son las que tienen productos a
+          la vista. Antes salían de la constante: las dieciséis, cargadas o
+          no, así que la mayoría de las opciones llevaban a "No encontramos
+          nada". Si no hay ninguna, el grupo no se dibuja, igual que el de
+          marcas.
+        */}
+        {categorias.length > 0 && (
+          <fieldset className="filtro-grupo">
+            <legend>Categoría</legend>
+            <ul className="filtro-lista">
+              <li>
                 <button
                   type="button"
-                  className={`filtro-opcion ${categoria === c ? "activa" : ""}`}
-                  onClick={() => elegirCategoria(c)}
-                  aria-pressed={categoria === c}
+                  className={`filtro-opcion ${!categoria ? "activa" : ""}`}
+                  onClick={() => elegirCategoria(null)}
+                  aria-pressed={!categoria}
                 >
-                  {c}
+                  Todas
                 </button>
               </li>
-            ))}
-          </ul>
-        </fieldset>
+              {categorias.map((c) => (
+                <li key={c}>
+                  <button
+                    type="button"
+                    className={`filtro-opcion ${
+                      categoria === c ? "activa" : ""
+                    }`}
+                    onClick={() => elegirCategoria(c)}
+                    aria-pressed={categoria === c}
+                  >
+                    {c}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </fieldset>
+        )}
 
         {marcas.length > 0 && (
           <fieldset className="filtro-grupo">

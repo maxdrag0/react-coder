@@ -4,6 +4,7 @@ import {
   leerCatalogo,
   guardarCatalogo,
   invalidarCatalogo,
+  traerUnaVez,
 } from "@/services/firebase/cacheCatalogo";
 
 const PRODUCTOS = [{ codigo: "1", nombre: "Torta" }];
@@ -124,5 +125,76 @@ describe("cacheCatalogo", () => {
       JSON.stringify({ items: { truco: true }, guardadoEn: Date.now() }),
     );
     expect(leerCatalogo(null)).toBeNull();
+  });
+});
+
+/*
+  EL BUG QUE CUBRE: la portada y el pie de página se montan juntos y los dos
+  piden el catálogo completo. Con el caché vacío —la primera visita— ninguno
+  ve nada guardado todavía, así que salían DOS barridos del catálogo en
+  paralelo y las dos escribían la misma entrada. Con 31 productos son 62
+  lecturas por sesión en vez de 31; con el catálogo entero cargado, 640.
+*/
+describe("traerUnaVez", () => {
+  const diferido = () => {
+    let resolver, rechazar;
+    const promesa = new Promise((res, rej) => {
+      resolver = res;
+      rechazar = rej;
+    });
+    return { promesa, resolver, rechazar };
+  };
+
+  it("dos pedidos a la vez comparten una sola consulta", async () => {
+    const { promesa, resolver } = diferido();
+    const traer = vi.fn(() => promesa);
+
+    const ambos = Promise.all([
+      traerUnaVez(null, traer),
+      traerUnaVez(null, traer),
+    ]);
+    resolver(PRODUCTOS);
+
+    expect(await ambos).toEqual([PRODUCTOS, PRODUCTOS]);
+    expect(traer).toHaveBeenCalledTimes(1);
+  });
+
+  it("no mezcla categorías distintas", async () => {
+    const traer = vi.fn(async (c) => [c]);
+    const [todas, tortas] = await Promise.all([
+      traerUnaVez(null, () => traer("todas")),
+      traerUnaVez("Tortas", () => traer("Tortas")),
+    ]);
+
+    expect(todas).toEqual(["todas"]);
+    expect(tortas).toEqual(["Tortas"]);
+    expect(traer).toHaveBeenCalledTimes(2);
+  });
+
+  it("cuando termina, el siguiente vuelve a preguntar", async () => {
+    // No es un caché: de eso se encarga guardarCatalogo. Solo evita que dos
+    // pedidos simultáneos salgan dos veces.
+    const traer = vi.fn(async () => PRODUCTOS);
+    await traerUnaVez(null, traer);
+    await traerUnaVez(null, traer);
+    expect(traer).toHaveBeenCalledTimes(2);
+  });
+
+  it("el error llega a los dos y no queda pegado", async () => {
+    const { promesa, rechazar } = diferido();
+    const falla = vi.fn(() => promesa);
+
+    const uno = traerUnaVez(null, falla);
+    const dos = traerUnaVez(null, falla);
+    rechazar(new Error("sin red"));
+
+    await expect(uno).rejects.toThrow("sin red");
+    await expect(dos).rejects.toThrow("sin red");
+    expect(falla).toHaveBeenCalledTimes(1);
+
+    // Y el que viene después puede volver a intentar.
+    const ok = vi.fn(async () => PRODUCTOS);
+    expect(await traerUnaVez(null, ok)).toEqual(PRODUCTOS);
+    expect(ok).toHaveBeenCalledTimes(1);
   });
 });

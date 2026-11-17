@@ -99,3 +99,34 @@ describe("ninguna consulta filtra por un campo que ya no existe", () => {
     expect(culpables).toEqual([]);
   });
 });
+
+/*
+  EL BUG QUE CUBRE: cuando la consulta falla, esta funcion devolvia
+  `{items: [], lastVisibleDoc: null}`, que es EXACTAMENTE lo que devuelve la
+  ultima pagina de un catalogo que se termino. Quien pagina no tenia manera
+  de distinguir "no hay mas" de "se corto": el barrido del catalogo cortaba
+  con lo que tenia y lo guardaba en el cache como si fuera todo.
+
+  Desde que el filtro de categorias se deriva del catalogo cargado, un
+  catalogo truncado no muestra una lista corta: borra la categoria del panel.
+*/
+describe("obtenerProductos: cuando la consulta falla", () => {
+  it("lo dice, en vez de parecer el final del catálogo", async () => {
+    getDocs.mockRejectedValueOnce(new Error("sin red"));
+    const pagina = await obtenerProductos(null);
+    expect(pagina.fallo).toBe(true);
+  });
+
+  it("devuelve igual la forma de siempre, para no romper a quien no mire", async () => {
+    getDocs.mockRejectedValueOnce(new Error("sin red"));
+    const pagina = await obtenerProductos(null);
+    expect(pagina.items).toEqual([]);
+    expect(pagina.lastVisibleDoc).toBeNull();
+  });
+
+  it("no marca fallo cuando simplemente no hay productos", async () => {
+    const pagina = await obtenerProductos(null);
+    expect(pagina.items).toEqual([]);
+    expect(pagina.fallo).toBeUndefined();
+  });
+});

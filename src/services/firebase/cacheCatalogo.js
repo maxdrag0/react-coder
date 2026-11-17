@@ -27,6 +27,19 @@ const VERSION = 2;
 // En memoria: sobrevive a la navegación entre páginas sin tocar el disco.
 let enMemoria = null;
 
+/*
+  Las consultas que están saliendo en este momento, por clave.
+
+  El caché no alcanza para esto: se escribe cuando la consulta TERMINA, así
+  que dos pedidos que arrancan juntos con el caché vacío no ven nada y salen
+  los dos. Y arrancan juntos de verdad: la portada y el pie de página se
+  montan en el mismo render y los dos piden el catálogo completo.
+
+  Con 31 productos eran 62 lecturas por sesión en vez de 31; con el catálogo
+  entero cargado, 640. El plan gratuito da 50.000 por día.
+*/
+const enVuelo = new Map();
+
 const ahora = () => Date.now();
 
 const vigente = (entrada) =>
@@ -79,6 +92,34 @@ export const guardarCatalogo = (categoria, items) => {
   } catch {
     // Si no entra (cuota llena), el caché en memoria alcanza.
   }
+};
+
+/**
+ * Una sola consulta por clave mientras esté saliendo. Quien llegue segundo
+ * espera la misma respuesta en vez de pedir de nuevo.
+ *
+ * No es un caché —de eso se encarga guardarCatalogo—: en cuanto termina, la
+ * promesa se olvida, así que el siguiente pedido vuelve a preguntar. Si falla,
+ * el error llega a todos los que estaban esperando y tampoco queda pegado.
+ *
+ * @param {string|null} categoria
+ * @param {() => Promise<any>} traer
+ */
+export const traerUnaVez = (categoria, traer) => {
+  const clave = categoria ?? "__todas__";
+  const yendo = enVuelo.get(clave);
+  if (yendo) return yendo;
+
+  const promesa = traer();
+  enVuelo.set(clave, promesa);
+
+  // El olvido va en then/catch y no en finally sobre la promesa guardada:
+  // finally devuelve OTRA promesa, y guardar esa haría que un rechazo sin
+  // nadie escuchando quedara sin manejar.
+  const olvidar = () => enVuelo.delete(clave);
+  promesa.then(olvidar, olvidar);
+
+  return promesa;
 };
 
 /** Se llama al crear, editar o borrar un producto desde el panel. */

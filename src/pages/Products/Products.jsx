@@ -13,6 +13,10 @@ import { useProducts } from "../../hooks/useProducts";
 import { precioMinimo } from "../../constants/unidades";
 import { SIN_MARCA } from "../../constants/marcas";
 import { seMuestra } from "../../constants/estadoProducto";
+import {
+  categoriasConProductos,
+  deLaCategoria,
+} from "../../constants/categoriasConProductos";
 import "./Products.css";
 
 const coincideTexto = (item, busqueda) => {
@@ -42,14 +46,46 @@ function Products() {
   const urlSearch = searchParams.get("search") || "";
   const [localSearch, setLocalSearch] = useState(urlSearch);
 
-  // El catálogo entero de una: el filtro corre en el cliente, así que con
-  // paginado el buscador solo veía la primera página. Traerlo completo
-  // también hace que filtrar sea instantáneo mientras se escribe.
-  const { items, loading } = useProducts(category, { traerTodo: true });
+  /*
+    El catálogo entero de una, SIN pedirle la categoría a Firestore.
+
+    Dos razones. El filtro corre en el cliente, así que con paginado el
+    buscador solo veía la primera página. Y el panel de filtros tiene que
+    saber qué categorías tienen algo cargado para no ofrecer las que no:
+    pidiendo una sola categoría no hay manera de saberlo.
+
+    No cuesta lecturas: pega en la misma entrada de caché que llena la
+    portada, así que moverse entre categorías pasó de una vuelta al catálogo
+    por categoría a una sola por sesión.
+  */
+  const { items, loading } = useProducts(undefined, { traerTodo: true });
 
   // Un producto oculto no existe para la tienda: se va antes de calcular
   // marcas, precio máximo y conteos, para que no infle ningún número.
   const visibles = useMemo(() => items.filter(seMuestra), [items]);
+
+  /*
+    Las categorías del panel salen del catálogo y no de la constante: de las
+    dieciséis se usan menos de la mitad, así que ofrecerlas todas llenaba el
+    filtro de opciones que llevan a "No encontramos nada".
+
+    La elegida va igual aunque esté vacía, para que el panel pueda marcarla
+    como activa mientras la cabecera muestra ese nombre.
+  */
+  const categorias = useMemo(
+    () => categoriasConProductos(visibles, category),
+    [visibles, category],
+  );
+
+  /*
+    Lo que mira esta página. El filtro por categoría pasó al cliente junto
+    con los demás, así que las marcas, el precio máximo y los conteos se
+    calculan sobre el rubro que se está mirando y no sobre todo el catálogo.
+  */
+  const enCategoria = useMemo(
+    () => deLaCategoria(visibles, category),
+    [visibles, category],
+  );
 
   const [marcasElegidas, setMarcasElegidas] = useState([]);
   const [topePrecio, setTopePrecio] = useState(null);
@@ -59,29 +95,29 @@ function Products() {
   }, [urlSearch]);
 
   const marcas = useMemo(() => {
-    const vistas = new Set(visibles.map(marcaDe));
+    const vistas = new Set(enCategoria.map(marcaDe));
     return [...vistas].sort((a, b) =>
       a === SIN_MARCA ? 1 : b === SIN_MARCA ? -1 : a.localeCompare(b),
     );
-  }, [visibles]);
+  }, [enCategoria]);
 
   const precioMax = useMemo(() => {
-    const precios = visibles.map(precioMinimo).filter((p) => p !== null);
+    const precios = enCategoria.map(precioMinimo).filter((p) => p !== null);
     return precios.length ? Math.max(...precios) : 0;
-  }, [visibles]);
+  }, [enCategoria]);
 
   const tope = topePrecio ?? precioMax;
 
   const filtrados = useMemo(
     () =>
-      visibles.filter(
+      enCategoria.filter(
         (item) =>
           coincideTexto(item, localSearch) &&
           coincidePrecio(item, tope) &&
           (marcasElegidas.length === 0 ||
             marcasElegidas.includes(marcaDe(item))),
       ),
-    [visibles, localSearch, marcasElegidas, tope],
+    [enCategoria, localSearch, marcasElegidas, tope],
   );
 
   // El conteo por marca aplica los demás filtros pero NO el de marca: así
@@ -89,14 +125,14 @@ function Products() {
   // uno quiere saber antes de tildarla.
   const conteoMarcas = useMemo(() => {
     const cuenta = {};
-    for (const item of visibles) {
+    for (const item of enCategoria) {
       if (!coincideTexto(item, localSearch)) continue;
       if (!coincidePrecio(item, tope)) continue;
       const marca = marcaDe(item);
       cuenta[marca] = (cuenta[marca] ?? 0) + 1;
     }
     return cuenta;
-  }, [visibles, localSearch, tope]);
+  }, [enCategoria, localSearch, tope]);
 
   const cambiarBusqueda = (e) => {
     const valor = e.target.value;
@@ -143,6 +179,7 @@ function Products() {
       <div className="productos-cuerpo">
         <aside className="productos-panel">
           <FiltrosProductos
+            categorias={categorias}
             categoria={category ?? null}
             onCategoria={(c) =>
               navigate(c ? `/products/${encodeURIComponent(c)}` : "/products")

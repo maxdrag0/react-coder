@@ -3,6 +3,7 @@ import { services } from "../services/index.js";
 import {
   leerCatalogo,
   guardarCatalogo,
+  traerUnaVez,
 } from "../services/firebase/cacheCatalogo.js";
 
 const useProducts = (category, { traerTodo = false } = {}) => {
@@ -27,21 +28,46 @@ const useProducts = (category, { traerTodo = false } = {}) => {
           return;
         }
 
-        // El buscador filtra en el cliente, así que con una sola página de 8
-        // productos buscar "torta" devolvía "no encontramos nada" en un
-        // catálogo con cincuenta. Cuando hay búsqueda se trae todo.
-        let acumulado = [];
-        let cursor = null;
+        /*
+          El buscador filtra en el cliente, así que con una sola página de 8
+          productos buscar "torta" devolvía "no encontramos nada" en un
+          catálogo con cincuenta. Cuando hay búsqueda se trae todo.
 
-        for (let i = 0; i < 60; i++) {
-          const { items: pagina, lastVisibleDoc } =
-            await services.firebase.obtenerProductos(category, cursor, 100);
-          acumulado = [...acumulado, ...pagina];
-          cursor = lastVisibleDoc;
-          if (pagina.length === 0 || !lastVisibleDoc) break;
-        }
+          Va dentro de traerUnaVez porque el caché se escribe recién cuando
+          esto TERMINA: dos consumidores que se montan juntos con el caché
+          vacío —la portada y el pie de página, en la primera visita— no ven
+          nada y salen los dos. Eran el doble de lecturas por sesión.
+        */
+        const acumulado = await traerUnaVez(category, async () => {
+          let juntado = [];
+          let cursor = null;
 
-        guardarCatalogo(category, acumulado);
+          for (let i = 0; i < 60; i++) {
+            const {
+              items: pagina,
+              lastVisibleDoc,
+              fallo,
+            } = await services.firebase.obtenerProductos(category, cursor, 100);
+
+            /*
+              Una consulta que se cayo no es el final del catalogo. Sin esto
+              el bucle cortaba con lo que tenia y lo guardaba como si fuera
+              todo: la tienda mostraba 100 de 323 productos durante media
+              hora, recargar no alcanzaba, y el filtro —que ahora sale del
+              catalogo cargado— dejaba de ofrecer categorias enteras. Sin un
+              solo mensaje.
+            */
+            if (fallo) throw new Error("No se pudo traer el catálogo entero");
+
+            juntado = [...juntado, ...pagina];
+            cursor = lastVisibleDoc;
+            if (pagina.length === 0 || !lastVisibleDoc) break;
+          }
+
+          guardarCatalogo(category, juntado);
+          return juntado;
+        });
+
         setItems(acumulado);
         setLastVisible(null);
         setHasMore(false);

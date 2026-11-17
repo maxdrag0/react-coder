@@ -78,3 +78,33 @@ describe("Panel en celular: ningún campo empuja el ancho", () => {
     expect(reglaDe(celular, ".admin-header h2")).toMatch(/font-size/);
   });
 });
+
+describe("Panel en celular: las reglas de tamaño no quedan tapadas", () => {
+  /*
+    EL BUG: un media query NO aporta especificidad. `.prodfiltros-select` con
+    font-size vivía en el primer bloque de celular, y la regla base del mismo
+    selector está más abajo en el archivo: ganaba la de abajo y el select
+    seguía con la letra grande. Es la misma trampa que ya tenía documentada
+    el NavBar.
+  */
+  const posicionDe = (desde, selector) => {
+    const indice = css.indexOf(`${selector} {`, desde);
+    return indice === -1 ? Infinity : indice;
+  };
+
+  it("el font-size de celular del select va después de su regla base", () => {
+    const base = posicionDe(0, ".prodfiltros-select");
+    const conTamano = css.indexOf(
+      "font-size",
+      css.indexOf(".prodfiltros-select {", base + 1),
+    );
+
+    // La última declaración del selector tiene que ser la del celular.
+    const ultima = css.lastIndexOf(".prodfiltros-select {");
+    expect(ultima).toBeGreaterThan(base);
+    expect(conTamano).toBeGreaterThan(base);
+    expect(css.slice(ultima, ultima + 200)).toMatch(
+      /font-size:\s*var\(--t-xs\)/,
+    );
+  });
+});

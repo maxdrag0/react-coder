@@ -356,7 +356,6 @@
   .prodfiltros-select {
     min-width: 0;
     max-width: 100%;
-    font-size: var(--t-xs);
   }
 
   /* Lo mismo para cualquier campo del panel: nada mas ancho que su caja. */
@@ -696,8 +695,14 @@
     flex-basis: 100%;
     max-width: none;
   }
+  /*
+    El tamaño va ACA y no en el bloque de celular de arriba: la regla base de
+    .prodfiltros-select esta mas abajo en el archivo, y como un media query
+    no aporta especificidad, le ganaba y el select seguia en --t-sm.
+  */
   .prodfiltros-select {
     flex: 1 1 10rem;
+    font-size: var(--t-xs);
   }
   .prodfiltros-precio {
     flex: 1 1 100%;

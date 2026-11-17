@@ -137,3 +137,44 @@ describe("enviarOrden: sin red", () => {
     await expect(mandar()).rejects.toMatchObject({ code: "sin-red" });
   });
 });
+
+/*
+  EL BUG: enviarOrden desarmaba el cuerpo con `{ items, telefono,
+  idempotencia }` y armaba el body con esos tres. La dirección y la ciudad
+  que le pasaba el carrito se perdían en el camino, sin un error: el servidor
+  las pedía, no llegaban, y el pedido volvía con 422 para siempre.
+
+  Los tests del carrito no lo podían ver, porque ahí enviarOrden está
+  mockeada: el corte está justo en este archivo.
+*/
+describe("enviarOrden: los datos de envío", () => {
+  it("manda la dirección y la ciudad", async () => {
+    global.fetch = responder(201, { id: "uuid-1", total: 8000 });
+    await mandar({ direccion: "San Martín 742", ciudad: "Córdoba" });
+
+    expect(cuerpoDe()).toMatchObject({
+      direccion: "San Martín 742",
+      ciudad: "Córdoba",
+    });
+  });
+
+  it("no las manda cuando no las hay: el servidor las lee del perfil", async () => {
+    global.fetch = responder(201, { id: "uuid-1", total: 8000 });
+    await mandar();
+
+    expect(cuerpoDe()).not.toHaveProperty("direccion");
+    expect(cuerpoDe()).not.toHaveProperty("ciudad");
+  });
+
+  it("distingue el 422 de la dirección del 422 del teléfono", async () => {
+    // Los dos son 422 y el carrito pide un campo distinto en cada caso: con
+    // un solo código, el aviso aparecía siempre en el teléfono.
+    global.fetch = responder(422, { error: "sin_direccion" });
+    await expect(mandar()).rejects.toMatchObject({ code: "sin_direccion" });
+  });
+
+  it("un 422 sin código reconocible no se hace pasar por otro", async () => {
+    global.fetch = responder(422, {});
+    await expect(mandar()).rejects.toMatchObject({ code: "sin_telefono" });
+  });
+});

@@ -9,7 +9,8 @@ import "./Carrito.css";
 import { enviarOrden } from "@/services/api/ordenes";
 import Reconciliar from "./Reconciliar";
 import { usePerfil } from "@/hooks/usePerfil";
-import { errorDeTelefono, soloDigitos } from "@/utils/telefono";
+import { useDatosEnvio } from "./useDatosEnvio";
+import DatosEnvio from "./DatosEnvio";
 import { formatearTotal } from "@/utils/formatearPrecio";
 import VerificacionPendiente from "@/components/auth/VerificacionPendiente/VerificacionPendiente";
 
@@ -23,12 +24,18 @@ function Carrito() {
     guardar: guardarPerfil,
   } = usePerfil();
 
-  // Los usuarios que ya existian no tienen telefono, y los que entran con
-  // Google tampoco: ahi no hay formulario donde pedirlo. Si falta, se pide
-  // aca antes de dejar mandar el pedido.
-  const [telefono, setTelefono] = useState("");
-  const [errorTelefono, setErrorTelefono] = useState("");
-  const faltaTelefono = !cargandoPerfil && Boolean(user) && !perfil?.telefono;
+  /*
+    Teléfono, dirección y ciudad. Los usuarios que ya existían no tienen
+    teléfono, y los que entran con Google tampoco: ahí no hay formulario
+    donde pedirlo. Lo que falte se pide acá, antes de dejar mandar el pedido,
+    y queda guardado en el perfil para no volver a pedirlo.
+  */
+  const envio = useDatosEnvio({
+    perfil,
+    activo: !cargandoPerfil && Boolean(user),
+    guardarPerfil,
+  });
+
   const [showModal, setShowModal] = useState(false);
   const [orderId, setOrderId] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -99,7 +106,7 @@ function Carrito() {
 
       const { id } = await enviarOrden({
         items,
-        telefono: perfil?.telefono ? undefined : telefono,
+        ...envio.paraEnviar(),
         idempotencia: idempotencia.current,
       });
 
@@ -111,7 +118,17 @@ function Carrito() {
         reconciliar(error.problemas);
         setProblemas(error.problemas);
       } else if (error.code === "sin_telefono") {
-        setErrorTelefono("Necesitamos tu teléfono para coordinar el pedido.");
+        envio.marcarError(
+          "telefono",
+          "Necesitamos tu teléfono para coordinar el pedido.",
+        );
+      } else if (error.code === "sin_direccion") {
+        // Puede pasar sin que el formulario se equivoque: el perfil se pudo
+        // haber editado en otra pestaña.
+        envio.marcarError(
+          "direccion",
+          "Necesitamos tu dirección para el envío.",
+        );
       } else {
         console.error("Error al enviar el pedido:", error);
         setErrorEnvio(error.message);
@@ -127,14 +144,10 @@ function Carrito() {
       return;
     }
 
-    if (!perfil?.telefono) {
-      const malo = errorDeTelefono(telefono);
-      if (malo) return setErrorTelefono(malo);
-      // Queda guardado para que no lo tenga que escribir la próxima vez.
-      await guardarPerfil({ telefono: soloDigitos(telefono) });
-    }
+    // Valida lo que falta y lo guarda en el perfil. Si algo no sirve, no
+    // sale el pedido: el servidor lo rechazaría igual.
+    if (!(await envio.confirmar())) return;
 
-    setErrorTelefono("");
     await mandar();
   };
 
@@ -189,26 +202,7 @@ function Carrito() {
               <strong>{formatearTotal(total)}</strong>
             </div>
 
-            {faltaTelefono && (
-              <div className="campo carrito-telefono">
-                <label htmlFor="carrito-telefono">Tu teléfono</label>
-                <input
-                  id="carrito-telefono"
-                  className="campo-control"
-                  type="tel"
-                  autoComplete="tel"
-                  placeholder="11 2345-6789"
-                  value={telefono}
-                  onChange={(e) => setTelefono(e.target.value)}
-                />
-                <small
-                  className={errorTelefono ? "campo-error" : "campo-ayuda"}
-                >
-                  {errorTelefono ||
-                    "Es por donde te contactamos para coordinar."}
-                </small>
-              </div>
-            )}
+            {envio.falta && <DatosEnvio {...envio} />}
 
             {/* El servidor rechaza el pedido sin el mail verificado, y hace
                 bien: es el único que no se puede saltear. Pero enterarse

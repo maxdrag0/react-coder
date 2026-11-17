@@ -23,8 +23,21 @@ vi.mock("@/contexts/auth/useAuth", () => ({
 }));
 
 vi.mock("@/hooks/usePerfil", () => ({
+  /*
+    Un objeto nuevo en cada render, a proposito: asi es como se usa de
+    verdad un mock de hook, y es lo que destapo que useDatosEnvio se
+    renderizaba en bucle. Si se cambia por uno estable, ese bug puede
+    volver sin que nada falle.
+
+    El envio va cargado porque sin direccion el pedido no sale, y estos
+    tests son sobre otra cosa.
+  */
   usePerfil: () => ({
-    perfil: { telefono: "1123456789" },
+    perfil: {
+      telefono: "1123456789",
+      direccion: "San Martín 742",
+      ciudad: "Córdoba",
+    },
     cargando: false,
     guardar: vi.fn(),
   }),

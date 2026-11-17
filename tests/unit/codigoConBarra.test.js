@@ -121,12 +121,16 @@ beforeEach(() => {
     .mockReset()
     .mockResolvedValue([{ exists: true, id: "2302-MI", data: () => PRODUCTO }]);
   set.mockReset().mockResolvedValue(undefined);
-  getPerfil
-    .mockReset()
-    .mockResolvedValue({
-      exists: true,
-      data: () => ({ telefono: "1123456789" }),
-    });
+  // El perfil completo: sin direccion el pedido no entra, y este archivo
+  // es sobre el codigo con barra, no sobre el envio.
+  getPerfil.mockReset().mockResolvedValue({
+    exists: true,
+    data: () => ({
+      telefono: "1123456789",
+      direccion: "San Martín 742",
+      ciudad: "Córdoba",
+    }),
+  });
   getConfig.mockReset().mockResolvedValue({ exists: false });
   docDeColeccion.mockReset();
 });

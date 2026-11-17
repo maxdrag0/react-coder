@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/auth/useAuth";
 import { usePerfil } from "@/hooks/usePerfil";
 import { errorDeTelefono, soloDigitos } from "@/utils/telefono";
+import { errorDeCiudad, errorDeDireccion, limpiarTexto } from "@/utils/envio";
 import { logoutUser } from "@/services/firebase/authFirebase";
 import { useTheme } from "@/contexts/theme/useTheme";
 import VerificacionPendiente from "@/components/auth/VerificacionPendiente/VerificacionPendiente";
 import CabeceraPerfil from "./CabeceraPerfil";
+import CampoEditable from "./CampoEditable";
 import MisPedidos from "./MisPedidos";
 import "./Profile.css";
 
@@ -18,35 +19,14 @@ const Profile = () => {
   const { perfil, cargando, guardar } = usePerfil();
   const navigate = useNavigate();
 
-  // El telefono es lo unico editable del perfil: el nombre y el email viven
-  // en Auth y cambiarlos pide reautenticacion, que es otra pantalla.
-  const [telefono, setTelefono] = useState("");
-  const [estado, setEstado] = useState({ error: "", listo: false });
-  const [guardando, setGuardando] = useState(false);
+  /*
+    El telefono, la direccion y la ciudad: lo que hace falta para atender un
+    pedido. El nombre y el email viven en Auth y cambiarlos pide
+    reautenticacion, que es otra pantalla.
 
-  useEffect(() => {
-    if (perfil?.telefono) setTelefono(perfil.telefono);
-  }, [perfil]);
-
-  const guardarTelefono = async (e) => {
-    e.preventDefault();
-    const error = errorDeTelefono(telefono);
-    if (error) return setEstado({ error, listo: false });
-
-    setGuardando(true);
-    try {
-      await guardar({ telefono: soloDigitos(telefono) });
-      setEstado({ error: "", listo: true });
-    } catch {
-      setEstado({
-        error: "No pudimos guardarlo. Probá de nuevo.",
-        listo: false,
-      });
-    } finally {
-      setGuardando(false);
-    }
-  };
-
+    La direccion se pide en el carrito la primera vez, pero tiene que poder
+    cambiarse sin hacer un pedido: la gente se muda.
+  */
   const salir = async () => {
     await logoutUser();
     navigate("/");
@@ -72,47 +52,48 @@ const Profile = () => {
               <span className="info-label">Email:</span>
               <span className="info-value">{user.email}</span>
             </div>
-            <form
-              className="info-group info-editable"
-              onSubmit={guardarTelefono}
-            >
-              <label className="info-label" htmlFor="perfil-telefono">
-                Teléfono:
-              </label>
-              <div className="info-value perfil-telefono">
-                <input
-                  id="perfil-telefono"
-                  className="campo-control"
-                  type="tel"
-                  autoComplete="tel"
-                  placeholder={cargando ? "Cargando..." : "11 2345-6789"}
-                  value={telefono}
-                  onChange={(e) => {
-                    setTelefono(e.target.value);
-                    setEstado({ error: "", listo: false });
-                  }}
-                  disabled={cargando}
-                />
-                <button
-                  type="submit"
-                  className="boton boton-secundario"
-                  disabled={guardando || cargando}
-                >
-                  {guardando ? "Guardando..." : "Guardar"}
-                </button>
-              </div>
-              {estado.error && (
-                <small className="campo-error">{estado.error}</small>
-              )}
-              {estado.listo && (
-                <small className="campo-ok">Teléfono guardado.</small>
-              )}
-              {!estado.error && !estado.listo && (
-                <small className="campo-ayuda">
-                  Es por donde te contactamos cuando hacés un pedido.
-                </small>
-              )}
-            </form>
+            <CampoEditable
+              id="perfil-telefono"
+              etiqueta="Teléfono:"
+              type="tel"
+              autoComplete="tel"
+              placeholder={cargando ? "Cargando..." : "11 2345-6789"}
+              inicial={perfil?.telefono}
+              cargando={cargando}
+              validar={errorDeTelefono}
+              normalizar={soloDigitos}
+              onGuardar={(telefono) => guardar({ telefono })}
+              ayuda="Es por donde te contactamos cuando hacés un pedido."
+              okTexto="Teléfono guardado."
+            />
+            <CampoEditable
+              id="perfil-direccion"
+              etiqueta="Dirección:"
+              type="text"
+              autoComplete="street-address"
+              placeholder={cargando ? "Cargando..." : "San Martín 742"}
+              inicial={perfil?.direccion}
+              cargando={cargando}
+              validar={errorDeDireccion}
+              normalizar={limpiarTexto}
+              onGuardar={(direccion) => guardar({ direccion })}
+              ayuda="Calle y altura. Es adonde mandamos el pedido."
+              okTexto="Dirección guardada."
+            />
+            <CampoEditable
+              id="perfil-ciudad"
+              etiqueta="Ciudad o localidad:"
+              type="text"
+              autoComplete="address-level2"
+              placeholder={cargando ? "Cargando..." : "Villa María"}
+              inicial={perfil?.ciudad}
+              cargando={cargando}
+              validar={errorDeCiudad}
+              normalizar={limpiarTexto}
+              onGuardar={(ciudad) => guardar({ ciudad })}
+              ayuda="La usamos para coordinar el envío."
+              okTexto="Ciudad guardada."
+            />
           </div>
         </section>
 

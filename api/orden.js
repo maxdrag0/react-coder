@@ -3,6 +3,7 @@ import { auth, db } from "./_lib/firebaseAdmin.js";
 import { validarCuerpo } from "./_lib/validarCuerpo.js";
 import { validarOrden } from "./_lib/validarOrden.js";
 import { errorDeTelefono, soloDigitos } from "../src/utils/telefono.js";
+import { faltaEnvio, limpiarTexto } from "../src/utils/envio.js";
 import {
   SIN_RECARGO,
   conRecargo,
@@ -93,7 +94,7 @@ export default async function handler(req, res) {
   const forma = validarCuerpo(req.body);
   if (!forma.ok) return res.status(400).json({ error: forma.error });
 
-  const { idempotencia, telefono } = forma.datos;
+  const { idempotencia, telefono, direccion, ciudad } = forma.datos;
 
   /*
     Los codigos se normalizan APENAS ENTRAN, antes de cualquier otra cosa.
@@ -117,18 +118,61 @@ export default async function handler(req, res) {
   }));
 
   try {
-    // 3. Telefono: el del perfil manda, y si no hay se acepta el del cuerpo.
+    /*
+      3. Con que datos se atiende el pedido.
+
+      Para los dos —el telefono y el envio— manda lo que ya esta GUARDADO en
+      el perfil: es lo que el dueno conoce de esa persona. El cuerpo se usa
+      solo para completar lo que falta, y lo que llega nuevo queda guardado
+      para no volver a pedirlo en el proximo pedido.
+
+      Se exige aca y no solo en el formulario porque es el unico lugar que no
+      se puede saltear. Un pedido sin telefono no se puede atender —el
+      negocio es llamar al cliente— y uno sin direccion no se puede enviar:
+      obliga a escribirle de nuevo, una vez por pedido.
+    */
     const perfilRef = db.collection("users").doc(usuario.uid);
     const perfil = await perfilRef.get();
-    const guardado = perfil.exists ? (perfil.data()?.telefono ?? "") : "";
+    const datos = perfil.exists ? (perfil.data() ?? {}) : {};
 
-    let telefonoFinal = guardado;
+    // Lo que el cliente nos dijo ahora y todavia no estaba. Se escribe de
+    // una sola vez al final: son datos del mismo documento.
+    const aGuardar = {};
+
+    let telefonoFinal = datos.telefono ?? "";
     if (!telefonoFinal) {
       if (errorDeTelefono(telefono) !== null) {
         return res.status(422).json({ error: "sin_telefono" });
       }
       telefonoFinal = soloDigitos(telefono);
-      await perfilRef.set({ telefono: telefonoFinal }, { merge: true });
+      aGuardar.telefono = telefonoFinal;
+    }
+
+    /*
+      La direccion y la ciudad viajan juntas y se evaluan juntas: media
+      direccion no sirve para despachar, y mezclar la calle del perfil con la
+      ciudad del cuerpo daria una direccion que nadie escribio. El formulario
+      manda las dos cuando falta cualquiera de las dos.
+    */
+    let envio = {
+      direccion: limpiarTexto(datos.direccion),
+      ciudad: limpiarTexto(datos.ciudad),
+    };
+
+    if (faltaEnvio(envio)) {
+      const delCuerpo = {
+        direccion: limpiarTexto(direccion),
+        ciudad: limpiarTexto(ciudad),
+      };
+      if (faltaEnvio(delCuerpo)) {
+        return res.status(422).json({ error: "sin_direccion" });
+      }
+      envio = delCuerpo;
+      Object.assign(aGuardar, envio);
+    }
+
+    if (Object.keys(aGuardar).length > 0) {
+      await perfilRef.set(aGuardar, { merge: true });
     }
 
     /*
@@ -181,6 +225,13 @@ export default async function handler(req, res) {
       },
       items: renglones,
       total,
+      /*
+        El envio va DENTRO del pedido y no solo en el perfil: si alguien se
+        muda, los pedidos viejos tienen que seguir diciendo adonde se
+        mandaron. El perfil guarda el ultimo dato; el pedido, el que valia
+        cuando se hizo.
+      */
+      envio,
       // La fecha la pone el servidor: un reloj mal puesto del cliente ensucia
       // el orden con el que el dueno lee los pedidos.
       date: new Date().toISOString(),

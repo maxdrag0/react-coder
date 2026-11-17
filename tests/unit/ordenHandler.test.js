@@ -57,6 +57,9 @@ const PRODUCTO = {
 
 const docDe = (p) => ({ exists: true, id: p.codigo, data: () => p });
 
+// Los datos de envio que manda el formulario cuando el perfil no los tiene.
+const ENVIO = { direccion: "San Martín 742", ciudad: "Córdoba" };
+
 const pedido = (extra = {}) => ({
   method: "POST",
   headers: { authorization: "Bearer token-valido" },
@@ -88,7 +91,11 @@ beforeEach(() => {
   commit.mockReset().mockResolvedValue(undefined);
   getPerfil.mockReset().mockResolvedValue({
     exists: true,
-    data: () => ({ telefono: "1123456789" }),
+    data: () => ({
+      telefono: "1123456789",
+      direccion: "San Martín 742",
+      ciudad: "Córdoba",
+    }),
   });
   // Sin documento de configuracion el recargo es cero: la tienda muestra el
   // precio de lista. Es el estado antes de que nadie toque el panel.
@@ -258,18 +265,20 @@ describe("api/orden: telefono", () => {
   it("acepta el telefono del cuerpo si el perfil no tiene", async () => {
     getPerfil.mockResolvedValue({ exists: true, data: () => ({}) });
     const res = respuesta();
-    await handler(pedido({ telefono: "11 2345-6789" }), res);
+    // Con el perfil vacio tambien falta el envio, y sin eso el pedido no
+    // entra: el formulario manda los dos juntos.
+    await handler(pedido({ telefono: "11 2345-6789", ...ENVIO }), res);
     expect(res.codigo).toBe(201);
     // La orden es la ULTIMA escritura: antes el handler guarda el telefono en
     // el perfil, para no volver a pedirlo en el proximo pedido.
     expect(set.mock.calls.at(-1)[0].buyer.telefono).toBe("1123456789");
   });
 
-  it("guarda en el perfil el telefono que llego en el cuerpo", async () => {
+  it("guarda en el perfil lo que llego en el cuerpo, en una sola escritura", async () => {
     getPerfil.mockResolvedValue({ exists: true, data: () => ({}) });
-    await handler(pedido({ telefono: "11 2345-6789" }), respuesta());
+    await handler(pedido({ telefono: "11 2345-6789", ...ENVIO }), respuesta());
     expect(set.mock.calls[0]).toEqual([
-      { telefono: "1123456789" },
+      { telefono: "1123456789", ...ENVIO },
       { merge: true },
     ]);
   });
@@ -277,8 +286,9 @@ describe("api/orden: telefono", () => {
   it("422 con un telefono del cuerpo que no sirve", async () => {
     getPerfil.mockResolvedValue({ exists: true, data: () => ({}) });
     const res = respuesta();
-    await handler(pedido({ telefono: "123" }), res);
+    await handler(pedido({ telefono: "123", ...ENVIO }), res);
     expect(res.codigo).toBe(422);
+    expect(res.cuerpo.error).toBe("sin_telefono");
   });
 });
 
@@ -515,5 +525,110 @@ describe("api/orden: el contador de mas vendidos", () => {
     const res = respuesta();
     await handler(pedido(), res);
     expect(res.codigo).toBe(201);
+  });
+});
+
+/*
+  El negocio es "me llega el pedido y te contacto para coordinar el pago y el
+  envio". El telefono resuelve el contacto; la direccion resuelve el envio.
+  Sin ella hay que escribirle de nuevo a cada cliente para preguntarsela, una
+  vez por pedido.
+
+  Se exige ACA y no solo en el formulario por la misma razon que el telefono:
+  es el unico lugar que no se puede saltear.
+*/
+describe("api/orden: la dirección de envío", () => {
+  const sinEnvio = () =>
+    getPerfil.mockResolvedValue({
+      exists: true,
+      data: () => ({ telefono: "1123456789" }),
+    });
+
+  it("rechaza el pedido si no hay dirección en ninguna parte", async () => {
+    sinEnvio();
+    const res = respuesta();
+    await handler(pedido(), res);
+
+    expect(res.codigo).toBe(422);
+    expect(res.cuerpo.error).toBe("sin_direccion");
+  });
+
+  it("rechaza el pedido si falta la ciudad", async () => {
+    sinEnvio();
+    const res = respuesta();
+    await handler(pedido({ direccion: "San Martín 742" }), res);
+
+    expect(res.codigo).toBe(422);
+    expect(res.cuerpo.error).toBe("sin_direccion");
+  });
+
+  it("rechaza una dirección que no puede ser una dirección", async () => {
+    sinEnvio();
+    const res = respuesta();
+    await handler(pedido({ direccion: "1234", ciudad: "Córdoba" }), res);
+
+    expect(res.codigo).toBe(422);
+    expect(res.cuerpo.error).toBe("sin_direccion");
+  });
+
+  it("no escribe el pedido cuando falta la dirección", async () => {
+    sinEnvio();
+    await handler(pedido(), respuesta());
+    expect(set).not.toHaveBeenCalledWith(
+      expect.objectContaining({ items: expect.anything() }),
+    );
+  });
+
+  it("acepta la del cuerpo cuando el perfil no la tiene", async () => {
+    sinEnvio();
+    const res = respuesta();
+    await handler(
+      pedido({ direccion: "  Ruta 5 km 12 ", ciudad: " Oro Verde " }),
+      res,
+    );
+
+    expect(res.codigo).toBe(201);
+  });
+
+  it("la guarda en el perfil, limpia, para no pedirla de nuevo", async () => {
+    sinEnvio();
+    await handler(
+      pedido({ direccion: "  San  Martín 742 ", ciudad: " Córdoba " }),
+      respuesta(),
+    );
+
+    expect(set).toHaveBeenCalledWith(
+      { direccion: "San Martín 742", ciudad: "Córdoba" },
+      { merge: true },
+    );
+  });
+
+  it("el perfil manda sobre lo que diga el cuerpo", async () => {
+    // Igual que el telefono: lo guardado es lo que el dueno ya conoce.
+    const res = respuesta();
+    await handler(
+      pedido({ direccion: "Otra calle 1", ciudad: "Otra ciudad" }),
+      res,
+    );
+
+    const orden = set.mock.calls.find((c) => c[0]?.items)?.[0];
+    expect(orden.envio).toEqual({
+      direccion: "San Martín 742",
+      ciudad: "Córdoba",
+    });
+  });
+
+  it("queda guardada en el pedido, que es donde el dueño la lee", async () => {
+    // En el pedido y no solo en el perfil: si alguien se muda, los pedidos
+    // viejos tienen que seguir diciendo adónde se mandaron.
+    const res = respuesta();
+    await handler(pedido(), res);
+
+    const orden = set.mock.calls.find((c) => c[0]?.items)?.[0];
+    expect(res.codigo).toBe(201);
+    expect(orden.envio).toEqual({
+      direccion: "San Martín 742",
+      ciudad: "Córdoba",
+    });
   });
 });

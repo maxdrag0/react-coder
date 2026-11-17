@@ -34,6 +34,14 @@ const ITEM = {
 
 const guardarPerfilMock = vi.fn();
 
+/*
+  El envío ya cargado en el perfil. Va en todos los casos de este archivo a
+  propósito: estos tests son sobre el TELÉFONO, y desde que la dirección es
+  obligatoria un perfil sin ella frena el pedido por otro motivo. La
+  dirección tiene sus propios tests en Carrito.envio.test.jsx.
+*/
+const ENVIO = { direccion: "San Martín 742", ciudad: "Córdoba" };
+
 function montar({ telefono = null } = {}) {
   useAuthMock.mockReturnValue({
     user: {
@@ -46,7 +54,7 @@ function montar({ telefono = null } = {}) {
     loading: false,
   });
   usePerfilMock.mockReturnValue({
-    perfil: telefono ? { telefono } : {},
+    perfil: telefono ? { telefono, ...ENVIO } : { ...ENVIO },
     cargando: false,
     guardar: guardarPerfilMock,
   });

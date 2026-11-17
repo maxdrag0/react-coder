@@ -23,7 +23,13 @@ const errorCon = (code, mensaje, extra = {}) => {
   return e;
 };
 
-export const enviarOrden = async ({ items, telefono, idempotencia }) => {
+export const enviarOrden = async ({
+  items,
+  telefono,
+  direccion,
+  ciudad,
+  idempotencia,
+}) => {
   /*
     La idempotencia la elige quien manda el pedido, no esta funcion. Generarla
     aca daba una distinta por llamada, y entonces no deduplicaba nada: un
@@ -49,10 +55,18 @@ export const enviarOrden = async ({ items, telefono, idempotencia }) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
+      /*
+        El telefono y los datos de envio viajan SOLO si el perfil no los
+        tiene: el servidor usa lo guardado y el cuerpo solo completa. Los
+        campos ausentes se omiten en vez de mandarse vacios, porque el
+        validador rechaza una cadena vacia.
+      */
       body: JSON.stringify({
         idempotencia,
         items,
         ...(telefono ? { telefono } : {}),
+        ...(direccion ? { direccion } : {}),
+        ...(ciudad ? { ciudad } : {}),
       }),
     });
   } catch {
@@ -85,10 +99,21 @@ export const enviarOrden = async ({ items, telefono, idempotencia }) => {
     );
   }
 
+  /*
+    422 es "falta un dato tuyo", y hay dos: el telefono y la direccion. El
+    carrito pide un campo distinto en cada caso, asi que el codigo tiene que
+    salir del cuerpo y no estar fijo. Con uno solo, el aviso de la direccion
+    aparecia siempre colgado del telefono.
+  */
   if (respuesta.status === 422) {
+    const codigo =
+      cuerpo.error === "sin_direccion" ? "sin_direccion" : "sin_telefono";
+
     throw errorCon(
-      "sin_telefono",
-      "Necesitamos tu telefono para coordinar el pedido.",
+      codigo,
+      codigo === "sin_direccion"
+        ? "Necesitamos tu dirección para el envío."
+        : "Necesitamos tu teléfono para coordinar el pedido.",
     );
   }
 

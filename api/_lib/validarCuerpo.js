@@ -80,11 +80,21 @@ export const validarCuerpo = (cuerpo) => {
     });
   }
 
-  const telefono =
-    typeof cuerpo.telefono === "string" ? cuerpo.telefono : undefined;
+  /*
+    El telefono y los datos de envio son opcionales ACA: quien decide si
+    alcanzan es el handler, que primero mira el perfil. Lo que no es texto se
+    descarta en vez de convertirse: este es el borde de confianza.
+  */
+  const soloTexto = (v) => (typeof v === "string" ? v : undefined);
 
   return {
     ok: true,
-    datos: { idempotencia: cuerpo.idempotencia, items, telefono },
+    datos: {
+      idempotencia: cuerpo.idempotencia,
+      items,
+      telefono: soloTexto(cuerpo.telefono),
+      direccion: soloTexto(cuerpo.direccion),
+      ciudad: soloTexto(cuerpo.ciudad),
+    },
   };
 };

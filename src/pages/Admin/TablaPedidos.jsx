@@ -15,6 +15,12 @@ const FilaPedido = ({ pedido, onEstado, onNota }) => {
   const telefono = pedido.buyer?.telefono;
   const whatsapp = paraWhatsapp(telefono);
 
+  // Adonde se manda. Va en la fila y no escondido en un detalle: es el dato
+  // que hace falta para despachar, al lado del telefono con el que se avisa.
+  const envio = [pedido.envio?.direccion, pedido.envio?.ciudad]
+    .filter(Boolean)
+    .join(", ");
+
   // Solo escribe si cambió: salir del campo sin tocarlo no tiene que
   // generar una escritura en Firestore.
   const guardarNota = () => {
@@ -53,6 +59,15 @@ const FilaPedido = ({ pedido, onEstado, onNota }) => {
             // Los pedidos hechos antes de que el teléfono fuera obligatorio
             // no lo tienen, y por eso no se pueden atender.
             <em className="admin-sin-telefono">sin teléfono</em>
+          )}
+          {envio ? (
+            <span className="admin-envio" title="Dirección de envío">
+              {envio}
+            </span>
+          ) : (
+            // Igual que el teléfono: los pedidos anteriores a que la
+            // dirección fuera obligatoria no la tienen.
+            <em className="admin-sin-telefono">sin dirección</em>
           )}
         </div>
       </td>

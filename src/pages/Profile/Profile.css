@@ -193,13 +193,15 @@
   gap: var(--e-2);
 }
 
-.perfil-telefono {
+/* El campo y su boton de guardar. Se llamaba .perfil-telefono, de cuando el
+   telefono era el unico dato editable del perfil. */
+.perfil-editable {
   display: flex;
   gap: var(--e-2);
   flex-wrap: wrap;
 }
 
-.perfil-telefono .campo-control {
+.perfil-editable .campo-control {
   flex: 1;
   min-width: 10rem;
 }

@@ -127,3 +127,29 @@ describe("validarCuerpo: duplicados que SI son validos", () => {
     expect(r.ok).toBe(true);
   });
 });
+
+describe("validarCuerpo: los datos de envío", () => {
+  it("los deja pasar como texto", () => {
+    const r = validarCuerpo(
+      cuerpo({ direccion: "San Martín 742", ciudad: "Córdoba" }),
+    );
+    expect(r.ok).toBe(true);
+    expect(r.datos.direccion).toBe("San Martín 742");
+    expect(r.datos.ciudad).toBe("Córdoba");
+  });
+
+  it("son opcionales acá: quien decide es el handler leyendo el perfil", () => {
+    const r = validarCuerpo(cuerpo());
+    expect(r.ok).toBe(true);
+    expect(r.datos.direccion).toBeUndefined();
+    expect(r.datos.ciudad).toBeUndefined();
+  });
+
+  it("descarta lo que no es texto en vez de convertirlo", () => {
+    // Este es el borde de confianza: un numero que se vuelve "1234" seria
+    // una coercion silenciosa.
+    const r = validarCuerpo(cuerpo({ direccion: 742, ciudad: ["Córdoba"] }));
+    expect(r.datos.direccion).toBeUndefined();
+    expect(r.datos.ciudad).toBeUndefined();
+  });
+});

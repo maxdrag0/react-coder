@@ -312,6 +312,30 @@
     align-items: flex-start;
   }
 
+  /*
+    Las cinco pestañas en una sola fila medían más que la pantalla, y una fila
+    más ancha que la pantalla empuja el ancho de TODO el documento: el panel
+    entero se arrastraba para los costados en el celular.
+
+    Envuelven en dos filas en vez de volverse un desplegable: con un
+    desplegable cada cambio de sección son dos toques y se pierden de vista
+    los contadores de pedidos abiertos y mensajes sin leer, que son la razón
+    para entrar al panel.
+  */
+  .admin-tabs {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  /* Con flex 1 1 auto y min-width 0: sin encogerse, una pestaña más ancha
+     que la pantalla seguiría desbordando aunque la fila envuelva. */
+  .admin-tab {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 40px;
+    text-align: center;
+  }
+
   .admin-actions-bar {
     flex-direction: column;
     align-items: stretch;
@@ -396,6 +420,12 @@
   font-size: var(--t-xs);
   color: var(--text-suave);
   word-break: break-all;
+}
+
+/* La direccion de envio, abajo del telefono. Mas apagada que el contacto:
+   se lee al despachar, no al decidir. */
+.admin-envio {
+  color: var(--text-suave);
 }
 
 /* El email no tiene espacios y es largo: sin esto ensanchaba la columna. */

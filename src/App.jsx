@@ -14,10 +14,14 @@ import AdminDashboard from "./pages/Admin/AdminDashboard";
 import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
 import BottomNav from "@/components/BottomNav/BottomNav";
 import Footer from "@/components/Footer/Footer";
+import ScrollArriba from "@/components/ScrollArriba/ScrollArriba";
 
 function App() {
   return (
     <>
+      {/* Sube al principio al cambiar de pagina: sin esto, entrar a un
+          producto despues de bajar el catalogo abria la ficha en el pie. */}
+      <ScrollArriba />
       <NavBar />
       <main className="page-container">
         <Routes>

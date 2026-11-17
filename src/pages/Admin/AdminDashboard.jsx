@@ -45,6 +45,7 @@ import Confirmar from "../../components/common/Confirmar/Confirmar";
 import { useConfirmacion } from "../../hooks/useConfirmacion";
 import { filtrarPedidos, contarPorEstado, ABIERTOS } from "./filtrarPedidos";
 import { descargarCsv } from "./exportarProductos";
+import { descargarPedidos } from "./exportarPedidos";
 import FiltrosProductosAdmin from "./FiltrosProductosAdmin";
 import {
   filtrarProductos,
@@ -604,6 +605,22 @@ const AdminDashboard = () => {
 
       {pestana === "pedidos" && (
         <>
+          {/* Baja lo que se esta viendo, no todo: la lista ya viene filtrada
+              por la pantalla, asi que "abiertos" baja los abiertos. Exportar
+              siempre el total obligaria a filtrar de nuevo en Excel. */}
+          <div className="admin-actions-bar">
+            <button
+              type="button"
+              className="boton boton-secundario"
+              onClick={() => descargarPedidos(pedidosFiltrados, filtroEstado)}
+              disabled={pedidosFiltrados.length === 0}
+              title="Baja los pedidos que estás viendo, en un archivo que Excel abre directo"
+            >
+              <Download size={18} />
+              Descargar Excel
+            </button>
+          </div>
+
           <FiltrosPedidos
             estado={filtroEstado}
             onEstado={setFiltroEstado}

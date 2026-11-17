@@ -193,6 +193,49 @@
   gap: var(--e-2);
 }
 
+/*
+  Las dos solapas. Mismo gesto que las del panel —una pista con dos pastillas
+  adentro— pero sin compartir las clases: el panel es otra pagina y acoplar
+  las dos haria que un retoque alla moviera esto.
+*/
+.perfil-pestanas {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: var(--e-5);
+  background: var(--surface-alto);
+  border-radius: var(--r-control);
+}
+
+.perfil-pestana {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 40px;
+  padding: var(--e-2) var(--e-3);
+  border: none;
+  border-radius: var(--r-control);
+  background: none;
+  color: var(--text-suave);
+  font-family: var(--fuente);
+  font-size: var(--t-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color var(--mov-rapido),
+    color var(--mov-rapido);
+}
+
+.perfil-pestana:hover {
+  color: var(--text);
+}
+
+.perfil-pestana.activa {
+  background: var(--surface);
+  color: var(--gold);
+  font-weight: 600;
+  box-shadow: var(--elev-1);
+}
+
 /* El campo y su boton de guardar. Se llamaba .perfil-telefono, de cuando el
    telefono era el unico dato editable del perfil. */
 .perfil-editable {

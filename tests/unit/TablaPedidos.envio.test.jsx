@@ -43,3 +43,36 @@ describe("TablaPedidos: la dirección de envío", () => {
     expect(screen.getByText(/sin direcci[oó]n/i)).toBeInTheDocument();
   });
 });
+
+describe("TablaPedidos: el chat de WhatsApp", () => {
+  it("abre con el mensaje del pedido ya escrito", () => {
+    // Escribir "hola, te escribo por tu pedido de..." una vez por pedido es
+    // trabajo que la página puede hacer sola.
+    montar();
+    const link = screen.getByRole("link", { name: /1123456789/ });
+    expect(link).toHaveAttribute(
+      "href",
+      expect.stringContaining("https://wa.me/5491123456789?text="),
+    );
+    expect(decodeURIComponent(link.getAttribute("href"))).toContain(
+      "pedido de pirotecnia",
+    );
+  });
+
+  it("usa el número que WhatsApp entiende, no el que escribió el cliente", () => {
+    // "9 11 2233 4455" es como se escribe para el exterior: sin normalizar,
+    // el link llevaba a 54991122334455 y WhatsApp decía que no existe.
+    montar({
+      ...PEDIDO,
+      buyer: { ...PEDIDO.buyer, telefono: "9 11 2233-4455" },
+    });
+    const link = screen.getByRole("link", { name: /2233/ });
+    expect(link.getAttribute("href")).toContain("wa.me/5491122334455");
+  });
+
+  it("sin un número usable no pone link", () => {
+    montar({ ...PEDIDO, buyer: { ...PEDIDO.buyer, telefono: "1234" } });
+    expect(screen.queryByRole("link", { name: /1234/ })).toBeNull();
+    expect(screen.getByText("1234")).toBeInTheDocument();
+  });
+});

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MessageCircle } from "lucide-react";
 import { formatearPrecio } from "../../utils/formatearPrecio";
-import { paraWhatsapp } from "../../utils/telefono";
+import { linkDeWhatsapp, mensajeDePedido } from "../../utils/mensajeWhatsapp";
 import { ESTADOS_PEDIDO, estadoDePedido } from "../../constants/estadoPedido";
 import { renglonDe } from "../../constants/renglon";
 
@@ -13,7 +13,14 @@ const FilaPedido = ({ pedido, onEstado, onNota }) => {
   const [nota, setNota] = useState(pedido.nota ?? "");
   const estado = estadoDePedido(pedido);
   const telefono = pedido.buyer?.telefono;
-  const whatsapp = paraWhatsapp(telefono);
+  /*
+    El chat abre con el mensaje del pedido ya escrito: escribir "hola, te
+    escribo por tu pedido de..." una vez por pedido es trabajo que la página
+    puede hacer sola, y de paso evita mandarle a una persona el pedido de
+    otra. Va como texto sugerido: WhatsApp lo deja en el campo y quien
+    atiende decide si lo manda así.
+  */
+  const whatsapp = linkDeWhatsapp(telefono, mensajeDePedido(pedido));
 
   // Adonde se manda. Va en la fila y no escondido en un detalle: es el dato
   // que hace falta para despachar, al lado del telefono con el que se avisa.
@@ -45,7 +52,7 @@ const FilaPedido = ({ pedido, onEstado, onNota }) => {
             whatsapp ? (
               <a
                 className="admin-whatsapp"
-                href={`https://wa.me/${whatsapp}`}
+                href={whatsapp}
                 target="_blank"
                 rel="noreferrer"
               >

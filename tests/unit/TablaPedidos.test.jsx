@@ -81,10 +81,12 @@ describe("TablaPedidos: nota", () => {
 
 describe("TablaPedidos: contacto", () => {
   it("el teléfono es un link de WhatsApp con el número normalizado", () => {
+    // El link lleva ademas el mensaje del pedido (?text=...), que se prueba
+    // en TablaPedidos.envio.test.jsx. Aca lo que importa es el numero.
     montar([PEDIDO]);
     expect(screen.getByRole("link", { name: /1123456789/ })).toHaveAttribute(
       "href",
-      "https://wa.me/5491123456789",
+      expect.stringContaining("https://wa.me/5491123456789"),
     );
   });
 

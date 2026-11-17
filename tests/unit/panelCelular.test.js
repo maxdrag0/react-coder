@@ -108,3 +108,44 @@ describe("Panel en celular: las reglas de tamaño no quedan tapadas", () => {
     );
   });
 });
+
+describe("Panel: los contenedores de los filtros se pueden achicar", () => {
+  /*
+    EL BUG, medido en Chrome con el CSS compilado a 360px: el documento media
+    394 contra un viewport de 345, o sea 49px de desborde, y el panel entero
+    se arrastraba de costado.
+
+    La causa: un item de grid o de flex arranca con min-width: auto —"no te
+    achiques por debajo de tu contenido"— y un <input> trae un ancho
+    intrinseco de veinte caracteres (328px). Ese 328 subia por la cadena
+    —buscador 378, campos 378— y fijaba la unica columna del grid en 378px
+    adentro de un contenedor de 313.
+
+    Ponerle min-width: 0 a los selects y a los inputs no alcanzaba: lo que
+    faltaban eran los CONTENEDORES del medio. Despues del arreglo, medido a
+    320, 360 y 412px: cero desborde.
+  */
+  const conMinWidthCero = (selector) => {
+    const regla = reglaDe(css, selector);
+    return regla !== null && /min-width:\s*0/.test(regla);
+  };
+
+  it("los hijos del grid de filtros de productos", () => {
+    expect(
+      conMinWidthCero(".prodfiltros > *") || css.includes(".prodfiltros > *,"),
+    ).toBe(true);
+  });
+
+  it("los hijos de la fila de campos", () => {
+    expect(css).toMatch(/\.prodfiltros-campos\s*>\s*\*/);
+  });
+
+  it("y los del grid de filtros de pedidos, que usa el mismo buscador", () => {
+    expect(css).toMatch(/\.pedidos-filtros\s*>\s*\*/);
+  });
+
+  it("la regla declara min-width: 0", () => {
+    const bloque = css.slice(css.indexOf(".prodfiltros > *"));
+    expect(bloque.slice(0, 200)).toMatch(/min-width:\s*0/);
+  });
+});

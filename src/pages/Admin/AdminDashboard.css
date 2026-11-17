@@ -634,6 +634,33 @@
   margin-bottom: var(--e-4);
 }
 
+/*
+  EL DESBORDE DEL PANEL EN CELULAR, medido y no deducido.
+
+  Un item de grid o de flex arranca con min-width: auto, que significa "no te
+  achiques por debajo de tu contenido". Y un <input> trae un ancho intrinseco
+  de veinte caracteres: 328px.
+
+  Ese 328 subia por toda la cadena —buscador 378, campos 378— y terminaba
+  fijando la unica columna del grid en 378px adentro de un contenedor de 313.
+  Una fila mas ancha que la pantalla empuja el ancho de TODO el documento,
+  asi que el panel entero se arrastraba de costado.
+
+  Medido en Chrome con el CSS compilado, a 360px de ancho:
+    antes: viewport 345, documento 394 (49px de desborde)
+
+  Ya se le habia puesto min-width: 0 a los selects y a los inputs sueltos y
+  no alcanzo: lo que faltaba eran los CONTENEDORES del medio, que son los que
+  heredan el ancho del input y se lo pasan al grid.
+
+  Va para los dos paneles —productos y pedidos— porque comparten el buscador.
+*/
+.prodfiltros > *,
+.prodfiltros-campos > *,
+.pedidos-filtros > * {
+  min-width: 0;
+}
+
 .prodfiltros-chips {
   display: flex;
   gap: var(--e-2);

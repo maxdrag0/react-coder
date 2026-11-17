@@ -179,6 +179,9 @@ const ModelosEditor = ({
             )}
           </div>
 
+          {/* Vacio significa que este modelo NO se vende por unidad, y es
+              el caso de las bengalas de humo: van por display y nada mas.
+              Antes era obligatorio y la unica salida era poner 0. */}
           <div className="campo">
             <label htmlFor={`mod-${i}-precio`}>Precio por unidad</label>
             <input
@@ -188,8 +191,10 @@ const ModelosEditor = ({
               min="0"
               value={m.precio ?? ""}
               onChange={(e) => onModelo(i, "precio", e.target.value)}
-              required
             />
+            <small className="campo-ayuda">
+              Dejalo vacío si este modelo no se vende por unidad.
+            </small>
           </div>
         </div>
 

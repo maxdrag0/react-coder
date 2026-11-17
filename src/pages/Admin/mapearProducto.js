@@ -174,8 +174,14 @@ const presentacionesDeFormulario = (mapa, precioUnitario) => {
   así que cambiarlo dejaría huérfano todo lo que lo referencia. Editar el
   nombre del modelo no toca el id.
 
-  Se descartan los modelos sin nombre o sin precio unitario: no se podrían ni
-  elegir ni comprar.
+  Se descarta el modelo sin nombre y el que no tiene NINGUN precio: no se
+  podrian ni elegir ni comprar. El precio POR UNIDAD, en cambio, puede
+  faltar: las bengalas de humo vienen en seis colores y se venden por
+  display.
+
+  Antes se descartaba el modelo sin precio unitario, asi que la unica salida
+  era poner 0 —lo mismo que pasaba con los productos sin modelos— y si el
+  campo quedaba vacio el modelo DESAPARECIA al guardar, sin aviso.
 */
 const modelosDeFormulario = (form) => {
   const usados = form.modelos
@@ -185,8 +191,20 @@ const modelosDeFormulario = (form) => {
 
   for (const m of form.modelos) {
     const etiqueta = (m.etiqueta ?? "").trim();
-    const precio = numeroOpcional(m.precio);
-    if (!etiqueta || precio === null) continue;
+    if (!etiqueta) continue;
+
+    /*
+      El precio por unidad vacio entra como 0, y presentacionesDeFormulario
+      descarta cualquier precio que no sea mayor a cero: la presentacion
+      unitaria queda en null y la tienda no la ofrece.
+    */
+    const presentaciones = presentacionesDeFormulario(
+      m.presentaciones,
+      numeroOpcional(m.precio) ?? 0,
+    );
+
+    const vendible = UNIDADES.some((u) => presentaciones[u.clave]?.precio > 0);
+    if (!vendible) continue;
 
     const id = m.id || idLibre(etiqueta, usados);
     if (!m.id) usados.push(id);
@@ -194,7 +212,7 @@ const modelosDeFormulario = (form) => {
     salida.push({
       id,
       etiqueta,
-      presentaciones: presentacionesDeFormulario(m.presentaciones, precio),
+      presentaciones,
       // null y no omitido: igual que las presentaciones, el merge profundo de
       // Firestore conservaria la foto vieja si la clave no viajara.
       foto: (m.foto ?? "").trim() || null,

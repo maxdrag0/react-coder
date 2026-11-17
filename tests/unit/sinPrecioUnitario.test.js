@@ -164,3 +164,105 @@ describe("el formulario del panel", () => {
     expect(aFormulario(soloDisplay).price).toBe("");
   });
 });
+
+/*
+  Lo mismo, pero con modelos: las bengalas de humo vienen en seis colores y
+  se venden por display.
+
+  EL BUG: modelosDeFormulario descartaba el modelo sin precio por unidad
+  —`if (!etiqueta || precio === null) continue`—, asi que la unica salida era
+  poner 0, igual que antes. Y si el campo quedaba vacio, el modelo
+  DESAPARECIA al guardar, sin aviso: seis colores cargados a mano se iban en
+  silencio.
+*/
+describe("modelos que no se venden por unidad", () => {
+  const conUnModelo = (modelo) => ({
+    ...PRODUCTO_VACIO,
+    codigo: "B100",
+    name: "Bengala de humo",
+    category: "Bengalas",
+    conModelos: true,
+    modelos: [{ id: null, temporal: "t1", ...modelo }],
+  });
+
+  const soloDisplay = {
+    etiqueta: "Rojo",
+    precio: "",
+    presentaciones: {
+      display: { activa: true, precio: "12000", unidades: "6" },
+    },
+  };
+
+  it("guarda el modelo que solo tiene precio por display", () => {
+    const { modelos } = aFirestore(conUnModelo(soloDisplay));
+    expect(modelos).toHaveLength(1);
+    expect(modelos[0].etiqueta).toBe("Rojo");
+  });
+
+  it("no le inventa un precio por unidad", () => {
+    const { modelos } = aFirestore(conUnModelo(soloDisplay));
+    expect(modelos[0].presentaciones.unitario).toBeNull();
+    expect(modelos[0].presentaciones.display.precio).toBe(12000);
+  });
+
+  it("le genera su identificador igual", () => {
+    // El id es lo que ata el modelo a los carritos y a los pedidos.
+    const { modelos } = aFirestore(conUnModelo(soloDisplay));
+    expect(typeof modelos[0].id).toBe("string");
+    expect(modelos[0].id.length).toBeGreaterThan(0);
+  });
+
+  it("la tienda ofrece el display y NO la unidad", () => {
+    const producto = aFirestore(conUnModelo(soloDisplay));
+    const claves = unidadesDisponibles(producto, producto.modelos[0].id).map(
+      (u) => u.clave,
+    );
+    expect(claves).toEqual(["display"]);
+  });
+
+  it("la card muestra el precio del display", () => {
+    const producto = aFirestore(conUnModelo(soloDisplay));
+    expect(rangoDesde(producto)).toMatchObject({
+      min: 12000,
+      clave: "display",
+    });
+  });
+
+  it("sigue descartando el modelo que no tiene NINGUN precio", () => {
+    // Sin ningun precio no se puede ni elegir ni comprar: eso no cambia.
+    const { modelos } = aFirestore(
+      conUnModelo({ etiqueta: "Verde", precio: "", presentaciones: {} }),
+    );
+    expect(modelos).toHaveLength(0);
+  });
+
+  it("sigue descartando el modelo sin nombre", () => {
+    const { modelos } = aFirestore(
+      conUnModelo({ ...soloDisplay, etiqueta: "  " }),
+    );
+    expect(modelos).toHaveLength(0);
+  });
+
+  it("el que se vende de las dos formas no cambia", () => {
+    const { modelos } = aFirestore(
+      conUnModelo({
+        etiqueta: "Azul",
+        precio: "2500",
+        presentaciones: {
+          display: { activa: true, precio: "12000", unidades: "6" },
+        },
+      }),
+    );
+    expect(modelos[0].presentaciones.unitario).toEqual({ precio: 2500 });
+    expect(modelos[0].presentaciones.display.precio).toBe(12000);
+  });
+
+  it("y el formulario lo vuelve a mostrar vacio, no en cero", () => {
+    // Si al reabrir apareciera 0, guardar de nuevo escribiria 0 y volveriamos
+    // al problema de antes.
+    const guardado = aFirestore(conUnModelo(soloDisplay));
+    const form = aFormulario({ ...guardado, codigo: "B100" });
+    expect(form.modelos[0].precio).toBe("");
+    expect(form.modelos[0].presentaciones.display.precio).toBe(12000);
+  });
+});

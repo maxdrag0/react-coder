@@ -27,7 +27,12 @@ import {
 } from "../../services/firebase/storageFirebase";
 import { invalidarCatalogo } from "../../services/firebase/cacheCatalogo";
 import { estaAbierto } from "../../constants/estadoPedido";
-import { aFormulario, aFirestore, PRODUCTO_VACIO } from "./mapearProducto";
+import {
+  aFormulario,
+  aFirestore,
+  sinNingunPrecio,
+  PRODUCTO_VACIO,
+} from "./mapearProducto";
 import ProductoModal from "./ProductoModal";
 import TablaProductos from "./TablaProductos";
 import TablaPedidos from "./TablaPedidos";
@@ -243,6 +248,21 @@ const AdminDashboard = () => {
 
   const guardar = async (e) => {
     e.preventDefault();
+
+    /*
+      Al menos una forma de venta con precio. El precio por unidad dejo de
+      ser obligatorio —hay productos que se venden solo por display— y con
+      eso se perdio la unica validacion que impedia guardar un producto sin
+      ningun precio: ese producto sale en la grilla sin precio y en su ficha
+      no hay nada que elegir ni que agregar al carrito.
+    */
+    if (sinNingunPrecio(formulario)) {
+      setErrorModal(
+        "Poné al menos un precio: por unidad, por display o por bulto.",
+      );
+      return;
+    }
+
     setGuardando(true);
     setErrorModal("");
     try {

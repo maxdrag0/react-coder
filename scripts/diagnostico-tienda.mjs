@@ -1,5 +1,5 @@
 import { db } from "./firebaseAdmin.mjs";
-import { rangoUnitario, presentacionesDe } from "../src/constants/unidades.js";
+import { rangoDesde, presentacionesDe } from "../src/constants/unidades.js";
 import { modelosDe } from "../src/constants/modelos.js";
 import { fotosDe } from "../src/constants/fotos.js";
 import { estadoDe } from "../src/constants/estadoProducto.js";
@@ -7,7 +7,7 @@ import { estadoDe } from "../src/constants/estadoProducto.js";
 /*
   Diagnostico: que ve la tienda realmente. Solo lee, no escribe nada.
 
-  Usa los MISMOS modulos que la tienda (rangoUnitario, modelosDe, fotosDe) y
+  Usa los MISMOS modulos que la tienda (rangoDesde, modelosDe, fotosDe) y
   no los campos crudos. La version anterior leia `precioUnitario` directo y
   reportaba como "sin precio" a todo producto con modelos, porque el precio
   de esos vive en cada modelo y el del producto se escribe en null a
@@ -40,7 +40,7 @@ for (const p of productos) {
   if (modelos.length > 0) conModelos.push({ nombre, cuantos: modelos.length });
 
   // El precio real, mirando los modelos si los hay.
-  if (rangoUnitario(p) === null) sinPrecio.push({ nombre, codigo: p.codigo });
+  if (rangoDesde(p) === null) sinPrecio.push({ nombre, codigo: p.codigo });
 
   if (fotosDe(p).length === 0) sinFoto.push({ nombre, codigo: p.codigo });
 

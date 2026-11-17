@@ -230,8 +230,10 @@ const ProductoModal = ({
               />
             ) : (
               <>
-                {/* El unitario no es opcional: es la referencia de todo lo
-                    demas y lo que usa el filtro de precio del catalogo. */}
+                {/* Vacio significa que NO se vende por unidad, y es el caso
+                    de las bengalas de humo: van por display y nada mas.
+                    Antes era obligatorio y la unica salida era poner 0, que
+                    ademas dejaba la card sin precio. */}
                 <Campo
                   id="p-precio"
                   etiqueta="Precio por unidad"
@@ -239,7 +241,7 @@ const ProductoModal = ({
                   min="0"
                   value={producto.price}
                   onChange={cambiar("price")}
-                  required
+                  ayuda="Dejalo vacío si este producto no se vende por unidad."
                 />
 
                 {UNIDADES.filter((u) => u.clave !== "unitario").map((u) => (

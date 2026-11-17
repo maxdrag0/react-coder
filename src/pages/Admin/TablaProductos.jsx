@@ -1,7 +1,7 @@
 import { Pencil, Trash2 } from "lucide-react";
 import { estadoDe, etiquetaDe, ACTIVO } from "../../constants/estadoProducto";
 import { formatearPrecio } from "../../utils/formatearPrecio";
-import { rangoUnitario } from "../../constants/unidades";
+import { rangoDesde } from "../../constants/unidades";
 import { modelosDe } from "../../constants/modelos";
 
 const nombreDe = (p) => p.nombre || "";
@@ -12,7 +12,7 @@ const fotoDe = (p) => p.fotoUrl || "";
   que un producto se vende en cinco variantes importa.
 */
 const textoDePrecio = (p) => {
-  const rango = rangoUnitario(p);
+  const rango = rangoDesde(p);
   if (!rango) return "—";
   if (rango.min === rango.max) return formatearPrecio(rango.min);
   return `${formatearPrecio(rango.min)} – ${formatearPrecio(rango.max)}`;

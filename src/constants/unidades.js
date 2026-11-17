@@ -21,7 +21,7 @@ import { modelosDe, tieneModelos, modeloPorId } from "./modelos.js";
   Un producto puede además tener MODELOS (ver modelos.js), y entonces las
   presentaciones viven en cada modelo: el display de un mortero de 3 pulgadas
   no trae lo mismo que el de 5. Un producto con modelos no tiene precio
-  propio; para la card está `rangoUnitario`.
+  propio; para la card está `rangoDesde`.
 */
 
 export const UNIDADES = [
@@ -115,26 +115,54 @@ export const unidadesDisponibles = (item, modeloId = null) => {
   return UNIDADES.filter((u) => presentaciones[u.clave]);
 };
 
+/*
+  Las presentaciones de un producto: las suyas, o las de cada uno de sus
+  modelos cuando los tiene.
+*/
+const juegosDePresentaciones = (item) =>
+  tieneModelos(item)
+    ? modelosDe(item).map((m) => desdeMapa(m.presentaciones))
+    : [presentacionesDe(item)];
+
+/* La más barata de un juego, con cuál es. El orden de UNIDADES desempata. */
+const masBarata = (presentaciones) => {
+  let mejor = null;
+  for (const u of UNIDADES) {
+    const p = presentaciones[u.clave];
+    if (!p) continue;
+    if (mejor === null || p.precio < mejor.precio) {
+      mejor = { precio: p.precio, clave: u.clave };
+    }
+  }
+  return mejor;
+};
+
 /**
- * El precio unitario más bajo y más alto del producto, mirando todos sus
- * modelos. Es lo que la card necesita para decir "desde $8.000" y lo que usan
- * los filtros de precio, que no pueden elegir un modelo por su cuenta.
+ * El precio de ENTRADA: el más barato al que se puede comprar el producto,
+ * sea la presentación que sea, y en qué presentación es.
  *
- * @returns {{min: number, max: number}|null}
+ * Antes esto miraba solo el precio unitario, y eso daba por sentado que todo
+ * se vende por unidad. Las bengalas de humo se venden por display y nada
+ * más: con el unitario vacío, la card se quedaba SIN PRECIO y el producto se
+ * caía del filtro de precios. Ahora la card puede decir "desde $15.250 el
+ * display".
+ *
+ * `clave` sirve para nombrar la presentación cuando no es la unidad: decir
+ * "desde $15.250" a secas haría pensar que es el precio de una.
+ *
+ * @returns {{min: number, max: number, clave: string}|null}
  */
-export const rangoUnitario = (item) => {
+export const rangoDesde = (item) => {
   if (!item) return null;
 
-  const precios = tieneModelos(item)
-    ? modelosDe(item)
-        .map((m) => desdeMapa(m.presentaciones).unitario?.precio)
-        .filter((p) => p !== undefined)
-    : [presentacionesDe(item).unitario?.precio].filter((p) => p !== undefined);
+  const baratas = juegosDePresentaciones(item).map(masBarata).filter(Boolean);
+  if (baratas.length === 0) return null;
 
-  if (precios.length === 0) return null;
+  const min = Math.min(...baratas.map((b) => b.precio));
+  const max = Math.max(...baratas.map((b) => b.precio));
 
-  return { min: Math.min(...precios), max: Math.max(...precios) };
+  return { min, max, clave: baratas.find((b) => b.precio === min).clave };
 };
 
 /** El piso del rango. Lo usan los filtros y la exportación. */
-export const precioMinimo = (item) => rangoUnitario(item)?.min ?? null;
+export const precioMinimo = (item) => rangoDesde(item)?.min ?? null;

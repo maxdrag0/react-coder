@@ -66,3 +66,11 @@
   color: var(--text-suave);
   overflow-wrap: anywhere;
 }
+
+/* Nombra la presentación cuando el precio de entrada no es el de una unidad:
+   un número solo se lee como el precio de una. */
+.precio-unidad {
+  font-size: var(--t-xs);
+  font-weight: 400;
+  color: var(--text-suave);
+}

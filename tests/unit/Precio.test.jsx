@@ -117,8 +117,13 @@ describe("Precio: productos con modelos", () => {
     expect(container.querySelector(".precio-principal")).toBeInTheDocument();
   });
 
-  it("no renderiza nada si ningun modelo tiene precio unitario", () => {
-    const sinPrecio = {
+  it("muestra el precio del modelo que solo se vende por bulto", () => {
+    /*
+      Antes devolvía null: el precio salía únicamente del unitario, así que
+      un producto que no se vende por unidad —las bengalas de humo, que van
+      por display— aparecía en la grilla SIN PRECIO.
+    */
+    const soloBulto = {
       modelos: [
         {
           id: "a",
@@ -127,7 +132,30 @@ describe("Precio: productos con modelos", () => {
         },
       ],
     };
-    const { container } = render(<Precio item={sinPrecio} />);
+    render(<Precio item={soloBulto} />);
+    expect(screen.getByText(/90\.000/)).toBeInTheDocument();
+  });
+
+  it("nombra la presentacion cuando no es la unidad", () => {
+    // Un número solo se lee como el precio de una unidad.
+    const soloBulto = {
+      modelos: [
+        {
+          id: "a",
+          etiqueta: "A",
+          presentaciones: { bulto: { precio: 90000 } },
+        },
+      ],
+    };
+    render(<Precio item={soloBulto} />);
+    expect(screen.getByText(/el bulto/i)).toBeInTheDocument();
+  });
+
+  it("no renderiza nada si no hay ningun precio", () => {
+    const sinNada = {
+      modelos: [{ id: "a", etiqueta: "A", presentaciones: {} }],
+    };
+    const { container } = render(<Precio item={sinNada} />);
     expect(container.querySelector(".precio")).toBeNull();
   });
 });

@@ -1,9 +1,10 @@
 import { formatearPrecio } from "@/utils/formatearPrecio";
 import {
+  UNIDADES,
   unidadesDisponibles,
   precioDe,
   unidadesQueTrae,
-  rangoUnitario,
+  rangoDesde,
 } from "@/constants/unidades";
 import { tieneModelos } from "@/constants/modelos";
 import "./Precio.css";
@@ -29,32 +30,54 @@ const Precio = ({ item, compacto = false }) => {
   // Un producto con modelos no tiene precio propio: el precio vive en cada
   // modelo, y elegirlo pasa dentro del producto y no en la grilla.
   if (tieneModelos(item)) {
-    const rango = rangoUnitario(item);
+    const rango = rangoDesde(item);
     if (!rango) return null;
 
     const desde = rango.min !== rango.max;
+
+    const etiqueta = UNIDADES.find((u) => u.clave === rango.clave)?.etiqueta;
 
     return (
       <div className="precio">
         <p className="precio-principal">
           {desde && <span className="precio-desde">desde</span>}
           {formatearPrecio(rango.min)}
+          {/* Las bengalas de humo tienen un modelo por color y se venden
+              solo por display: sin nombrarlo, el numero se lee como el
+              precio de una. */}
+          {rango.clave !== "unitario" && etiqueta && (
+            <span className="precio-unidad"> el {etiqueta.toLowerCase()}</span>
+          )}
         </p>
       </div>
     );
   }
 
   const disponibles = unidadesDisponibles(item);
-  const unitario = disponibles.find((u) => u.clave === "unitario");
-  if (!unitario) return null;
+  if (disponibles.length === 0) return null;
 
-  const otras = disponibles.filter((u) => u.clave !== "unitario");
+  /*
+    El precio de entrada es el mas barato que se pueda comprar, y no siempre
+    es el de la unidad: las bengalas de humo se venden solo por display.
+    Antes esto exigia el unitario y devolvia null sin el, asi que esos
+    productos salian en la grilla SIN NINGUN PRECIO.
+  */
+  const entrada = disponibles[0];
+  const otras = disponibles.filter((u) => u.clave !== entrada.clave);
 
   if (compacto) {
     return (
       <div className="precio">
         <p className="precio-principal">
-          {formatearPrecio(precioDe(item, "unitario"))}
+          {formatearPrecio(precioDe(item, entrada.clave))}
+          {/* Nombrar la presentacion cuando no es la unidad: un numero solo
+              haria pensar que es el precio de una. */}
+          {entrada.clave !== "unitario" && (
+            <span className="precio-unidad">
+              {" "}
+              el {entrada.etiqueta.toLowerCase()}
+            </span>
+          )}
         </p>
 
         {otras.length > 0 && (

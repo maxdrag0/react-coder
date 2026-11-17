@@ -140,7 +140,22 @@ export const aFormulario = (p) => {
   arriba sobre el merge profundo.
 */
 const presentacionesDeFormulario = (mapa, precioUnitario) => {
-  const salida = { unitario: { precio: precioUnitario } };
+  /*
+    El precio por unidad vacio significa que NO se vende por unidad. Es el
+    caso de las bengalas de humo, que se venden solo por display.
+
+    Antes se escribia siempre, y la unica salida era poner 0. Eso andaba a
+    medias: la tienda descarta cualquier precio que no sea mayor a cero, asi
+    que dejaba de ofrecer la unidad... y tambien dejaba la card sin precio,
+    porque el precio de la card salia unicamente del unitario.
+
+    Va en null y no omitido, igual que las otras: con la clave ausente el
+    merge profundo de Firestore conservaria el precio que ya estaba guardado
+    y el producto se seguiria vendiendo por unidad.
+  */
+  const salida = {
+    unitario: precioUnitario > 0 ? { precio: precioUnitario } : null,
+  };
 
   for (const u of OPCIONALES) {
     const p = mapa?.[u.clave];
@@ -187,6 +202,29 @@ const modelosDeFormulario = (form) => {
   }
 
   return salida;
+};
+
+/**
+ * Si el formulario no tiene NINGUNA forma de venta con precio.
+ *
+ * Un producto asi sale en la grilla sin precio y su ficha no tiene nada que
+ * elegir ni que agregar al carrito. Antes lo impedia de rebote el campo de
+ * precio por unidad, que era obligatorio; desde que se puede vender solo por
+ * display, hace falta decirlo explicitamente.
+ *
+ * Con modelos el precio vive en cada uno, y modelosDeFormulario ya descarta
+ * los que no tienen: alcanza con que quede alguno.
+ */
+export const sinNingunPrecio = (form) => {
+  if (form?.conModelos) return modelosDeFormulario(form).length === 0;
+
+  const unitario = numeroOpcional(form?.price);
+  if (unitario > 0) return false;
+
+  return !OPCIONALES.some((u) => {
+    const p = form?.presentaciones?.[u.clave];
+    return p?.activa && numeroOpcional(p.precio) > 0;
+  });
 };
 
 /**

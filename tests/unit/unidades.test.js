@@ -5,7 +5,7 @@ import {
   precioDe,
   unidadesQueTrae,
   unidadesDisponibles,
-  rangoUnitario,
+  rangoDesde,
   precioMinimo,
 } from "../../src/constants/unidades";
 
@@ -238,22 +238,36 @@ describe("precioDe y unidadesDisponibles con modelos", () => {
   });
 });
 
-describe("rangoUnitario", () => {
+describe("rangoDesde", () => {
   it("con modelos da el minimo y el maximo entre todos", () => {
     // Es lo que la card necesita para decir "desde $8.000".
-    expect(rangoUnitario(CON_MODELOS)).toEqual({ min: 8000, max: 20000 });
+    expect(rangoDesde(CON_MODELOS)).toEqual({
+      min: 8000,
+      max: 20000,
+      clave: "unitario",
+    });
   });
 
   it("sin modelos da el precio del producto en los dos extremos", () => {
-    expect(rangoUnitario(VIEJO)).toEqual({ min: 270, max: 270 });
+    expect(rangoDesde(VIEJO)).toEqual({
+      min: 270,
+      max: 270,
+      clave: "unitario",
+    });
   });
 
   it("devuelve null si no hay ningun precio", () => {
-    expect(rangoUnitario({ nombre: "sin precio" })).toBeNull();
-    expect(rangoUnitario(null)).toBeNull();
+    expect(rangoDesde({ nombre: "sin precio" })).toBeNull();
+    expect(rangoDesde(null)).toBeNull();
   });
 
-  it("ignora un modelo que no tiene precio unitario", () => {
+  it("cuenta al modelo que solo se vende por bulto", () => {
+    /*
+      Antes se ignoraba: el rango miraba solo el precio unitario y daba por
+      sentado que todo se vende por unidad. Un modelo que solo se vende por
+      bulto SE PUEDE COMPRAR, así que entra en el rango — si no, la card
+      diría un máximo que no es el máximo.
+    */
     const mixto = {
       modelos: [
         {
@@ -268,7 +282,18 @@ describe("rangoUnitario", () => {
         },
       ],
     };
-    expect(rangoUnitario(mixto)).toEqual({ min: 500, max: 500 });
+    expect(rangoDesde(mixto)).toEqual({
+      min: 500,
+      max: 90000,
+      clave: "unitario",
+    });
+  });
+
+  it("nombra la presentacion mas barata, que no siempre es la unidad", () => {
+    const soloDisplay = {
+      presentaciones: { display: { precio: 15250, unidades: 5 } },
+    };
+    expect(rangoDesde(soloDisplay).clave).toBe("display");
   });
 });
 

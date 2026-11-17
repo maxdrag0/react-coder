@@ -29,6 +29,16 @@ export const errorDeTelefono = (valor) => {
   if (d.length > MAXIMO) {
     return "Son demasiados números, revisá si se repitió alguno.";
   }
+  /*
+    Lo último: que sirva para WhatsApp. El teléfono es por donde se atiende
+    el pedido, así que un número que no se puede convertir no es un dato,
+    es un pedido que no se puede coordinar. Acá SÍ se exige el código de
+    área: sin él no se puede llamar desde afuera del pueblo ni abrir un
+    chat.
+  */
+  if (paraWhatsapp(valor) === null) {
+    return "Escribilo con el código de área y el número, sin el 0 ni el 15. Por ejemplo: 11 2233 4455.";
+  }
   return null;
 };
 
@@ -51,22 +61,38 @@ const sinQuince = (local) => {
   return local;
 };
 
+const LARGO_LOCAL = 10; // código de área + abonado
+
+/*
+  El número LOCAL: área + abonado, sin el 54, sin el 9 de los celulares, sin
+  el 0 del área y sin el 15 del abonado.
+
+  Cada prefijo se saca solo si lo que queda alcanza para un número local.
+  Esa condición es lo que evita recortar un número que casualmente empiece
+  con 54 o con 9.
+*/
+const localDe = (valor) => {
+  let d = soloDigitos(valor).replace(/^0+/, "");
+
+  if (d.startsWith("54") && d.length - 2 >= LARGO_LOCAL) d = d.slice(2);
+
+  /*
+    EL BUG QUE ARREGLA: alguien escribió "9 11 2233 4455", que es como se
+    escribe un celular para el exterior. Sin sacar ese 9, el link quedaba
+    549 + 91122334455 = 54991122334455, con el nueve repetido, y WhatsApp
+    respondía que el número no existe.
+  */
+  if (d.startsWith("9") && d.length - 1 >= LARGO_LOCAL) d = d.slice(1);
+
+  // "54 011 ..." deja el cero del área adentro.
+  return sinQuince(d.replace(/^0+/, ""));
+};
+
 /**
  * Número listo para un link de WhatsApp: 54 + 9 + área sin 0 + abonado sin 15.
  * @returns {string|null} solo dígitos, o null si el teléfono no sirve
  */
 export const paraWhatsapp = (valor) => {
-  if (!esTelefonoValido(valor)) return null;
-
-  let d = soloDigitos(valor);
-
-  if (d.startsWith("549")) return d;
-
-  // Solo se saca el 54 si lo que queda alcanza para un número local: si no,
-  // un local que empieza con 54 quedaría recortado.
-  if (d.startsWith("54") && d.length - 2 >= 10) d = d.slice(2);
-
-  d = d.replace(/^0+/, "");
-
-  return `549${sinQuince(d)}`;
+  const local = localDe(valor);
+  return local.length === LARGO_LOCAL ? `549${local}` : null;
 };

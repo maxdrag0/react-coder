@@ -3,9 +3,9 @@ import { mensajeDePedido, linkDeWhatsapp } from "@/utils/mensajeWhatsapp";
 
 /*
   El panel es desde donde se atiende el pedido: se abre el chat y se arranca
-  la conversación. Escribir a mano "hola, te escribo por tu pedido de..." una
-  vez por pedido es trabajo que la página puede hacer sola, y además evita
-  mandar el mensaje al cliente equivocado.
+  la conversación. Escribir "hola, te escribo por tu pedido de..." una vez por
+  pedido es trabajo que la página puede hacer sola, y además evita mandar el
+  mensaje al cliente equivocado.
 */
 const PEDIDO = {
   id: "a1b2c3d4-0000-4444-8888-999999999999",
@@ -23,23 +23,34 @@ const PEDIDO = {
   ],
 };
 
+const renglones = (pedido) => mensajeDePedido(pedido).split("\n");
+
 describe("mensajeDePedido", () => {
   it("saluda por el nombre de pila", () => {
     // Por el nombre de pila y no el completo: es un mensaje, no una carta.
     expect(mensajeDePedido(PEDIDO)).toMatch(/^Hola Ana/);
   });
 
-  it("dice de qué se trata", () => {
-    expect(mensajeDePedido(PEDIDO)).toMatch(/pedido de pirotecnia/i);
+  it("el encabezado dice de qué pedido se trata y abre la lista", () => {
+    expect(renglones(PEDIDO)[0]).toMatch(
+      /pedido de pirotecnia del 16 de noviembre:$/,
+    );
   });
 
-  it("lista lo que pidió, como lo muestra el panel", () => {
-    const mensaje = mensajeDePedido(PEDIDO);
-    expect(mensaje).toContain("2x Torta 100 tiros (Unidad)");
-    expect(mensaje).toContain("1x Bengala de humo (Rojo, Display)");
+  it("pone un renglón por producto, con guión", () => {
+    // Todo seguido en un párrafo no se puede leer de un vistazo para
+    // preparar el pedido, que es para lo que se manda.
+    expect(renglones(PEDIDO)).toContain("- 2x Torta 100 tiros (Unidad)");
+    expect(renglones(PEDIDO)).toContain("- 1x Bengala de humo (Rojo, Display)");
   });
 
-  it("incluye el total", () => {
+  it("el total y la pregunta van en su propio renglón", () => {
+    const lineas = renglones(PEDIDO);
+    expect(lineas.some((l) => /^Total/.test(l))).toBe(true);
+    expect(lineas.at(-1)).toMatch(/^¿Coordinamos/);
+  });
+
+  it("incluye el total con su formato", () => {
     expect(mensajeDePedido(PEDIDO)).toContain("45.000");
   });
 
@@ -58,9 +69,8 @@ describe("mensajeDePedido", () => {
         unidad: "unitario",
       })),
     };
-    const mensaje = mensajeDePedido(largo);
-    expect(mensaje).toMatch(/y 6 m[aá]s/);
-    expect(mensaje).not.toContain("Producto 11");
+    expect(renglones(largo)).toContain("- y 6 más");
+    expect(mensajeDePedido(largo)).not.toContain("Producto 11");
   });
 
   it("no dice 'undefined' cuando falta algo", () => {
@@ -70,9 +80,16 @@ describe("mensajeDePedido", () => {
     expect(mensaje.length).toBeGreaterThan(10);
   });
 
+  it("sin productos no deja renglones vacíos ni dos puntos colgando", () => {
+    const pelado = mensajeDePedido({ id: "x", items: [], buyer: {} });
+    expect(pelado).not.toMatch(/\n\s*\n/);
+    expect(pelado).not.toMatch(/:\s*$/m);
+  });
+
   it("sin nombre saluda igual, sin quedar cortado", () => {
-    const mensaje = mensajeDePedido({ ...PEDIDO, buyer: { telefono: "1" } });
-    expect(mensaje).toMatch(/^Hola!/);
+    expect(mensajeDePedido({ ...PEDIDO, buyer: { telefono: "1" } })).toMatch(
+      /^Hola!/,
+    );
   });
 });
 
@@ -80,6 +97,12 @@ describe("linkDeWhatsapp", () => {
   it("arma el link con el número normalizado y el mensaje", () => {
     const link = linkDeWhatsapp("9 11 2233-4455", "Hola Ana");
     expect(link).toBe("https://wa.me/5491122334455?text=Hola%20Ana");
+  });
+
+  it("escapa los saltos de línea de la lista", () => {
+    // Sin esto el mensaje llega todo pegado en un solo renglón.
+    const link = linkDeWhatsapp("1122334455", "Pedido:\n- 2x Bengala");
+    expect(link).toContain("%0A");
   });
 
   it("escapa lo que rompería la URL", () => {

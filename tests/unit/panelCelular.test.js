@@ -51,3 +51,30 @@ describe("Panel en celular: las pestañas no empujan el ancho de la página", ()
     expect(regla).toMatch(/min-width:\s*0/);
   });
 });
+
+describe("Panel en celular: ningún campo empuja el ancho", () => {
+  /*
+    EL BUG: un <select> dentro de un flex NO se achica por debajo del ancho
+    de su opción más larga si no se le baja el min-width. La categoría más
+    larga —"Tres Tiros Y Girandolas"— mide unos 210px, al lado va el select
+    de marcas, y los dos juntos pasan los 360px de la pantalla. El panel
+    entero se podía arrastrar para los costados aunque las pestañas ya
+    envolvieran.
+  */
+  it("los selectores de los filtros se pueden achicar", () => {
+    const regla = reglaDe(celular, ".prodfiltros-select");
+    expect(regla).toMatch(/min-width:\s*0/);
+    expect(regla).toMatch(/max-width:\s*100%/);
+  });
+
+  it("los campos de texto tampoco desbordan", () => {
+    const regla = reglaDe(celular, ".admin-actions-bar input");
+    expect(regla).toMatch(/min-width:\s*0/);
+  });
+
+  it("el título del panel no ocupa dos renglones", () => {
+    // --t-xl son 31px: en 360px el título solo empujaba todo abajo del
+    // pliegue.
+    expect(reglaDe(celular, ".admin-header h2")).toMatch(/font-size/);
+  });
+});

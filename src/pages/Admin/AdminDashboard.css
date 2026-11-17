@@ -322,6 +322,15 @@
     los contadores de pedidos abiertos y mensajes sin leer, que son la razón
     para entrar al panel.
   */
+  /*
+    El titulo del panel en --t-xl son 31px: en 360px ocupa dos renglones y
+    empuja todo lo demas abajo del pliegue. En el celular el titulo no es la
+    informacion, las pestañas si.
+  */
+  .admin-header h2 {
+    font-size: var(--t-md);
+  }
+
   .admin-tabs {
     width: 100%;
     flex-wrap: wrap;
@@ -334,6 +343,34 @@
     min-width: 0;
     min-height: 40px;
     text-align: center;
+    font-size: var(--t-xs);
+  }
+
+  /*
+    EL DESBORDE DE VERDAD: un <select> dentro de un flex NO se achica por
+    debajo del ancho de su opcion mas larga si no se le baja el min-width.
+    "Tres Tiros Y Girandolas" mide ~210px, al lado va el de marcas, y los
+    dos juntos pasan los 360px de la pantalla: el panel entero se podia
+    arrastrar para los costados aunque las pestañas ya envolvieran.
+  */
+  .prodfiltros-select {
+    min-width: 0;
+    max-width: 100%;
+    font-size: var(--t-xs);
+  }
+
+  /* Lo mismo para cualquier campo del panel: nada mas ancho que su caja. */
+  .admin-actions-bar input,
+  .prodfiltros-campos input,
+  .prodfiltros-precio input {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .pedidos-chip,
+  .admin-table td,
+  .admin-table td::before {
+    font-size: var(--t-xs);
   }
 
   .admin-actions-bar {
